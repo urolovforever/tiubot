@@ -1,0 +1,507 @@
+# ==================== .gitignore ====================
+
+# ============================================
+# Python
+# ============================================
+
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# C extensions
+*.so
+
+# Distribution / packaging
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# PyInstaller
+*.manifest
+*.spec
+
+# Installer logs
+pip-log.txt
+pip-delete-this-directory.txt
+
+# Unit test / coverage reports
+htmlcov/
+.tox/
+.nox/
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+*.py,cover
+.hypothesis/
+.pytest_cache/
+cover/
+
+# Translations
+*.mo
+*.pot
+
+# Django stuff:
+*.log
+local_settings.py
+db.sqlite3
+db.sqlite3-journal
+
+# Flask stuff:
+instance/
+.webassets-cache
+
+# Scrapy stuff:
+.scrapy
+
+# Sphinx documentation
+docs/_build/
+
+# PyBuilder
+.pybuilder/
+target/
+
+# Jupyter Notebook
+.ipynb_checkpoints
+
+# IPython
+profile_default/
+ipython_config.py
+
+# pyenv
+.python-version
+
+# pipenv
+Pipfile.lock
+
+# poetry
+poetry.lock
+
+# pdm
+.pdm.toml
+
+# PEP 582
+__pypackages__/
+
+# Celery stuff
+celerybeat-schedule
+celerybeat.pid
+
+# SageMath parsed files
+*.sage.py
+
+# Environments
+.env
+.venv
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+
+# Spyder project settings
+.spyderproject
+.spyproject
+
+# Rope project settings
+.ropeproject
+
+# mkdocs documentation
+/site
+
+# mypy
+.mypy_cache/
+.dmypy.json
+dmypy.json
+
+# Pyre type checker
+.pyre/
+
+# pytype static type analyzer
+.pytype/
+
+# Cython debug symbols
+cython_debug/
+
+
+# ============================================
+# Database
+# ============================================
+
+# SQLite
+*.db
+*.sqlite
+*.sqlite3
+*.db-journal
+*.db-shm
+*.db-wal
+
+# PostgreSQL
+*.sql
+
+# MySQL
+*.mwb
+*.mwb.bak
+
+# Database backups
+backups/
+*.backup
+*.bak
+
+
+# ============================================
+# Environment Variables
+# ============================================
+
+# Dotenv
+.env
+.env.local
+.env.*.local
+.env.production
+.env.development
+.env.test
+
+# Environment config
+config.local.py
+settings.local.py
+
+
+# ============================================
+# IDE / Editors
+# ============================================
+
+# Visual Studio Code
+.vscode/
+*.code-workspace
+
+# PyCharm
+.idea/
+*.iml
+*.iws
+.idea_modules/
+
+# Sublime Text
+*.sublime-project
+*.sublime-workspace
+
+# Vim
+*.swp
+*.swo
+*~
+.vim/
+
+# Emacs
+*~
+\#*\#
+.\#*
+
+# Eclipse
+.project
+.pydevproject
+.settings/
+
+# NetBeans
+nbproject/
+
+# JetBrains
+.idea/
+*.iml
+out/
+
+
+# ============================================
+# Operating Systems
+# ============================================
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+._*
+.DocumentRevisions-V100
+.fseventsd
+.Spotlight-V100
+.TemporaryItems
+.Trashes
+.VolumeIcon.icns
+.com.apple.timemachine.donotpresent
+.AppleDB
+.AppleDesktop
+Network Trash Folder
+Temporary Items
+.apdisk
+
+# Windows
+Thumbs.db
+Thumbs.db:encryptable
+ehthumbs.db
+ehthumbs_vista.db
+*.stackdump
+[Dd]esktop.ini
+$RECYCLE.BIN/
+*.cab
+*.msi
+*.msix
+*.msm
+*.msp
+*.lnk
+
+# Linux
+*~
+.directory
+.Trash-*
+.nfs*
+
+
+# ============================================
+# Logs
+# ============================================
+
+# Bot logs
+*.log
+logs/
+*.log.*
+bot.log
+bot.log.*
+error.log
+access.log
+debug.log
+
+# Log directories
+log/
+logs/
+
+
+# ============================================
+# Temporary files
+# ============================================
+
+# Temporary files
+*.tmp
+*.temp
+temp/
+tmp/
+cache/
+.cache/
+
+# Backup files
+*.bak
+*.backup
+*.old
+*.orig
+
+
+# ============================================
+# Bot Specific
+# ============================================
+
+# Bot database
+tiu_bot.db
+tiu_bot.db-journal
+tiu_bot.db-shm
+tiu_bot.db-wal
+
+# Test database
+test.db
+test_*.db
+
+# User data
+user_data/
+downloads/
+uploads/
+
+# Media files (agar kerak bo'lmasa)
+# media/
+# images/
+# videos/
+
+# Session files
+*.session
+*.session-journal
+
+# Aiogram storage
+aiogram_storage/
+
+
+# ============================================
+# Development
+# ============================================
+
+# Development files
+dev/
+development/
+sandbox/
+test_*.py
+debug_*.py
+
+# Experiment files
+experiments/
+playground/
+
+# Notes
+notes.txt
+TODO.txt
+NOTES.md
+
+
+# ============================================
+# Documentation (draft)
+# ============================================
+
+# Draft documentation
+docs/drafts/
+*.draft.md
+
+# Generated documentation
+docs/_build/
+docs/build/
+
+
+# ============================================
+# Deployment
+# ============================================
+
+# Docker
+docker-compose.override.yml
+.dockerignore
+
+# Kubernetes
+*.secret.yaml
+secrets/
+
+# CI/CD
+.gitlab-ci.local.yml
+
+
+# ============================================
+# Dependencies
+# ============================================
+
+# Node modules (agar bor bo'lsa)
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Package lock files (optional)
+package-lock.json
+yarn.lock
+
+
+# ============================================
+# Archives
+# ============================================
+
+# Compressed files
+*.zip
+*.tar
+*.tar.gz
+*.tgz
+*.rar
+*.7z
+*.gz
+*.bz2
+
+
+# ============================================
+# Security
+# ============================================
+
+# SSH keys
+*.pem
+*.key
+*.pub
+id_rsa*
+id_ed25519*
+
+# SSL/TLS certificates
+*.crt
+*.cer
+*.der
+*.p12
+*.pfx
+
+# API keys va tokens
+.secrets
+secrets.json
+credentials.json
+token.txt
+
+
+# ============================================
+# Testing
+# ============================================
+
+# Test files
+.pytest_cache/
+.coverage
+htmlcov/
+.tox/
+test-results/
+coverage/
+
+# Test databases
+test_*.db
+
+
+# ============================================
+# Miscellaneous
+# ============================================
+
+# Thumbnails
+*.thumb
+
+# System files
+.fuse_hidden*
+
+# Cloud sync
+.sync/
+.syncthing/
+
+# Dropbox
+.dropbox
+.dropbox.cache
+
+# Google Drive
+.gdrive
+
+# OneDrive
+desktop.ini
+
+
+# ============================================
+# Keep these files (exceptions)
+# ============================================
+
+# Force include specific files if needed
+# !important_file.txt
+# !config.example.py
+
+
+# ============================================
+# Custom Ignores (Project Specific)
+# ============================================
+
+# Add your custom ignores here
+# example_custom_file.txt
+
+
+# End of .gitignore
