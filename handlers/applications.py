@@ -156,50 +156,12 @@ async def process_application_message(message: types.Message, state: FSMContext)
 
     await state.update_data(message=message.text)
 
-    user = db.get_user(user_id)
-
-    if user and user[3]:
-        await state.update_data(phone=user[3])
-        await message.answer(
-            t(user_id, 'attach_file'),
-            reply_markup=get_cancel_keyboard(user_id)
-        )
-        await ApplicationForm.waiting_for_file.set()
-    else:
-        await message.answer(
-            t(user_id, 'send_phone'),
-            reply_markup=get_phone_keyboard(user_id)
-        )
-        await ApplicationForm.waiting_for_phone.set()
-
-
-async def process_phone(message: types.Message, state: FSMContext):
-    user_id = message.from_user.id
-
-    if message.text in ['❌ Bekor qilish', '❌ Отмена', '❌ Cancel']:
-        await state.finish()
-        await message.answer(
-            t(user_id, 'application_cancelled'),
-            reply_markup=get_main_keyboard(user_id)
-        )
-        return
-
-    phone = None
-
-    if message.contact:
-        phone = message.contact.phone_number
-    elif message.text:
-        phone = message.text
-
-    if phone:
-        await state.update_data(phone=phone)
-        db.update_user_phone(user_id, phone)
-
-        await message.answer(
-            t(user_id, 'attach_file'),
-            reply_markup=get_cancel_keyboard(user_id)
-        )
-        await ApplicationForm.waiting_for_file.set()
+    # Har safar telefon raqam so‘raymiz
+    await message.answer(
+        t(user_id, 'send_phone'),
+        reply_markup=get_phone_keyboard(user_id)
+    )
+    await ApplicationForm.waiting_for_phone.set()
 
 
 async def process_file_or_finish(message: types.Message, state: FSMContext):
