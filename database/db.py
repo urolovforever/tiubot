@@ -18,16 +18,15 @@ class Database:
         conn = self.get_connection()
         c = conn.cursor()
 
-        # Users table
+        # Users table (5 ustun)
         c.execute('''CREATE TABLE IF NOT EXISTS users
                      (user_id INTEGER PRIMARY KEY, 
                       username TEXT, 
                       full_name TEXT,
-                      phone_number TEXT,
                       language TEXT DEFAULT 'uz',
                       registration_date TEXT)''')
 
-        # Applications table
+        # Applications table (9 ustun - username va phone_number bilan)
         c.execute('''CREATE TABLE IF NOT EXISTS applications
                      (id INTEGER PRIMARY KEY AUTOINCREMENT,
                       user_id INTEGER,
@@ -54,6 +53,7 @@ class Database:
         c.execute('''CREATE TABLE IF NOT EXISTS schedules
                      (id INTEGER PRIMARY KEY AUTOINCREMENT,
                       faculty TEXT,
+                      direction TEXT,
                       course TEXT,
                       group_name TEXT,
                       image_id TEXT,
@@ -63,14 +63,13 @@ class Database:
         conn.close()
         logger.info("Database initialized successfully")
 
-    def save_user(self, user_id: int, username: str, full_name: str,
-                  phone_number: str = None, language: str = 'uz'):
+    def save_user(self, user_id: int, username: str, full_name: str, language: str = 'uz'):
         conn = self.get_connection()
         c = conn.cursor()
         try:
             c.execute(
-                "INSERT OR REPLACE INTO users VALUES (?,?,?,?,?,?)",
-                (user_id, username, full_name, phone_number, language,
+                "INSERT OR REPLACE INTO users VALUES (?,?,?,?,?)",
+                (user_id, username, full_name, language,
                  datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
             )
             conn.commit()
@@ -88,6 +87,19 @@ class Database:
         except Exception as e:
             logger.error(f"Error getting user: {e}")
             return None
+        finally:
+            conn.close()
+
+    def get_all_users(self) -> List[int]:
+        """Barcha foydalanuvchilar ID larini olish (broadcast uchun)"""
+        conn = self.get_connection()
+        c = conn.cursor()
+        try:
+            c.execute("SELECT user_id FROM users")
+            return [row[0] for row in c.fetchall()]
+        except Exception as e:
+            logger.error(f"Error getting all users: {e}")
+            return []
         finally:
             conn.close()
 
@@ -115,17 +127,6 @@ class Database:
         finally:
             conn.close()
 
-    def update_user_phone(self, user_id: int, phone_number: str):
-        conn = self.get_connection()
-        c = conn.cursor()
-        try:
-            c.execute("UPDATE users SET phone_number=? WHERE user_id=?", (phone_number, user_id))
-            conn.commit()
-        except Exception as e:
-            logger.error(f"Error updating phone: {e}")
-        finally:
-            conn.close()
-
     # Applications
     def create_application(self, user_id: int, username: str, full_name: str,
                            phone_number: str, message: str, file_id: Optional[str] = None) -> int:
@@ -134,10 +135,10 @@ class Database:
         try:
             c.execute(
                 '''INSERT INTO applications 
-                   (user_id, username, full_name, phone_number, message, file_id, status, created_at)
-                   VALUES (?,?,?,?,?,?,?,?)''',
+                   (user_id, username, full_name, phone_number, message, file_id, status, created_at, admin_response)
+                   VALUES (?,?,?,?,?,?,?,?,?)''',
                 (user_id, username, full_name, phone_number, message, file_id, 'new',
-                 datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
+                 datetime.now().strftime("%Y-%m-%d %H:%M:%S"), None)
             )
             app_id = c.lastrowid
             conn.commit()
@@ -158,6 +159,21 @@ class Database:
             return c.fetchall()
         except Exception as e:
             logger.error(f"Error getting applications: {e}")
+            return []
+        finally:
+            conn.close()
+
+    def get_answered_applications(self) -> List[Tuple]:
+        """Javob berilgan murojaatlar"""
+        conn = self.get_connection()
+        c = conn.cursor()
+        try:
+            c.execute(
+                "SELECT * FROM applications WHERE status='answered' ORDER BY created_at DESC"
+            )
+            return c.fetchall()
+        except Exception as e:
+            logger.error(f"Error getting answered applications: {e}")
             return []
         finally:
             conn.close()
@@ -204,6 +220,65 @@ class Database:
             conn.commit()
         except Exception as e:
             logger.error(f"Error updating application: {e}")
+        finally:
+            conn.close()
+
+    def get_statistics(self, period: str = 'week') -> dict:
+        """Statistika olish"""
+        conn = self.get_connection()
+        c = conn.cursor()
+        try:
+            if period == 'week':
+                days = 7
+            elif period == 'month':
+                days = 30
+            else:
+                days = 7
+
+            # Yangi foydalanuvchilar
+            c.execute(f"""
+                SELECT COUNT(*) FROM users 
+                WHERE date(registration_date) >= date('now', '-{days} days')
+            """)
+            new_users = c.fetchone()[0]
+
+            # Yangi murojaatlar
+            c.execute(f"""
+                SELECT COUNT(*) FROM applications 
+                WHERE date(created_at) >= date('now', '-{days} days')
+            """)
+            new_applications = c.fetchone()[0]
+
+            # Javob berilgan murojaatlar
+            c.execute(f"""
+                SELECT COUNT(*) FROM applications 
+                WHERE status='answered' AND date(created_at) >= date('now', '-{days} days')
+            """)
+            answered = c.fetchone()[0]
+
+            # Javob berilmagan
+            c.execute("SELECT COUNT(*) FROM applications WHERE status='new'")
+            pending = c.fetchone()[0]
+
+            # Jami foydalanuvchilar
+            c.execute("SELECT COUNT(*) FROM users")
+            total_users = c.fetchone()[0]
+
+            # Jami murojaatlar
+            c.execute("SELECT COUNT(*) FROM applications")
+            total_apps = c.fetchone()[0]
+
+            return {
+                'new_users': new_users,
+                'new_applications': new_applications,
+                'answered': answered,
+                'pending': pending,
+                'total_users': total_users,
+                'total_applications': total_apps
+            }
+        except Exception as e:
+            logger.error(f"Error getting statistics: {e}")
+            return {}
         finally:
             conn.close()
 

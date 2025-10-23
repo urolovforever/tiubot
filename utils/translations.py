@@ -32,6 +32,14 @@ TRANSLATIONS = {
         'events_list': '📢 Tadbirlar ro\'yxati:',
         'no_events': '📭 Hozircha tadbirlar yo\'q',
         'event_details': '📌 Tadbir ma\'lumotlari',
+        'enter_event_title': '📝 Tadbir nomini kiriting:',
+        'enter_event_description': '📄 Tadbir tavsifini kiriting:',
+        'enter_event_date': '📅 Tadbir sanasini kiriting (masalan: 25.12.2024):',
+        'enter_event_location': '📍 Tadbir manzilini kiriting:',
+        'send_event_image': '🖼 Tadbir rasmini yuboring (yoki skip):',
+        'event_created': '✅ Tadbir yaratildi!',
+        'choose_event_to_delete': '🗑 O\'chirish uchun tadbirni tanlang:',
+        'event_deleted': '✅ Tadbir o\'chirildi',
 
         # Applications
         'send_application': '✍️ Murojaatingizni yozing:',
@@ -41,24 +49,43 @@ TRANSLATIONS = {
         'application_cancelled': '❌ Murojaat bekor qilindi',
         'attach_file': '📎 Rasm yoki fayl biriktirasizmi?\nYo\'q bo\'lsa "❌ Bekor qilish" bosing',
 
-        # Admin
+        # Admin panel
         'admin_panel': '👨‍💼 Admin panel',
         'view_applications': '📬 Murojaatlar',
         'add_event': '➕ Tadbir qo\'shish',
         'manage_events': '📝 Tadbirlarni boshqarish',
+        'new_applications': '📬 Yangi murojaatlar',
+        'answered_applications': '✅ Javob berilganlar',
+        'statistics': '📊 Statistika',
+        'broadcast': '📢 Broadcast',
         'no_new_applications': '📭 Yangi murojaatlar yo\'q',
         'reply_to_application': '💬 Javob yozing:',
         'response_sent': '✅ Javob yuborildi',
 
-        # Event management
-        'enter_event_title': '📝 Tadbir nomini kiriting:',
-        'enter_event_description': '📄 Tadbir tavsifini kiriting:',
-        'enter_event_date': '📅 Tadbir sanasini kiriting (masalan: 25.12.2024):',
-        'enter_event_location': '📍 Tadbir manzilini kiriting:',
-        'send_event_image': '🖼 Tadbir rasmini yuboring (yoki skip):',
-        'event_created': '✅ Tadbir yaratildi!',
-        'choose_event_to_delete': '🗑 O\'chirish uchun tadbirni tanlang:',
-        'event_deleted': '✅ Tadbir o\'chirildi',
+        # Statistics
+        'stats_title': '📊 Statistika',
+        'new_users': '👥 Yangi foydalanuvchilar',
+        'new_apps': '📬 Yangi murojaatlar',
+        'answered_apps': '✅ Javob berilgan',
+        'pending_apps': '⏳ Kutilmoqda',
+        'total_users': '👥 Jami foydalanuvchilar',
+        'total_apps': '📬 Jami murojaatlar',
+        'weekly': '📅 Haftalik',
+        'monthly': '📆 Oylik',
+
+        # Broadcast
+        'broadcast_enter_message': '📢 Broadcast xabarini yozing:',
+        'broadcast_confirm': '📢 Xabar yuborilsinmi?\n\nFoydalanuvchilar soni: {count}\n\nXabar:\n{message}',
+        'broadcast_sending': '📤 Xabar yuborilmoqda...',
+        'broadcast_completed': '✅ Broadcast yakunlandi!\n\n✅ Yuborildi: {success}\n❌ Xatolik: {failed}',
+        'broadcast_cancelled': '❌ Broadcast bekor qilindi',
+
+        # Skip button
+        'skip': '⏭ O\'tkazib yuborish',
+        'file_skipped': '⏭ Fayl biriktirilmadi',
+
+        # Notifications
+        'response_received': '✅ Murojaatingizga javob keldi!',
 
         # Contact
         'contact_text': '''📞 Aloqa ma'lumotlari
@@ -97,13 +124,21 @@ TRANSLATIONS = {
         'choose_faculty': '📚 Выберите факультет:',
         'choose_course': '🎓 Выберите курс:',
         'choose_group': '👥 Выберите группу:',
-        'schedule_not_found': '❌ Расписание для этой группы не найдено',
+        'schedule_not_found': '❌ Расписание не найдено',
         'schedule_success': '✅ Расписание занятий:',
 
         # Events
         'events_list': '📢 Список мероприятий:',
         'no_events': '📭 Пока нет мероприятий',
         'event_details': '📌 Информация о мероприятии',
+        'enter_event_title': '📝 Введите название мероприятия:',
+        'enter_event_description': '📄 Введите описание мероприятия:',
+        'enter_event_date': '📅 Введите дату (например: 25.12.2024):',
+        'enter_event_location': '📍 Введите место проведения:',
+        'send_event_image': '🖼 Отправьте изображение (или skip):',
+        'event_created': '✅ Мероприятие создано!',
+        'choose_event_to_delete': '🗑 Выберите мероприятие для удаления:',
+        'event_deleted': '✅ Мероприятие удалено',
 
         # Applications
         'send_application': '✍️ Напишите ваше обращение:',
@@ -118,19 +153,37 @@ TRANSLATIONS = {
         'view_applications': '📬 Обращения',
         'add_event': '➕ Добавить мероприятие',
         'manage_events': '📝 Управление мероприятиями',
-        'no_new_applications': '📭 Новых обращений нет',
+        'new_applications': '📬 Новые обращения',
+        'answered_applications': '✅ Отвеченные',
+        'statistics': '📊 Статистика',
+        'broadcast': '📢 Рассылка',
         'reply_to_application': '💬 Напишите ответ:',
         'response_sent': '✅ Ответ отправлен',
 
-        # Event management
-        'enter_event_title': '📝 Введите название мероприятия:',
-        'enter_event_description': '📄 Введите описание мероприятия:',
-        'enter_event_date': '📅 Введите дату (например: 25.12.2024):',
-        'enter_event_location': '📍 Введите место проведения:',
-        'send_event_image': '🖼 Отправьте изображение (или skip):',
-        'event_created': '✅ Мероприятие создано!',
-        'choose_event_to_delete': '🗑 Выберите мероприятие для удаления:',
-        'event_deleted': '✅ Мероприятие удалено',
+        # Statistics
+        'stats_title': '📊 Статистика',
+        'new_users': '👥 Новые пользователи',
+        'new_apps': '📬 Новые обращения',
+        'answered_apps': '✅ Отвеченные обращения',
+        'pending_apps': '⏳ В ожидании',
+        'total_users': '👥 Всего пользователей',
+        'total_apps': '📬 Всего обращений',
+        'weekly': '📅 Недельная',
+        'monthly': '📆 Месячная',
+
+        # Broadcast
+        'broadcast_enter_message': '📢 Введите сообщение для рассылки:',
+        'broadcast_confirm': '📢 Отправить сообщение?\n\nПользователей: {count}\n\nСообщение:\n{message}',
+        'broadcast_sending': '📤 Сообщение отправляется...',
+        'broadcast_completed': '✅ Рассылка завершена!\n\n✅ Отправлено: {success}\n❌ Ошибка: {failed}',
+        'broadcast_cancelled': '❌ Рассылка отменена',
+
+        # Skip
+        'skip': '⏭ Пропустить',
+        'file_skipped': '⏭ Файл не прикреплён',
+
+        # Notifications
+        'response_received': '✅ Вы получили ответ на ваше обращение!',
 
         # Contact
         'contact_text': '''📞 Контактная информация
@@ -176,6 +229,14 @@ TRANSLATIONS = {
         'events_list': '📢 Events list:',
         'no_events': '📭 No events yet',
         'event_details': '📌 Event details',
+        'enter_event_title': '📝 Enter event title:',
+        'enter_event_description': '📄 Enter event description:',
+        'enter_event_date': '📅 Enter date (e.g.: 25.12.2024):',
+        'enter_event_location': '📍 Enter location:',
+        'send_event_image': '🖼 Send image (or skip):',
+        'event_created': '✅ Event created!',
+        'choose_event_to_delete': '🗑 Choose event to delete:',
+        'event_deleted': '✅ Event deleted',
 
         # Applications
         'send_application': '✍️ Write your application:',
@@ -190,19 +251,37 @@ TRANSLATIONS = {
         'view_applications': '📬 Applications',
         'add_event': '➕ Add Event',
         'manage_events': '📝 Manage Events',
-        'no_new_applications': '📭 No new applications',
+        'new_applications': '📬 New Applications',
+        'answered_applications': '✅ Answered',
+        'statistics': '📊 Statistics',
+        'broadcast': '📢 Broadcast',
         'reply_to_application': '💬 Write reply:',
         'response_sent': '✅ Response sent',
 
-        # Event management
-        'enter_event_title': '📝 Enter event title:',
-        'enter_event_description': '📄 Enter event description:',
-        'enter_event_date': '📅 Enter date (e.g.: 25.12.2024):',
-        'enter_event_location': '📍 Enter location:',
-        'send_event_image': '🖼 Send image (or skip):',
-        'event_created': '✅ Event created!',
-        'choose_event_to_delete': '🗑 Choose event to delete:',
-        'event_deleted': '✅ Event deleted',
+        # Statistics
+        'stats_title': '📊 Statistics',
+        'new_users': '👥 New Users',
+        'new_apps': '📬 New Applications',
+        'answered_apps': '✅ Answered Applications',
+        'pending_apps': '⏳ Pending',
+        'total_users': '👥 Total Users',
+        'total_apps': '📬 Total Applications',
+        'weekly': '📅 Weekly',
+        'monthly': '📆 Monthly',
+
+        # Broadcast
+        'broadcast_enter_message': '📢 Enter broadcast message:',
+        'broadcast_confirm': '📢 Send this message?\n\nUser count: {count}\n\nMessage:\n{message}',
+        'broadcast_sending': '📤 Sending message...',
+        'broadcast_completed': '✅ Broadcast completed!\n\n✅ Sent: {success}\n❌ Failed: {failed}',
+        'broadcast_cancelled': '❌ Broadcast cancelled',
+
+        # Skip
+        'skip': '⏭ Skip',
+        'file_skipped': '⏭ No file attached',
+
+        # Notifications
+        'response_received': '✅ You have received a reply to your application!',
 
         # Contact
         'contact_text': '''📞 Contact Information

@@ -205,6 +205,7 @@ async def process_phone(message: types.Message, state: FSMContext):
 async def process_file_or_finish(message: types.Message, state: FSMContext):
     user_id = message.from_user.id
 
+    # Bekor qilish
     if message.text in ['❌ Bekor qilish', '❌ Отмена', '❌ Cancel']:
         await state.finish()
         await message.answer(
@@ -213,15 +214,28 @@ async def process_file_or_finish(message: types.Message, state: FSMContext):
         )
         return
 
+    # Skip - YANGI
+    if message.text in ['⏭ O\'tkazib yuborish', '⏭ Пропустить', '⏭ Skip']:
+        await state.update_data(file_id=None)
+        # Save application without file
+        await save_and_send_application(message, state)
+        return
+
     file_id = None
 
+    # Check if file was sent
     if message.photo:
         file_id = message.photo[-1].file_id
     elif message.document:
         file_id = message.document.file_id
 
     await state.update_data(file_id=file_id)
+    await save_and_send_application(message, state)
 
+
+async def save_and_send_application(message: types.Message, state: FSMContext):
+    """Murojaatni saqlash va yuborish"""
+    user_id = message.from_user.id
     data = await state.get_data()
     user = db.get_user(user_id)
 
@@ -235,7 +249,7 @@ async def process_file_or_finish(message: types.Message, state: FSMContext):
         full_name,
         phone,
         data['message'],
-        file_id
+        data.get('file_id')
     )
 
     await message.answer(
@@ -264,14 +278,45 @@ async def process_file_or_finish(message: types.Message, state: FSMContext):
 
     for admin_id in ADMIN_IDS:
         try:
-            if file_id:
-                await message.bot.send_photo(admin_id, file_id, caption=admin_text)
+            if data.get('file_id'):
+                await message.bot.send_photo(admin_id, data['file_id'], caption=admin_text)
             else:
                 await message.bot.send_message(admin_id, admin_text)
         except Exception as e:
             logger.error(f'Error notifying admin {admin_id}: {e}')
 
     await state.finish()
+
+
+# Skip button bilan fayl so'rash
+async def process_phone(message: types.Message, state: FSMContext):
+    user_id = message.from_user.id
+
+    if message.text in ['❌ Bekor qilish', '❌ Отмена', '❌ Cancel']:
+        await state.finish()
+        await message.answer(
+            t(user_id, 'application_cancelled'),
+            reply_markup=get_main_keyboard(user_id)
+        )
+        return
+
+    phone = None
+
+    if message.contact:
+        phone = message.contact.phone_number
+    elif message.text:
+        phone = message.text
+
+    if phone:
+        await state.update_data(phone=phone)
+
+        # Skip button bilan
+        from keyboards.reply import get_skip_keyboard
+        await message.answer(
+            t(user_id, 'attach_file'),
+            reply_markup=get_skip_keyboard(user_id)
+        )
+        await ApplicationForm.waiting_for_file.set()
 
 
 async def my_applications_handler(message: types.Message):
@@ -343,3 +388,5 @@ def register_applications_handlers(dp: Dispatcher):
                                 state=ApplicationForm.waiting_for_phone)
     dp.register_message_handler(process_file_or_finish, content_types=['text', 'photo', 'document'],
                                 state=ApplicationForm.waiting_for_file)
+
+

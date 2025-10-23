@@ -1,14 +1,20 @@
 from aiogram import types, Dispatcher
 from aiogram.dispatcher import FSMContext
-from keyboards.reply import get_admin_keyboard, get_cancel_keyboard, get_events_keyboard
+from keyboards.reply import (get_admin_keyboard, get_cancel_keyboard, get_events_keyboard,
+                             get_main_keyboard, get_statistics_keyboard, get_broadcast_confirm_keyboard)
 from database.db import Database
-from states.forms import AdminReplyState, EventCreateState, EventDeleteState
+from states.forms import AdminReplyState, EventCreateState, EventDeleteState, BroadcastState
 from utils.helpers import t, is_admin
+from datetime import datetime
+from config import ADMIN_IDS
 import logging
+import asyncio
 
 db = Database()
 logger = logging.getLogger(__name__)
 
+
+# ==================== ADMIN PANEL ASOSIY ====================
 
 async def admin_panel_handler(message: types.Message, state: FSMContext):
     user_id = message.from_user.id
@@ -18,13 +24,22 @@ async def admin_panel_handler(message: types.Message, state: FSMContext):
 
     await state.finish()
 
+    lang = db.get_user_language(user_id)
+    texts = {
+        'uz': '👨‍💼 Admin panel\n\nKerakli bo\'limni tanlang:',
+        'ru': '👨‍💼 Админ панель\n\nВыберите нужный раздел:',
+        'en': '👨‍💼 Admin Panel\n\nChoose the section:'
+    }
+
     await message.answer(
-        t(user_id, 'admin_panel'),
+        texts.get(lang, texts['uz']),
         reply_markup=get_admin_keyboard(user_id)
     )
 
 
-async def view_applications_handler(message: types.Message):
+# ==================== YANGI MUROJAATLAR ====================
+
+async def view_new_applications_handler(message: types.Message):
     user_id = message.from_user.id
 
     if not is_admin(user_id):
@@ -33,14 +48,23 @@ async def view_applications_handler(message: types.Message):
     applications = db.get_new_applications()
 
     if not applications:
+        lang = db.get_user_language(user_id)
+        texts = {
+            'uz': '📭 Yangi murojaatlar yo\'q',
+            'ru': '📭 Новых обращений нет',
+            'en': '📭 No new applications'
+        }
         await message.answer(
-            t(user_id, 'no_new_applications'),
+            texts.get(lang, texts['uz']),
             reply_markup=get_admin_keyboard(user_id)
         )
         return
 
+    await message.answer(f'📬 Yangi murojaatlar: {len(applications)} ta\n\n')
+
     for app in applications:
         text = f'''📬 Murojaat #{app[0]}
+🆕 Status: Yangi
 
 👤 Foydalanuvchi:
   • Ism: {app[3]}
@@ -54,16 +78,69 @@ async def view_applications_handler(message: types.Message):
 
 📅 Sana: {app[8]}
 
-📌 Javob: /reply_{app[0]}'''
+📌 Javob berish: /reply_{app[0]}'''
 
-        if app[6]:
+        if app[6]:  # file_id
             try:
                 await message.answer_photo(app[6], caption=text)
             except:
-                await message.answer_document(app[6], caption=text)
+                try:
+                    await message.answer_document(app[6], caption=text)
+                except:
+                    await message.answer(text)
         else:
             await message.answer(text)
 
+        await asyncio.sleep(0.3)  # Spam oldini olish
+
+
+# ==================== JAVOB BERILGAN MUROJAATLAR ====================
+
+async def view_answered_applications_handler(message: types.Message):
+    user_id = message.from_user.id
+
+    if not is_admin(user_id):
+        return
+
+    applications = db.get_answered_applications()
+
+    if not applications:
+        lang = db.get_user_language(user_id)
+        texts = {
+            'uz': '📭 Javob berilgan murojaatlar yo\'q',
+            'ru': '📭 Нет отвеченных обращений',
+            'en': '📭 No answered applications'
+        }
+        await message.answer(
+            texts.get(lang, texts['uz']),
+            reply_markup=get_admin_keyboard(user_id)
+        )
+        return
+
+    await message.answer(f'✅ Javob berilgan murojaatlar: {len(applications)} ta\n\n')
+
+    for app in applications[:20]:  # Oxirgi 20 ta
+        text = f'''📬 Murojaat #{app[0]}
+✅ Status: Javob berilgan
+
+👤 Foydalanuvchi:
+  • Ism: {app[3]}
+  • Telefon: {app[4]}
+  • ID: {app[1]}
+
+💬 Murojaat:
+{app[5]}
+
+💬 Javob:
+{app[9] if app[9] else "Yo'q"}
+
+📅 Sana: {app[8]}'''
+
+        await message.answer(text)
+        await asyncio.sleep(0.3)
+
+
+# ==================== MUROJAATGA JAVOB BERISH ====================
 
 async def reply_command_handler(message: types.Message, state: FSMContext):
     user_id = message.from_user.id
@@ -73,15 +150,30 @@ async def reply_command_handler(message: types.Message, state: FSMContext):
 
     try:
         app_id = int(message.text.split('_')[1])
+
+        # Murojaat mavjudligini tekshirish
+        app = db.get_application(app_id)
+        if not app:
+            await message.answer('❌ Murojaat topilmadi')
+            return
+
         await state.update_data(app_id=app_id)
 
+        lang = db.get_user_language(user_id)
+        texts = {
+            'uz': f'💬 Murojaat #{app_id} uchun javob yozing:',
+            'ru': f'💬 Напишите ответ для обращения #{app_id}:',
+            'en': f'💬 Write reply for application #{app_id}:'
+        }
+
         await message.answer(
-            t(user_id, 'reply_to_application'),
+            texts.get(lang, texts['uz']),
             reply_markup=get_cancel_keyboard(user_id)
         )
         await AdminReplyState.waiting_for_reply.set()
-    except:
-        pass
+    except Exception as e:
+        logger.error(f'Error in reply command: {e}')
+        await message.answer('❌ Xatolik yuz berdi')
 
 
 async def process_admin_reply(message: types.Message, state: FSMContext):
@@ -90,7 +182,7 @@ async def process_admin_reply(message: types.Message, state: FSMContext):
     if message.text in ['❌ Bekor qilish', '❌ Отмена', '❌ Cancel']:
         await state.finish()
         await message.answer(
-            t(user_id, 'admin_panel'),
+            '❌ Bekor qilindi',
             reply_markup=get_admin_keyboard(user_id)
         )
         return
@@ -102,28 +194,350 @@ async def process_admin_reply(message: types.Message, state: FSMContext):
     app = db.get_application(app_id)
 
     if app:
+        # Update database
         db.update_application_response(app_id, response)
 
-        response_text = f'''✅ Murojaatingizga javob keldi!
+        # Foydalanuvchiga xabar yuborish
+        user_lang = db.get_user_language(app[1])
 
-Sizning murojaat #{app_id}:
+        response_texts = {
+            'uz': f'''✅ Murojaatingizga javob keldi!
+
+📬 Sizning murojaat #{app_id}:
 {app[5]}
 
 💬 Javob:
-{response}'''
+{response}
+
+📅 {datetime.now().strftime("%Y-%m-%d %H:%M")}''',
+
+            'ru': f'''✅ Получен ответ на ваше обращение!
+
+📬 Ваше обращение #{app_id}:
+{app[5]}
+
+💬 Ответ:
+{response}
+
+📅 {datetime.now().strftime("%Y-%m-%d %H:%M")}''',
+
+            'en': f'''✅ Response received for your application!
+
+📬 Your application #{app_id}:
+{app[5]}
+
+💬 Response:
+{response}
+
+📅 {datetime.now().strftime("%Y-%m-%d %H:%M")}'''
+        }
 
         try:
-            await message.bot.send_message(app[1], response_text)
+            await message.bot.send_message(
+                app[1],
+                response_texts.get(user_lang, response_texts['uz'])
+            )
+
             await message.answer(
-                t(user_id, 'response_sent'),
+                f'✅ Javob yuborildi!\n\nMurojaat #{app_id} holati "Javob berilgan" ga o\'zgartirildi',
                 reply_markup=get_admin_keyboard(user_id)
             )
         except Exception as e:
-            logger.error(f'Error sending response: {e}')
+            logger.error(f'Error sending response to user: {e}')
             await message.answer(
-                f'❌ Xatolik: Foydalanuvchiga javob yuborib bo\'lmadi',
+                f'❌ Xatolik: Foydalanuvchiga javob yuborib bo\'lmadi\n\nLekin javob database\'ga saqlandi',
                 reply_markup=get_admin_keyboard(user_id)
             )
+    else:
+        await message.answer(
+            '❌ Murojaat topilmadi',
+            reply_markup=get_admin_keyboard(user_id)
+        )
+
+    await state.finish()
+
+
+# ==================== STATISTIKA ====================
+
+async def statistics_handler(message: types.Message):
+    user_id = message.from_user.id
+
+    if not is_admin(user_id):
+        return
+
+    lang = db.get_user_language(user_id)
+    texts = {
+        'uz': '📊 Statistika\n\nDavrni tanlang:',
+        'ru': '📊 Статистика\n\nВыберите период:',
+        'en': '📊 Statistics\n\nChoose period:'
+    }
+
+    await message.answer(
+        texts.get(lang, texts['uz']),
+        reply_markup=get_statistics_keyboard(user_id)
+    )
+
+
+async def show_weekly_statistics(message: types.Message):
+    user_id = message.from_user.id
+
+    if not is_admin(user_id):
+        return
+
+    stats = db.get_statistics('week')
+
+    text = f'''📊 Haftalik statistika (oxirgi 7 kun)
+
+👥 Yangi foydalanuvchilar: {stats.get('new_users', 0)}
+📬 Yangi murojaatlar: {stats.get('new_applications', 0)}
+✅ Javob berilgan: {stats.get('answered', 0)}
+⏳ Kutilmoqda: {stats.get('pending', 0)}
+
+📈 Umumiy:
+👥 Jami foydalanuvchilar: {stats.get('total_users', 0)}
+📬 Jami murojaatlar: {stats.get('total_applications', 0)}
+
+📅 {datetime.now().strftime("%Y-%m-%d %H:%M")}'''
+
+    await message.answer(text, reply_markup=get_admin_keyboard(user_id))
+
+
+async def show_monthly_statistics(message: types.Message):
+    user_id = message.from_user.id
+
+    if not is_admin(user_id):
+        return
+
+    stats = db.get_statistics('month')
+
+    text = f'''📊 Oylik statistika (oxirgi 30 kun)
+
+👥 Yangi foydalanuvchilar: {stats.get('new_users', 0)}
+📬 Yangi murojaatlar: {stats.get('new_applications', 0)}
+✅ Javob berilgan: {stats.get('answered', 0)}
+⏳ Kutilmoqda: {stats.get('pending', 0)}
+
+📈 Umumiy:
+👥 Jami foydalanuvchilar: {stats.get('total_users', 0)}
+📬 Jami murojaatlar: {stats.get('total_applications', 0)}
+
+📅 {datetime.now().strftime("%Y-%m-%d %H:%M")}'''
+
+    await message.answer(text, reply_markup=get_admin_keyboard(user_id))
+
+
+# ==================== BROADCAST ====================
+
+async def broadcast_start_handler(message: types.Message, state: FSMContext):
+    user_id = message.from_user.id
+
+    if not is_admin(user_id):
+        return
+
+    lang = db.get_user_language(user_id)
+
+    # Foydalanuvchilar sonini ko'rsatish
+    users_count = len(db.get_all_users())
+
+    texts = {
+        'uz': f'''📢 Broadcast xabari
+
+Hozirgi foydalanuvchilar soni: {users_count}
+
+Xabarni yozing (matn, rasm yoki video):''',
+
+        'ru': f'''📢 Рассылка сообщения
+
+Текущее количество пользователей: {users_count}
+
+Напишите сообщение (текст, фото или видео):''',
+
+        'en': f'''📢 Broadcast Message
+
+Current number of users: {users_count}
+
+Write the message (text, photo or video):'''
+    }
+
+    await message.answer(
+        texts.get(lang, texts['uz']),
+        reply_markup=get_cancel_keyboard(user_id)
+    )
+    await BroadcastState.waiting_for_message.set()
+
+
+async def broadcast_process_message(message: types.Message, state: FSMContext):
+    user_id = message.from_user.id
+
+    if message.text in ['❌ Bekor qilish', '❌ Отмена', '❌ Cancel']:
+        await state.finish()
+        await message.answer(
+            '❌ Broadcast bekor qilindi',
+            reply_markup=get_admin_keyboard(user_id)
+        )
+        return
+
+    # Xabarni saqlash
+    broadcast_data = {
+        'text': message.text if message.text else message.caption,
+        'photo': message.photo[-1].file_id if message.photo else None,
+        'video': message.video.file_id if message.video else None,
+        'document': message.document.file_id if message.document else None
+    }
+
+    await state.update_data(broadcast_data=broadcast_data)
+
+    # Tasdiqlash
+    users_count = len(db.get_all_users())
+    lang = db.get_user_language(user_id)
+
+    preview = broadcast_data['text'] if broadcast_data['text'] else '[Media fayl]'
+
+    texts = {
+        'uz': f'''📢 Broadcast tasdiqlansinmi?
+
+👥 Foydalanuvchilar: {users_count} ta
+
+📝 Xabar:
+{preview[:200]}{'...' if len(preview) > 200 else ''}
+
+Yuborilsinmi?''',
+
+        'ru': f'''📢 Подтвердить рассылку?
+
+👥 Пользователи: {users_count}
+
+📝 Сообщение:
+{preview[:200]}{'...' if len(preview) > 200 else ''}
+
+Отправить?''',
+
+        'en': f'''📢 Confirm broadcast?
+
+👥 Users: {users_count}
+
+📝 Message:
+{preview[:200]}{'...' if len(preview) > 200 else ''}
+
+Send?'''
+    }
+
+    await message.answer(
+        texts.get(lang, texts['uz']),
+        reply_markup=get_broadcast_confirm_keyboard(user_id)
+    )
+    await BroadcastState.waiting_for_confirmation.set()
+
+
+async def broadcast_confirm(message: types.Message, state: FSMContext):
+    user_id = message.from_user.id
+    lang = db.get_user_language(user_id)
+
+    if message.text in ['❌ Bekor qilish', '❌ Отмена', '❌ Cancel']:
+        await state.finish()
+        await message.answer(
+            '❌ Broadcast bekor qilindi',
+            reply_markup=get_admin_keyboard(user_id)
+        )
+        return
+
+    if message.text not in ['✅ Ha, yuborish', '✅ Да, отправить', '✅ Yes, send']:
+        await message.answer('❌ Noto\'g\'ri tanlov')
+        return
+
+    # Broadcast yuborish
+    data = await state.get_data()
+    broadcast_data = data.get('broadcast_data')
+
+    users = db.get_all_users()
+
+    sending_texts = {
+        'uz': f'📤 Xabar yuborilmoqda...\n\nJami: {len(users)} ta',
+        'ru': f'📤 Отправка сообщения...\n\nВсего: {len(users)}',
+        'en': f'📤 Sending message...\n\nTotal: {len(users)}'
+    }
+
+    status_msg = await message.answer(
+        sending_texts.get(lang, sending_texts['uz']),
+        reply_markup=get_admin_keyboard(user_id)
+    )
+
+    success = 0
+    failed = 0
+
+    for user_id_target in users:
+        try:
+            if broadcast_data['photo']:
+                await message.bot.send_photo(
+                    user_id_target,
+                    broadcast_data['photo'],
+                    caption=broadcast_data['text']
+                )
+            elif broadcast_data['video']:
+                await message.bot.send_video(
+                    user_id_target,
+                    broadcast_data['video'],
+                    caption=broadcast_data['text']
+                )
+            elif broadcast_data['document']:
+                await message.bot.send_document(
+                    user_id_target,
+                    broadcast_data['document'],
+                    caption=broadcast_data['text']
+                )
+            else:
+                await message.bot.send_message(
+                    user_id_target,
+                    broadcast_data['text']
+                )
+
+            success += 1
+
+            # Har 10 ta xabardan keyin status yangilash
+            if success % 10 == 0:
+                try:
+                    await message.answer(
+                        f'📤 Yuborilmoqda...\n\n✅ Yuborildi: {success}\n❌ Xatolik: {failed}\n⏳ Qoldi: {len(users) - success - failed}'
+                    )
+                except:
+                    pass
+
+            await asyncio.sleep(0.05)  # Spam oldini olish
+
+        except Exception as e:
+            failed += 1
+            logger.error(f'Broadcast error for user {user_id_target}: {e}')
+
+    # Yakuniy natija
+    result_texts = {
+        'uz': f'''✅ Broadcast yakunlandi!
+
+✅ Muvaffaqiyatli: {success}
+❌ Xatolik: {failed}
+📊 Jami: {len(users)}
+
+📅 {datetime.now().strftime("%Y-%m-%d %H:%M")}''',
+
+        'ru': f'''✅ Рассылка завершена!
+
+✅ Успешно: {success}
+❌ Ошибок: {failed}
+📊 Всего: {len(users)}
+
+📅 {datetime.now().strftime("%Y-%m-%d %H:%M")}''',
+
+        'en': f'''✅ Broadcast completed!
+
+✅ Successful: {success}
+❌ Failed: {failed}
+📊 Total: {len(users)}
+
+📅 {datetime.now().strftime("%Y-%m-%d %H:%M")}'''
+    }
+
+    await status_msg.edit_text(
+        result_texts.get(lang, result_texts['uz'])
+    )
 
     await state.finish()
 
@@ -258,20 +672,66 @@ async def process_event_delete(message: types.Message, state: FSMContext):
 
 
 def register_admin_handlers(dp: Dispatcher):
+    # Admin panel asosiy
     dp.register_message_handler(
         admin_panel_handler,
-        lambda message: message.text in ['👨‍💼 Admin panel', '👨‍💼 Админ панель'],
+        lambda message: message.text in ['👨‍💼 Admin panel', '👨‍💼 Админ панель', '👨‍💼 Admin Panel'],
         state='*'
     )
+
+    # Yangi murojaatlar
     dp.register_message_handler(
-        view_applications_handler,
-        lambda message: message.text in ['📬 Murojaatlar', '📬 Обращения'] and is_admin(message.from_user.id)
+        view_new_applications_handler,
+        lambda message: message.text in ['📬 Yangi murojaatlar', '📬 Новые обращения', '📬 New Applications'] and is_admin(
+            message.from_user.id)
     )
+
+    # Javob berilgan murojaatlar
+    dp.register_message_handler(
+        view_answered_applications_handler,
+        lambda message: message.text in ['✅ Javob berilganlar', '✅ Отвеченные', '✅ Answered'] and is_admin(
+            message.from_user.id)
+    )
+
+    # Murojaatga javob
     dp.register_message_handler(
         reply_command_handler,
         lambda message: message.text.startswith('/reply_'),
         state='*'
     )
+    dp.register_message_handler(process_admin_reply, state=AdminReplyState.waiting_for_reply)
+
+    # Statistika
+    dp.register_message_handler(
+        statistics_handler,
+        lambda message: message.text in ['📊 Statistika', '📊 Статистика', '📊 Statistics'] and is_admin(
+            message.from_user.id)
+    )
+    dp.register_message_handler(
+        show_weekly_statistics,
+        lambda message: message.text in ['📅 Haftalik', '📅 Недельная', '📅 Weekly'] and is_admin(message.from_user.id)
+    )
+    dp.register_message_handler(
+        show_monthly_statistics,
+        lambda message: message.text in ['📆 Oylik', '📆 Месячная', '📆 Monthly'] and is_admin(message.from_user.id)
+    )
+
+    # Broadcast
+    dp.register_message_handler(
+        broadcast_start_handler,
+        lambda message: message.text in ['📢 Broadcast', '📢 Рассылка'] and is_admin(message.from_user.id),
+        state='*'
+    )
+    dp.register_message_handler(
+        broadcast_process_message,
+        content_types=['text', 'photo', 'video', 'document'],
+        state=BroadcastState.waiting_for_message
+    )
+    dp.register_message_handler(
+        broadcast_confirm,
+        state=BroadcastState.waiting_for_confirmation
+    )
+
     dp.register_message_handler(process_admin_reply, state=AdminReplyState.waiting_for_reply)
     dp.register_message_handler(
         add_event_handler,

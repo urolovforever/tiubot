@@ -9,6 +9,7 @@ class ApplicationForm(StatesGroup):
 
 class ScheduleStates(StatesGroup):
     waiting_for_faculty = State()
+    waiting_for_direction = State()
     waiting_for_course = State()
     waiting_for_group = State()
 
@@ -24,3 +25,8 @@ class EventCreateState(StatesGroup):
 
 class EventDeleteState(StatesGroup):
     waiting_for_event_choice = State()
+
+# YANGI STATE - Broadcast uchun
+class BroadcastState(StatesGroup):
+    waiting_for_message = State()
+    waiting_for_confirmation = State()

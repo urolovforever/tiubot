@@ -5,7 +5,7 @@ load_dotenv()
 
 # Bot settings
 BOT_TOKEN = os.getenv('BOT_TOKEN', '7910568707:AAE4ARRRTumtc2XxqcH6JsY-tGsbxIvuLr4')
-ADMIN_IDS = [1220079641]  # O'z telegram ID laringizni kiriting
+ADMIN_IDS = [1920079641]  # O'z telegram ID laringizni kiriting
 
 # Database settings
 DATABASE_NAME = 'tiu_bot.db'
