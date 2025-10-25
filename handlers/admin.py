@@ -1,7 +1,8 @@
 from aiogram import types, Dispatcher
 from aiogram.dispatcher import FSMContext
 from keyboards.reply import (get_admin_keyboard, get_cancel_keyboard, get_events_keyboard,
-                             get_main_keyboard, get_statistics_keyboard, get_broadcast_confirm_keyboard)
+                             get_main_keyboard, get_statistics_keyboard, get_broadcast_confirm_keyboard,
+                             get_skip_keyboard)
 from database.db import Database
 from states.forms import AdminReplyState, EventCreateState, EventDeleteState, BroadcastState
 from utils.helpers import t, is_admin
