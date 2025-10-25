@@ -162,3 +162,12 @@ def register_events_handlers(dp: Dispatcher):
         back_to_events_handler,
         lambda c: c.data == 'back_to_events'
     )
+    
+    db = Database()
+
+
+    # Legacy handler for back button
+    dp.register_message_handler(
+        event_details_handler,
+        lambda message: message.text and message.text in ['⬅️ Orqaga', '⬅️ Назад', '⬅️ Back']
+    )
