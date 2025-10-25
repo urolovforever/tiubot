@@ -596,5 +596,3 @@ def register_applications_handlers(dp: Dispatcher):
     dp.register_message_handler(process_file, content_types=['text', 'photo', 'document'],
                                 state=ApplicationForm.waiting_for_file)
     dp.register_message_handler(process_confirmation, state=ApplicationForm.waiting_for_confirmation)
-
-
