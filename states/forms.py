@@ -3,9 +3,12 @@ from aiogram.dispatcher.filters.state import State, StatesGroup
 class ApplicationForm(StatesGroup):
     waiting_for_user_type = State()
     waiting_for_app_type = State()
+    waiting_for_anonymity = State()  # Anonim yoki ochiq
+    waiting_for_phone = State()  # Faqat ochiq murojaat uchun
     waiting_for_message = State()
-    waiting_for_phone = State()
+    waiting_for_file_choice = State()  # Ha/Yo'q - fayl biriktirish
     waiting_for_file = State()
+    waiting_for_confirmation = State()  # Tasdiqlash
 
 class ScheduleStates(StatesGroup):
     waiting_for_faculty = State()
