@@ -145,22 +145,14 @@ async def event_details_handler(message: types.Message):
 
 
 def register_events_handlers(dp: Dispatcher):
-    """Register all event-related handlers"""
+    """
+    Register event-related handlers
 
-    # Main events handler (button click)
-    dp.register_message_handler(
-        events_handler,
-        lambda message: message.text in [
-            '📅 Tadbirlar taqvimi',
-            '📅 Календарь событий',
-            '📅 Events Calendar',
-            '📢 Tadbirlar',
-            '📢 Мероприятия',
-            '📢 Events'
-        ]
-    )
+    Note: Main events list is now shown from news.py menu
+    These handlers only handle inline keyboard callbacks
+    """
 
-    # Callback query handlers
+    # Callback query handlers for inline keyboards
     dp.register_callback_query_handler(
         event_callback_handler,
         lambda c: c.data.startswith('event_')
@@ -169,10 +161,4 @@ def register_events_handlers(dp: Dispatcher):
     dp.register_callback_query_handler(
         back_to_events_handler,
         lambda c: c.data == 'back_to_events'
-    )
-
-    # Legacy handler for back button
-    dp.register_message_handler(
-        event_details_handler,
-        lambda message: message.text and message.text in ['⬅️ Orqaga', '⬅️ Назад', '⬅️ Back']
     )

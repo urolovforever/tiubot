@@ -2,6 +2,7 @@ from aiogram import types, Dispatcher
 from aiogram.types import ReplyKeyboardMarkup, KeyboardButton
 from database.db import Database
 from utils.helpers import t
+from keyboards.inline import get_events_inline_keyboard
 
 db = Database()
 
@@ -127,35 +128,32 @@ Subscribe!'''
 
 
 async def events_calendar_handler(message: types.Message):
+    """
+    Yangiliklar menyusidan Tadbirlar taqvimini ko'rsatish
+    Yangi inline keyboard formatida
+    """
     user_id = message.from_user.id
-    lang = db.get_user_language(user_id)
 
-    events = db.get_all_events()
+    # Yaqinlashib kelayotgan tadbirlarni olish (sanasi bo'yicha tartiblangan)
+    events = db.get_all_events(upcoming_only=True)
 
-    texts = {
-        'uz': '🗓 Tadbirlar taqvimi\n\nYaqinlashib kelayotgan tadbirlar:\n\n',
-        'ru': '🗓 Календарь мероприятий\n\nПредстоящие мероприятия:\n\n',
-        'en': '🗓 Events Calendar\n\nUpcoming events:\n\n'
-    }
-
-    text = texts.get(lang, texts['uz'])
-
-    if events:
-        for event in events[:5]:
-            text += f'📌 {event[1]}\n📅 {event[3]}\n📍 {event[4]}\n\n'
-    else:
-        more_texts = {
-            'uz': 'Hozircha rejalashtirilgan tadbirlar yo\'q.',
-            'ru': 'Пока нет запланированных мероприятий.',
-            'en': 'No scheduled events yet.'
+    if not events:
+        texts = {
+            'uz': '📭 Hozircha rejalashtirilgan tadbirlar yo\'q.\n\n📱 @tiuofficial',
+            'ru': '📭 Пока нет запланированных мероприятий.\n\n📱 @tiuofficial',
+            'en': '📭 No scheduled events yet.\n\n📱 @tiuofficial'
         }
-        text += more_texts.get(lang, more_texts['uz'])
+        lang = db.get_user_language(user_id)
+        await message.answer(
+            texts.get(lang, texts['uz']),
+            reply_markup=get_news_submenu_keyboard(user_id)
+        )
+        return
 
-    text += '\n📱 @tiuofficial'
-
+    # Inline keyboard bilan tadbirlar ro'yxatini ko'rsatish
     await message.answer(
-        text,
-        reply_markup=get_news_submenu_keyboard(user_id)
+        t(user_id, 'events_calendar_title'),
+        reply_markup=get_events_inline_keyboard(events)
     )
 
 

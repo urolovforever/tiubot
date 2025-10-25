@@ -17,13 +17,10 @@ def get_main_keyboard(user_id: int) -> ReplyKeyboardMarkup:
         KeyboardButton(t(user_id, 'applications'))
     )
     keyboard.add(
-        KeyboardButton(t(user_id, 'events')),  # Tadbirlar taqvimi
-        KeyboardButton(t(user_id, 'news'))
+        KeyboardButton(t(user_id, 'news')),
+        KeyboardButton(t(user_id, 'contact'))
     )
-    keyboard.add(
-        KeyboardButton(t(user_id, 'contact')),
-        KeyboardButton(t(user_id, 'settings'))
-    )
+    keyboard.insert(KeyboardButton(t(user_id, 'settings')))
 
     # Admin panel button
     if is_admin(user_id):
