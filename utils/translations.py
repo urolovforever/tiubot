@@ -1,7 +1,7 @@
 TRANSLATIONS = {
     'uz': {
         # Main menu
-        'welcome': '👋 Salom!\nTashkent International University rasmiy botiga xush kelibsiz! 🎓',
+        'welcome': '🎓 Tashkent International University rasmiy botiga xush kelibsiz!\nQuyidagi menyulardan birini tanlang:',
         'main_menu': '📋 Asosiy menyu',
         'about_tiu': '🏫 TIU haqida',
         'admission': '🧑‍🎓 Qabul',
@@ -100,7 +100,7 @@ TRANSLATIONS = {
 
     'ru': {
         # Main menu
-        'welcome': '👋 Здравствуйте!\nДобро пожаловать в официальный бот Tashkent International University! 🎓',
+        'welcome': '🎓 Добро пожаловать в официальный бот Tashkent International University!\nВыберите один из пунктов меню:',
         'main_menu': '📋 Главное меню',
         'about_tiu': '🏫 О TIU',
         'admission': '🧑‍🎓 Поступление',
@@ -198,7 +198,7 @@ TRANSLATIONS = {
 
     'en': {
         # Main menu
-        'welcome': '👋 Hello!\nWelcome to Tashkent International University official bot! 🎓',
+        'welcome': '🎓 Welcome to the official Tashkent International University bot!\nPlease select one of the menu options:',
         'main_menu': '📋 Main Menu',
         'about_tiu': '🏫 About TIU',
         'admission': '🧑‍🎓 Admission',

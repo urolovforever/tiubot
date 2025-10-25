@@ -4,7 +4,7 @@ from dotenv import load_dotenv
 load_dotenv()
 
 # Bot settings
-BOT_TOKEN = os.getenv('BOT_TOKEN', '7910568707:AAE4ARRRTumtc2XxqcH6JsY-tGsbxIvuLr4')
+BOT_TOKEN = os.getenv('BOT_TOKEN', '8349358796:AAGh9cZHo31Ao1XTsh4TSgWlZRrPAAbgmS0')
 ADMIN_IDS = [1920079641]  # O'z telegram ID laringizni kiriting
 
 # Database settings

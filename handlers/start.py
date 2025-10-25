@@ -24,9 +24,9 @@ async def cmd_start(message: types.Message, state: FSMContext):
         await state.update_data(username=username, full_name=full_name)
         await OnboardingState.waiting_for_language.set()
         await message.answer(
-            '👋 Assalomu aleykum! Tilni tanlang\n'
-            '👋 Здравствуйте! Выберите язык\n'
-            '👋 Hello! Choose your language',
+            '🇺🇿  Assalomu aleykum! Tilni tanlang\n\n'
+            '🇷🇺 Здравствуйте! Выберите язык\n\n'
+            '🇬🇧 Hello! Choose your language',
             reply_markup=get_language_keyboard()
         )
     else:
