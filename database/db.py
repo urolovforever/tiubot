@@ -64,9 +64,31 @@ class Database:
                       title TEXT,
                       description TEXT,
                       date TEXT,
+                      time TEXT,
                       location TEXT,
+                      registration_link TEXT,
                       image_id TEXT,
                       created_at TEXT)''')
+
+        # Migration: Add time and registration_link columns to events table
+        try:
+            c.execute("ALTER TABLE events ADD COLUMN time TEXT")
+        except:
+            pass  # Column already exists
+
+        try:
+            c.execute("ALTER TABLE events ADD COLUMN registration_link TEXT")
+        except:
+            pass  # Column already exists
+
+        # Event reminders table - to track sent reminders
+        c.execute('''CREATE TABLE IF NOT EXISTS event_reminders
+                     (id INTEGER PRIMARY KEY AUTOINCREMENT,
+                      event_id INTEGER,
+                      user_id INTEGER,
+                      reminder_type TEXT,
+                      sent_at TEXT,
+                      FOREIGN KEY (event_id) REFERENCES events (id))''')
 
         # Schedules table
         c.execute('''CREATE TABLE IF NOT EXISTS schedules
@@ -304,14 +326,15 @@ class Database:
 
     # Events
     def create_event(self, title: str, description: str, date: str,
-                     location: str, image_id: Optional[str] = None) -> int:
+                     location: str, image_id: Optional[str] = None,
+                     time: Optional[str] = None, registration_link: Optional[str] = None) -> int:
         conn = self.get_connection()
         c = conn.cursor()
         try:
             c.execute(
-                '''INSERT INTO events (title, description, date, location, image_id, created_at)
-                   VALUES (?,?,?,?,?,?)''',
-                (title, description, date, location, image_id,
+                '''INSERT INTO events (title, description, date, time, location, registration_link, image_id, created_at)
+                   VALUES (?,?,?,?,?,?,?,?)''',
+                (title, description, date, time, location, registration_link, image_id,
                  datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
             )
             event_id = c.lastrowid
@@ -323,11 +346,19 @@ class Database:
         finally:
             conn.close()
 
-    def get_all_events(self) -> List[Tuple]:
+    def get_all_events(self, upcoming_only: bool = False) -> List[Tuple]:
+        """Get all events, optionally filter upcoming events only, sorted by date (nearest first)"""
         conn = self.get_connection()
         c = conn.cursor()
         try:
-            c.execute("SELECT * FROM events ORDER BY date DESC")
+            if upcoming_only:
+                # Only get future events
+                c.execute("""SELECT * FROM events
+                            WHERE date >= date('now')
+                            ORDER BY date ASC, time ASC""")
+            else:
+                # Get all events, sorted by date ascending (nearest first)
+                c.execute("SELECT * FROM events ORDER BY date ASC, time ASC")
             return c.fetchall()
         except Exception as e:
             logger.error(f"Error getting events: {e}")
@@ -352,9 +383,87 @@ class Database:
         c = conn.cursor()
         try:
             c.execute("DELETE FROM events WHERE id=?", (event_id,))
+            # Also delete related reminders
+            c.execute("DELETE FROM event_reminders WHERE event_id=?", (event_id,))
             conn.commit()
         except Exception as e:
             logger.error(f"Error deleting event: {e}")
+        finally:
+            conn.close()
+
+    def update_event(self, event_id: int, title: str, description: str, date: str,
+                     time: str, location: str, registration_link: Optional[str] = None,
+                     image_id: Optional[str] = None):
+        """Update an existing event"""
+        conn = self.get_connection()
+        c = conn.cursor()
+        try:
+            if image_id:
+                c.execute(
+                    """UPDATE events SET title=?, description=?, date=?, time=?, location=?,
+                       registration_link=?, image_id=? WHERE id=?""",
+                    (title, description, date, time, location, registration_link, image_id, event_id)
+                )
+            else:
+                c.execute(
+                    """UPDATE events SET title=?, description=?, date=?, time=?, location=?,
+                       registration_link=? WHERE id=?""",
+                    (title, description, date, time, location, registration_link, event_id)
+                )
+            conn.commit()
+        except Exception as e:
+            logger.error(f"Error updating event: {e}")
+        finally:
+            conn.close()
+
+    # Event reminders
+    def save_reminder(self, event_id: int, user_id: int, reminder_type: str):
+        """Save that a reminder was sent to a user"""
+        conn = self.get_connection()
+        c = conn.cursor()
+        try:
+            c.execute(
+                '''INSERT INTO event_reminders (event_id, user_id, reminder_type, sent_at)
+                   VALUES (?,?,?,?)''',
+                (event_id, user_id, reminder_type, datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
+            )
+            conn.commit()
+        except Exception as e:
+            logger.error(f"Error saving reminder: {e}")
+        finally:
+            conn.close()
+
+    def check_reminder_sent(self, event_id: int, user_id: int, reminder_type: str) -> bool:
+        """Check if a reminder was already sent"""
+        conn = self.get_connection()
+        c = conn.cursor()
+        try:
+            c.execute(
+                "SELECT id FROM event_reminders WHERE event_id=? AND user_id=? AND reminder_type=?",
+                (event_id, user_id, reminder_type)
+            )
+            return c.fetchone() is not None
+        except Exception as e:
+            logger.error(f"Error checking reminder: {e}")
+            return False
+        finally:
+            conn.close()
+
+    def get_events_needing_reminders(self, hours_before: int) -> List[Tuple]:
+        """Get events that need reminders (1 day or 1 hour before)"""
+        conn = self.get_connection()
+        c = conn.cursor()
+        try:
+            c.execute(f"""
+                SELECT * FROM events
+                WHERE datetime(date || ' ' || COALESCE(time, '00:00'))
+                      BETWEEN datetime('now')
+                      AND datetime('now', '+{hours_before} hours', '+30 minutes')
+            """)
+            return c.fetchall()
+        except Exception as e:
+            logger.error(f"Error getting events for reminders: {e}")
+            return []
         finally:
             conn.close()
 

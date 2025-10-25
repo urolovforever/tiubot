@@ -583,6 +583,14 @@ async def process_event_date(message: types.Message, state: FSMContext):
     user_id = message.from_user.id
 
     await state.update_data(date=message.text)
+    await message.answer(t(user_id, 'enter_event_time'))
+    await EventCreateState.waiting_for_time.set()
+
+
+async def process_event_time(message: types.Message, state: FSMContext):
+    user_id = message.from_user.id
+
+    await state.update_data(time=message.text)
     await message.answer(t(user_id, 'enter_event_location'))
     await EventCreateState.waiting_for_location.set()
 
@@ -591,7 +599,26 @@ async def process_event_location(message: types.Message, state: FSMContext):
     user_id = message.from_user.id
 
     await state.update_data(location=message.text)
-    await message.answer(t(user_id, 'send_event_image'))
+    await message.answer(
+        t(user_id, 'enter_event_registration_link'),
+        reply_markup=get_skip_keyboard(user_id)
+    )
+    await EventCreateState.waiting_for_registration_link.set()
+
+
+async def process_event_registration_link(message: types.Message, state: FSMContext):
+    user_id = message.from_user.id
+
+    # Check if user wants to skip
+    if message.text in ['⏭ O\'tkazib yuborish', '⏭ Пропустить', '⏭ Skip']:
+        await state.update_data(registration_link=None)
+    else:
+        await state.update_data(registration_link=message.text)
+
+    await message.answer(
+        t(user_id, 'send_event_image'),
+        reply_markup=get_skip_keyboard(user_id)
+    )
     await EventCreateState.waiting_for_image.set()
 
 
@@ -604,17 +631,21 @@ async def process_event_image(message: types.Message, state: FSMContext):
         image_id = message.photo[-1].file_id
     elif message.document:
         image_id = message.document.file_id
-    elif message.text and message.text.lower() in ['skip', 'yo\'q', 'нет', 'no']:
+    elif message.text and (message.text.lower() in ['skip', 'yo\'q', 'нет', 'no'] or
+                          message.text in ['⏭ O\'tkazib yuborish', '⏭ Пропустить', '⏭ Skip']):
         image_id = None
 
     data = await state.get_data()
 
+    # Create event with new fields
     db.create_event(
-        data['title'],
-        data['description'],
-        data['date'],
-        data['location'],
-        image_id
+        title=data['title'],
+        description=data['description'],
+        date=data['date'],
+        location=data['location'],
+        image_id=image_id,
+        time=data.get('time'),
+        registration_link=data.get('registration_link')
     )
 
     await message.answer(
@@ -625,6 +656,7 @@ async def process_event_image(message: types.Message, state: FSMContext):
 
 
 async def manage_events_handler(message: types.Message, state: FSMContext):
+    """Admin event management - shows inline keyboard with edit/delete options"""
     user_id = message.from_user.id
 
     if not is_admin(user_id):
@@ -639,17 +671,160 @@ async def manage_events_handler(message: types.Message, state: FSMContext):
         )
         return
 
+    from keyboards.inline import get_admin_events_keyboard
+
     await message.answer(
-        t(user_id, 'choose_event_to_delete'),
-        reply_markup=get_events_keyboard(user_id, events)
+        t(user_id, 'manage_events_title'),
+        reply_markup=get_admin_events_keyboard(events)
     )
-    await EventDeleteState.waiting_for_event_choice.set()
 
 
-async def process_event_delete(message: types.Message, state: FSMContext):
+# Event edit callback handlers
+async def edit_event_callback(callback: types.CallbackQuery, state: FSMContext):
+    """Handle edit event button click"""
+    user_id = callback.from_user.id
+
+    if not is_admin(user_id):
+        await callback.answer("❌ Ruxsat yo'q")
+        return
+
+    try:
+        event_id = int(callback.data.split('_')[-1])
+        from keyboards.inline import get_event_edit_options_keyboard
+
+        await callback.message.edit_text(
+            t(user_id, 'choose_field_to_edit'),
+            reply_markup=get_event_edit_options_keyboard(event_id)
+        )
+    except Exception as e:
+        await callback.answer(f"❌ Xatolik: {str(e)}")
+
+    await callback.answer()
+
+
+async def delete_event_callback(callback: types.CallbackQuery):
+    """Handle delete event button click - show confirmation"""
+    user_id = callback.from_user.id
+
+    if not is_admin(user_id):
+        await callback.answer("❌ Ruxsat yo'q")
+        return
+
+    try:
+        event_id = int(callback.data.split('_')[-1])
+        event = db.get_event(event_id)
+
+        if not event:
+            await callback.answer(t(user_id, 'event_not_found'))
+            return
+
+        from keyboards.inline import get_delete_confirm_keyboard
+
+        await callback.message.edit_text(
+            f"{t(user_id, 'confirm_delete_event')}\n\n<b>{event[1]}</b>",
+            parse_mode='HTML',
+            reply_markup=get_delete_confirm_keyboard(event_id)
+        )
+    except Exception as e:
+        await callback.answer(f"❌ Xatolik: {str(e)}")
+
+    await callback.answer()
+
+
+async def confirm_delete_event_callback(callback: types.CallbackQuery):
+    """Confirm and delete the event"""
+    user_id = callback.from_user.id
+
+    if not is_admin(user_id):
+        await callback.answer("❌ Ruxsat yo'q")
+        return
+
+    try:
+        event_id = int(callback.data.split('_')[-1])
+        db.delete_event(event_id)
+
+        await callback.message.edit_text(
+            t(user_id, 'event_deleted')
+        )
+        await callback.answer("✅ O'chirildi")
+    except Exception as e:
+        await callback.answer(f"❌ Xatolik: {str(e)}")
+
+
+async def admin_back_callback(callback: types.CallbackQuery):
+    """Handle admin back button"""
+    user_id = callback.from_user.id
+
+    await callback.message.delete()
+    await callback.message.answer(
+        t(user_id, 'admin_panel'),
+        reply_markup=get_admin_keyboard(user_id)
+    )
+    await callback.answer()
+
+
+async def admin_manage_events_callback(callback: types.CallbackQuery):
+    """Go back to manage events list"""
+    user_id = callback.from_user.id
+
+    events = db.get_all_events()
+
+    if not events:
+        await callback.message.edit_text(t(user_id, 'no_events'))
+        await callback.answer()
+        return
+
+    from keyboards.inline import get_admin_events_keyboard
+
+    await callback.message.edit_text(
+        t(user_id, 'manage_events_title'),
+        reply_markup=get_admin_events_keyboard(events)
+    )
+    await callback.answer()
+
+
+async def edit_field_callback(callback: types.CallbackQuery, state: FSMContext):
+    """Handle field edit button click"""
+    user_id = callback.from_user.id
+
+    if not is_admin(user_id):
+        await callback.answer("❌ Ruxsat yo'q")
+        return
+
+    # Parse callback data: edit_<field>_<event_id>
+    parts = callback.data.split('_')
+    field = parts[1]
+    event_id = int(parts[2])
+
+    # Store event_id and field in state
+    await state.update_data(event_id=event_id, field=field)
+
+    # Get field name in user's language
+    field_names = {
+        'title': 'nomini',
+        'desc': 'tavsifini',
+        'date': 'sanasini',
+        'time': 'vaqtini',
+        'location': 'manzilini',
+        'link': 'havolasini',
+        'image': 'rasmini'
+    }
+
+    await callback.message.edit_text(
+        f"Tadbirning {field_names.get(field, field)} yangi qiymatini kiriting:",
+        reply_markup=get_cancel_keyboard(user_id)
+    )
+
+    from states.forms import EventEditState
+    await EventEditState.waiting_for_field_value.set()
+    await callback.answer()
+
+
+async def process_field_edit(message: types.Message, state: FSMContext):
+    """Process the new field value"""
     user_id = message.from_user.id
 
-    if message.text in ['⬅️ Orqaga', '⬅️ Назад', '⬅️ Back']:
+    if message.text in ['❌ Bekor qilish', '❌ Отмена', '❌ Cancel']:
         await state.finish()
         await message.answer(
             t(user_id, 'admin_panel'),
@@ -657,17 +832,42 @@ async def process_event_delete(message: types.Message, state: FSMContext):
         )
         return
 
-    try:
-        event_id = int(message.text.split('.')[0])
-        db.delete_event(event_id)
+    data = await state.get_data()
+    event_id = data.get('event_id')
+    field = data.get('field')
 
-        await message.answer(
-            t(user_id, 'event_deleted'),
-            reply_markup=get_admin_keyboard(user_id)
-        )
-    except:
-        pass
+    # Get current event data
+    event = db.get_event(event_id)
+    if not event:
+        await message.answer(t(user_id, 'event_not_found'))
+        await state.finish()
+        return
 
+    # Update the specific field
+    if field == 'title':
+        db.update_event(event_id, message.text, event[2], event[3], event[4], event[5], event[6], event[7])
+    elif field == 'desc':
+        db.update_event(event_id, event[1], message.text, event[3], event[4], event[5], event[6], event[7])
+    elif field == 'date':
+        db.update_event(event_id, event[1], event[2], message.text, event[4], event[5], event[6], event[7])
+    elif field == 'time':
+        db.update_event(event_id, event[1], event[2], event[3], message.text, event[5], event[6], event[7])
+    elif field == 'location':
+        db.update_event(event_id, event[1], event[2], event[3], event[4], message.text, event[6], event[7])
+    elif field == 'link':
+        db.update_event(event_id, event[1], event[2], event[3], event[4], event[5], message.text, event[7])
+    elif field == 'image':
+        if message.photo:
+            image_id = message.photo[-1].file_id
+            db.update_event(event_id, event[1], event[2], event[3], event[4], event[5], event[6], image_id)
+        elif message.document:
+            image_id = message.document.file_id
+            db.update_event(event_id, event[1], event[2], event[3], event[4], event[5], event[6], image_id)
+
+    await message.answer(
+        "✅ Tadbir yangilandi!",
+        reply_markup=get_admin_keyboard(user_id)
+    )
     await state.finish()
 
 
@@ -742,7 +942,9 @@ def register_admin_handlers(dp: Dispatcher):
     dp.register_message_handler(process_event_title, state=EventCreateState.waiting_for_title)
     dp.register_message_handler(process_event_description, state=EventCreateState.waiting_for_description)
     dp.register_message_handler(process_event_date, state=EventCreateState.waiting_for_date)
+    dp.register_message_handler(process_event_time, state=EventCreateState.waiting_for_time)
     dp.register_message_handler(process_event_location, state=EventCreateState.waiting_for_location)
+    dp.register_message_handler(process_event_registration_link, state=EventCreateState.waiting_for_registration_link)
     dp.register_message_handler(
         process_event_image,
         content_types=['text', 'photo', 'document'],
@@ -754,4 +956,39 @@ def register_admin_handlers(dp: Dispatcher):
             message.from_user.id),
         state='*'
     )
-    dp.register_message_handler(process_event_delete, state=EventDeleteState.waiting_for_event_choice)
+
+    # Event edit/delete callback handlers
+    dp.register_callback_query_handler(
+        edit_event_callback,
+        lambda c: c.data.startswith('edit_event_') and is_admin(c.from_user.id),
+        state='*'
+    )
+    dp.register_callback_query_handler(
+        delete_event_callback,
+        lambda c: c.data.startswith('delete_event_') and is_admin(c.from_user.id)
+    )
+    dp.register_callback_query_handler(
+        confirm_delete_event_callback,
+        lambda c: c.data.startswith('confirm_delete_') and is_admin(c.from_user.id)
+    )
+    dp.register_callback_query_handler(
+        admin_back_callback,
+        lambda c: c.data == 'admin_back' and is_admin(c.from_user.id)
+    )
+    dp.register_callback_query_handler(
+        admin_manage_events_callback,
+        lambda c: c.data == 'admin_manage_events' and is_admin(c.from_user.id)
+    )
+    dp.register_callback_query_handler(
+        edit_field_callback,
+        lambda c: c.data.startswith('edit_') and not c.data.startswith('edit_event_') and is_admin(c.from_user.id),
+        state='*'
+    )
+
+    # Event edit state handler
+    from states.forms import EventEditState
+    dp.register_message_handler(
+        process_field_edit,
+        content_types=['text', 'photo', 'document'],
+        state=EventEditState.waiting_for_field_value
+    )
