@@ -26,7 +26,7 @@ class Database:
                       language TEXT DEFAULT 'uz',
                       registration_date TEXT)''')
 
-        # Applications table (9 ustun - username va phone_number bilan)
+        # Applications table (12 ustun - username, phone_number, user_type, app_type, is_anonymous bilan)
         c.execute('''CREATE TABLE IF NOT EXISTS applications
                      (id INTEGER PRIMARY KEY AUTOINCREMENT,
                       user_id INTEGER,
@@ -37,7 +37,26 @@ class Database:
                       file_id TEXT,
                       status TEXT DEFAULT 'new',
                       created_at TEXT,
-                      admin_response TEXT)''')
+                      admin_response TEXT,
+                      user_type TEXT,
+                      app_type TEXT,
+                      is_anonymous INTEGER DEFAULT 0)''')
+
+        # Migration: Yangi column lar qo'shish (agar mavjud table da bo'lmasa)
+        try:
+            c.execute("ALTER TABLE applications ADD COLUMN user_type TEXT")
+        except:
+            pass  # Column allaqachon mavjud
+
+        try:
+            c.execute("ALTER TABLE applications ADD COLUMN app_type TEXT")
+        except:
+            pass
+
+        try:
+            c.execute("ALTER TABLE applications ADD COLUMN is_anonymous INTEGER DEFAULT 0")
+        except:
+            pass
 
         # Events table
         c.execute('''CREATE TABLE IF NOT EXISTS events
@@ -129,16 +148,17 @@ class Database:
 
     # Applications
     def create_application(self, user_id: int, username: str, full_name: str,
-                           phone_number: str, message: str, file_id: Optional[str] = None) -> int:
+                           phone_number: str, message: str, file_id: Optional[str] = None,
+                           user_type: str = '', app_type: str = '', is_anonymous: bool = False) -> int:
         conn = self.get_connection()
         c = conn.cursor()
         try:
             c.execute(
-                '''INSERT INTO applications 
-                   (user_id, username, full_name, phone_number, message, file_id, status, created_at, admin_response)
-                   VALUES (?,?,?,?,?,?,?,?,?)''',
+                '''INSERT INTO applications
+                   (user_id, username, full_name, phone_number, message, file_id, status, created_at, admin_response, user_type, app_type, is_anonymous)
+                   VALUES (?,?,?,?,?,?,?,?,?,?,?,?)''',
                 (user_id, username, full_name, phone_number, message, file_id, 'new',
-                 datetime.now().strftime("%Y-%m-%d %H:%M:%S"), None)
+                 datetime.now().strftime("%Y-%m-%d %H:%M:%S"), None, user_type, app_type, 1 if is_anonymous else 0)
             )
             app_id = c.lastrowid
             conn.commit()
