@@ -30,3 +30,7 @@ class EventDeleteState(StatesGroup):
 class BroadcastState(StatesGroup):
     waiting_for_message = State()
     waiting_for_confirmation = State()
+
+# Boshlang'ich til tanlash uchun state
+class OnboardingState(StatesGroup):
+    waiting_for_language = State()
