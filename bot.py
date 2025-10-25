@@ -1,4 +1,5 @@
 import logging
+import asyncio
 from aiogram import Bot, Dispatcher, executor
 from aiogram.contrib.fsm_storage.memory import MemoryStorage
 from config import BOT_TOKEN
@@ -16,6 +17,9 @@ from handlers.schedule import register_schedule_handlers
 from handlers.events import register_events_handlers
 from handlers.applications import register_applications_handlers
 from handlers.admin import register_admin_handlers
+
+# Import event reminder system
+from utils.event_reminders import start_reminder_scheduler
 
 # Logging setup
 logging.basicConfig(
@@ -67,6 +71,11 @@ async def on_startup(dp: Dispatcher):
     logger.info('🚀 Bot is starting...')
     logger.info(f'Bot name: {(await dp.bot.get_me()).full_name}')
     register_all_handlers(dp)
+
+    # Start event reminder scheduler in background
+    asyncio.create_task(start_reminder_scheduler(dp.bot, interval_minutes=30))
+    logger.info('📅 Event reminder scheduler started')
+
     logger.info('✅ Bot started successfully!')
 
 

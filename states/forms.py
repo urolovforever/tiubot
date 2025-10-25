@@ -23,10 +23,16 @@ class EventCreateState(StatesGroup):
     waiting_for_title = State()
     waiting_for_description = State()
     waiting_for_date = State()
+    waiting_for_time = State()
     waiting_for_location = State()
+    waiting_for_registration_link = State()
     waiting_for_image = State()
 
 class EventDeleteState(StatesGroup):
+    waiting_for_event_choice = State()
+
+class EventEditState(StatesGroup):
+    waiting_for_field_value = State()
     waiting_for_event_choice = State()
 
 # YANGI STATE - Broadcast uchun
