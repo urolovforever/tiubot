@@ -64,8 +64,7 @@ async def broadcast_cancel(message: types.Message, state: FSMContext):
     """
     await state.finish()
     await message.answer(
-        "❌ <b>Broadcast bekor qilindi</b>\n\n"
-        "Yangi broadcast uchun: /broadcast",
+        "❌ <b>Broadcast bekor qilindi</b>",
         parse_mode='HTML'
     )
 
