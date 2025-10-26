@@ -35,6 +35,13 @@ class EventEditState(StatesGroup):
     waiting_for_field_value = State()
     waiting_for_event_choice = State()
 
+# YANGI - Sodda tadbir yuklash (nom, rasm+caption, sana)
+class EventQuickCreateState(StatesGroup):
+    waiting_for_title = State()  # Tadbir nomi
+    waiting_for_post = State()  # Rasm + caption (tavsif)
+    waiting_for_date = State()  # Sana
+    waiting_for_confirmation = State()  # Tasdiqlash
+
 # YANGI STATE - Broadcast uchun
 class BroadcastState(StatesGroup):
     waiting_for_message = State()

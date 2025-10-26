@@ -67,20 +67,8 @@ async def event_callback_handler(callback: CallbackQuery):
     registration_link = event[6]
     image_id = event[7]
 
-    # Format event details in Telegram post style
-    text = f"<b>{title}</b>\n\n"
-    text += f"📝 <b>Tavsif:</b>\n{description}\n\n"
-    text += f"📅 <b>Sana:</b> {date}\n"
-
-    if time:
-        text += f"⏰ <b>Vaqt:</b> {time}\n"
-
-    text += f"📍 <b>Joylashuv:</b> {location}\n"
-
-    if registration_link:
-        text += f"\n🔗 <b>Ro'yxatdan o'tish:</b> <a href='{registration_link}'>Bu yerga bosing</a>\n"
-
-    text += f"\n#TIUevents"
+    # Description'ni to'g'ridan-to'g'ri ko'rsatamiz (admin yuklagan caption)
+    text = description if description else f"<b>{title}</b>"
 
     # Send event details
     if image_id:
