@@ -42,10 +42,10 @@ class EventQuickCreateState(StatesGroup):
     waiting_for_date = State()  # Sana
     waiting_for_confirmation = State()  # Tasdiqlash
 
-# YANGI STATE - Broadcast uchun
+# UNIVERSAL BROADCAST STATE - Har qanday Telegram content type uchun
 class BroadcastState(StatesGroup):
-    waiting_for_message = State()
-    waiting_for_confirmation = State()
+    waiting_for_content = State()  # Har qanday content type: text, photo, video, audio, document, poll, etc.
+    waiting_for_confirmation = State()  # Tasdiqlash
 
 # Boshlang'ich til tanlash uchun state
 class OnboardingState(StatesGroup):

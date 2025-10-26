@@ -17,6 +17,7 @@ from handlers.schedule import register_schedule_handlers
 from handlers.events import register_events_handlers
 from handlers.event_quick_create import register_quick_event_handlers  # YANGI
 from handlers.applications import register_applications_handlers
+from handlers.universal_broadcast import register_universal_broadcast_handlers  # UNIVERSAL BROADCAST
 from handlers.admin import register_admin_handlers
 
 # Import event reminder system
@@ -63,6 +64,7 @@ def register_all_handlers(dp: Dispatcher):
 
     # Admin handlers (must be last)
     register_quick_event_handlers(dp)  # YANGI - Tez tadbir qo'shish
+    register_universal_broadcast_handlers(dp)  # UNIVERSAL BROADCAST - /broadcast command
     register_admin_handlers(dp)
 
     logger.info('✅ All handlers registered successfully')
