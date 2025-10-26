@@ -413,6 +413,13 @@ def register_universal_broadcast_handlers(dp: Dispatcher):
         state='*'
     )
 
+    # Broadcast button handler (admin panel)
+    dp.register_message_handler(
+        broadcast_command,
+        lambda message: message.text in ['📢 Broadcast', '📢 Рассылка'] and is_admin(message.from_user.id),
+        state='*'
+    )
+
     # /cancel komandasi broadcast rejimida
     dp.register_message_handler(
         broadcast_cancel,
