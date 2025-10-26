@@ -3,7 +3,11 @@ Initialize library categories
 Run this script once to create the 9 library categories in the database
 """
 
-import sqlite3
+import sys
+import os
+sys.path.insert(0, os.path.dirname(__file__))
+
+from database.db import Database
 from datetime import datetime
 
 DATABASE_NAME = 'tiu_bot.db'
@@ -96,7 +100,14 @@ CATEGORIES = [
 
 def init_categories():
     """Initialize library categories in database"""
-    conn = sqlite3.connect(DATABASE_NAME)
+
+    # First, ensure database and all tables exist
+    print("📦 Initializing database tables...")
+    db = Database(DATABASE_NAME)
+    print("✅ Database tables created successfully!\n")
+
+    # Now add categories
+    conn = db.get_connection()
     c = conn.cursor()
 
     try:
