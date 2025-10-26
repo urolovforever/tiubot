@@ -35,6 +35,12 @@ class EventEditState(StatesGroup):
     waiting_for_field_value = State()
     waiting_for_event_choice = State()
 
+# YANGI - Telegram post formatida tadbir yuklash
+class EventQuickCreateState(StatesGroup):
+    waiting_for_post = State()  # Rasm + caption
+    waiting_for_date = State()  # Faqat sana
+    waiting_for_confirmation = State()  # Tasdiqlash
+
 # YANGI STATE - Broadcast uchun
 class BroadcastState(StatesGroup):
     waiting_for_message = State()

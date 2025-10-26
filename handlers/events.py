@@ -67,23 +67,29 @@ async def event_callback_handler(callback: CallbackQuery):
     registration_link = event[6]
     image_id = event[7]
 
-    # Format event details in Telegram post style
-    text = f"<b>{title}</b>\n\n"
-    text += f"📝 <b>Tavsif:</b>\n{description}\n\n"
-    text += f"📅 <b>Sana:</b> {date}\n"
+    # Agar description HTML caption formatida bo'lsa (uzun va HTML teglari bor),
+    # uni to'g'ridan-to'g'ri ko'rsatamiz (admin tez yuklagan)
+    if description and len(description) > 200 and ('<b>' in description or '📌' in description or '🎓' in description):
+        # Bu caption formatida - to'g'ridan-to'g'ri ko'rsatamiz
+        text = description
+    else:
+        # Bu oddiy format - maydonlardan caption yasaymiz
+        text = f"<b>{title}</b>\n\n"
+        text += f"📝 <b>Tavsif:</b>\n{description}\n\n"
+        text += f"📅 <b>Sana:</b> {date}\n"
 
-    if time:
-        text += f"⏰ <b>Vaqt:</b> {time}\n"
+        if time:
+            text += f"⏰ <b>Vaqt:</b> {time}\n"
 
-    text += f"📍 <b>Joylashuv:</b> {location}\n"
+        text += f"📍 <b>Joylashuv:</b> {location}\n"
 
-    # Only show registration link in caption if it's a valid single URL
-    if registration_link:
-        link = registration_link.strip()
-        if (link.startswith('http://') or link.startswith('https://')) and '\n' not in link and len(link.split()) == 1:
-            text += f"\n🔗 <b>Ro'yxatdan o'tish:</b> <a href='{link}'>Bu yerga bosing</a>\n"
+        # Only show registration link in caption if it's a valid single URL
+        if registration_link:
+            link = registration_link.strip()
+            if (link.startswith('http://') or link.startswith('https://')) and '\n' not in link and len(link.split()) == 1:
+                text += f"\n🔗 <b>Ro'yxatdan o'tish:</b> <a href='{link}'>Bu yerga bosing</a>\n"
 
-    text += f"\n#TIUevents"
+        text += f"\n#TIUevents"
 
     # Send event details
     if image_id:
