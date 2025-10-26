@@ -147,7 +147,16 @@ async def process_event_post(message: types.Message, state: FSMContext):
 
     # Ma'lumotlarni saqlash
     photo_id = message.photo[-1].file_id
-    caption = message.caption_html  # HTML formatda saqlash (bold, emoji saqlanadi)
+
+    # HTML formatda caption olish (formatting saqlanadi)
+    # aiogram 2.x da caption_html yo'q, shuning uchun caption va entities ishlatamiz
+    caption = message.caption or ""
+
+    # Agar caption_entities bo'lsa, HTML formatga o'tkazish
+    if message.caption_entities:
+        # aiogram'ning HTML formatter'idan foydalanish
+        from aiogram.utils.markdown import html_decoration
+        caption = message.html_text or message.caption
 
     await state.update_data(
         photo_id=photo_id,
