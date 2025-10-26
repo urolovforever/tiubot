@@ -3,8 +3,11 @@ from aiogram.types import ReplyKeyboardMarkup, KeyboardButton
 from database.db import Database
 from utils.helpers import t
 from keyboards.inline import get_events_inline_keyboard
+from config import DIGEST_CHANNEL_ID
+import logging
 
 db = Database()
+logger = logging.getLogger(__name__)
 
 
 def get_news_submenu_keyboard(user_id: int) -> ReplyKeyboardMarkup:
@@ -15,16 +18,19 @@ def get_news_submenu_keyboard(user_id: int) -> ReplyKeyboardMarkup:
         'uz': [
             '🆕 So\'nggi yangiliklar',
             '🎥 Video yangiliklar',
+            '📰 Hafta dayjesti',
             '🗓 Tadbirlar taqvimi'
         ],
         'ru': [
             '🆕 Последние новости',
             '🎥 Видео новости',
+            '📰 Недельный дайджест',
             '🗓 Календарь мероприятий'
         ],
         'en': [
             '🆕 Latest news',
             '🎥 Video news',
+            '📰 Weekly digest',
             '🗓 Events calendar'
         ]
     }
@@ -157,6 +163,58 @@ async def events_calendar_handler(message: types.Message):
     )
 
 
+async def weekly_digest_handler(message: types.Message):
+    """
+    Hafta dayjesti - kanaldagi eng so'nggi postni foydalanuvchiga yuborish
+    """
+    user_id = message.from_user.id
+    lang = db.get_user_language(user_id)
+
+    try:
+        # Database'dan eng so'nggi post message ID ni olish
+        message_id = db.get_channel_post(DIGEST_CHANNEL_ID)
+
+        # Agar post ID mavjud bo'lmasa
+        if not message_id:
+            error_texts = {
+                'uz': '⚠️ Hozircha dayjest mavjud emas.',
+                'ru': '⚠️ Дайджест пока недоступен.',
+                'en': '⚠️ Digest is not available yet.'
+            }
+            await message.answer(
+                error_texts.get(lang, error_texts['uz']),
+                reply_markup=get_news_submenu_keyboard(user_id)
+            )
+            return
+
+        # Postni copy qilib yuborish (forward emas!)
+        await message.bot.copy_message(
+            chat_id=user_id,
+            from_chat_id=DIGEST_CHANNEL_ID,
+            message_id=message_id
+        )
+
+        # Menyuni qayta yuborish
+        await message.answer(
+            "📱 @tiuofficial",
+            reply_markup=get_news_submenu_keyboard(user_id)
+        )
+
+    except Exception as e:
+        logger.error(f'Weekly digest error for user {user_id}: {e}')
+
+        error_texts = {
+            'uz': '⚠️ Hozircha dayjest mavjud emas.',
+            'ru': '⚠️ Дайджест пока недоступен.',
+            'en': '⚠️ Digest is not available yet.'
+        }
+
+        await message.answer(
+            error_texts.get(lang, error_texts['uz']),
+            reply_markup=get_news_submenu_keyboard(user_id)
+        )
+
+
 def register_news_handlers(dp: Dispatcher):
     dp.register_message_handler(
         news_menu_handler,
@@ -176,6 +234,14 @@ def register_news_handlers(dp: Dispatcher):
             '🎥 Video yangiliklar',
             '🎥 Видео новости',
             '🎥 Video news'
+        ]
+    )
+    dp.register_message_handler(
+        weekly_digest_handler,
+        lambda message: message.text in [
+            '📰 Hafta dayjesti',
+            '📰 Недельный дайджест',
+            '📰 Weekly digest'
         ]
     )
     dp.register_message_handler(

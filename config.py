@@ -7,6 +7,9 @@ load_dotenv()
 BOT_TOKEN = os.getenv('BOT_TOKEN', '8349358796:AAGh9cZHo31Ao1XTsh4TSgWlZRrPAAbgmS0')
 ADMIN_IDS = [1920079641]  # O'z telegram ID laringizni kiriting
 
+# Channel settings
+DIGEST_CHANNEL_ID = os.getenv('DIGEST_CHANNEL_ID', '-1002319736714')  # Hafta dayjesti kanali ID
+
 # Database settings
 DATABASE_NAME = 'tiu_bot.db'
 
