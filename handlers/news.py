@@ -16,23 +16,23 @@ def get_news_submenu_keyboard(user_id: int) -> ReplyKeyboardMarkup:
 
     buttons = {
         'uz': [
-            '🆕 So\'nggi yangiliklar',
-            '🎥 Video yangiliklar',
-            '📰 Hafta dayjesti',
-            '🗓 Tadbirlar taqvimi'
-        ],
-        'ru': [
-            '🆕 Последние новости',
-            '🎥 Видео новости',
-            '📰 Недельный дайджест',
-            '🗓 Календарь мероприятий'
-        ],
-        'en': [
-            '🆕 Latest news',
-            '🎥 Video news',
-            '📰 Weekly digest',
-            '🗓 Events calendar'
-        ]
+    '🆕 Hafta dayjesti',
+    '🎥 So‘nggi yangiliklar',
+    '🗓 Tadbirlar taqvimi'
+],
+
+'ru': [
+    '🆕 Еженедельный дайджест',
+    '🎥 Последние новости',
+    '🗓 Календарь мероприятий'
+],
+
+'en': [
+    '🆕 Weekly digest',
+    '🎥 Latest news',
+    '🗓 Events calendar'
+]
+
     }
 
     for btn in buttons.get(lang, buttons['uz']):
@@ -220,22 +220,28 @@ def register_news_handlers(dp: Dispatcher):
         news_menu_handler,
         lambda message: message.text in ['📰 Yangiliklar', '📰 Новости', '📰 News']
     )
+
+    # 🆕 Hafta dayjesti (Weekly digest)
     dp.register_message_handler(
         latest_news_handler,
         lambda message: message.text in [
-            '🆕 So\'nggi yangiliklar',
-            '🆕 Последние новости',
-            '🆕 Latest news'
+            '🆕 Hafta dayjesti',
+            '🆕 Еженедельный дайджест',
+            '🆕 Weekly digest'
         ]
     )
+
+    # 🎥 Video yangiliklar (Video news)
     dp.register_message_handler(
         video_news_handler,
         lambda message: message.text in [
-            '🎥 Video yangiliklar',
-            '🎥 Видео новости',
-            '🎥 Video news'
+            '🎥 So‘nggi yangiliklar',
+            '🎥 Последние новости',
+            '🎥 Latest news'
         ]
     )
+
+    # 🗓 Tadbirlar taqvimi (Events calendar)
     dp.register_message_handler(
         weekly_digest_handler,
         lambda message: message.text in [
@@ -252,3 +258,4 @@ def register_news_handlers(dp: Dispatcher):
             '🗓 Events calendar'
         ]
     )
+

@@ -69,7 +69,6 @@ def get_faculty_keyboard(user_id: int) -> ReplyKeyboardMarkup:
     from config import FACULTIES
     from database.db import Database
 
-    db = Database()
     lang = db.get_user_language(user_id)
 
     keyboard = ReplyKeyboardMarkup(resize_keyboard=True, row_width=2)
