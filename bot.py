@@ -17,6 +17,7 @@ from handlers.schedule import register_schedule_handlers
 from handlers.events import register_events_handlers
 from handlers.event_quick_create import register_quick_event_handlers  # YANGI
 from handlers.applications import register_applications_handlers
+from handlers.library import register_library_handlers  # LIBRARY SYSTEM
 from handlers.universal_broadcast import register_universal_broadcast_handlers  # UNIVERSAL BROADCAST
 from handlers.channel_handler import register_channel_handlers  # CHANNEL POST TRACKER
 from handlers.admin import register_admin_handlers
@@ -62,6 +63,7 @@ def register_all_handlers(dp: Dispatcher):
     register_schedule_handlers(dp)
     register_events_handlers(dp)
     register_applications_handlers(dp)
+    register_library_handlers(dp)  # LIBRARY SYSTEM - Kutubxona tizimi
 
     # Channel handlers (before admin to catch channel posts)
     register_channel_handlers(dp)  # CHANNEL POST TRACKER - Kanaldan postlarni saqlash
