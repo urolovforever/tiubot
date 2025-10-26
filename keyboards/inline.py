@@ -113,7 +113,7 @@ def get_event_details_inline_keyboard(event_id: int, registration_link: str = No
 def get_admin_events_keyboard(events: list) -> InlineKeyboardMarkup:
     """
     Create inline keyboard for admin to manage events
-    Shows: Edit and Delete buttons for each event
+    Shows: Event name and Delete button for each event
     """
     keyboard = InlineKeyboardMarkup(row_width=2)
 
@@ -122,15 +122,15 @@ def get_admin_events_keyboard(events: list) -> InlineKeyboardMarkup:
         title = event[1]
 
         # Truncate title
-        display_title = title if len(title) <= 25 else title[:25] + '...'
+        display_title = title if len(title) <= 30 else title[:30] + '...'
 
         keyboard.row(
             InlineKeyboardButton(
-                text=f"✏️ {display_title}",
-                callback_data=f"edit_event_{event_id}"
+                text=f"📅 {display_title}",
+                callback_data=f"view_event_{event_id}"
             ),
             InlineKeyboardButton(
-                text="🗑",
+                text="🗑 O'chirish",
                 callback_data=f"delete_event_{event_id}"
             )
         )
@@ -146,22 +146,23 @@ def get_admin_events_keyboard(events: list) -> InlineKeyboardMarkup:
     return keyboard
 
 
-def get_event_edit_options_keyboard(event_id: int) -> InlineKeyboardMarkup:
-    """Keyboard with options to edit different fields of an event"""
-    keyboard = InlineKeyboardMarkup(row_width=1)
-
-    keyboard.add(
-        InlineKeyboardButton(text="📝 Nomini o'zgartirish", callback_data=f"edit_title_{event_id}"),
-        InlineKeyboardButton(text="📄 Tavsifni o'zgartirish", callback_data=f"edit_desc_{event_id}"),
-        InlineKeyboardButton(text="📅 Sanani o'zgartirish", callback_data=f"edit_date_{event_id}"),
-        InlineKeyboardButton(text="⏰ Vaqtni o'zgartirish", callback_data=f"edit_time_{event_id}"),
-        InlineKeyboardButton(text="📍 Manzilni o'zgartirish", callback_data=f"edit_location_{event_id}"),
-        InlineKeyboardButton(text="🔗 Havolani o'zgartirish", callback_data=f"edit_link_{event_id}"),
-        InlineKeyboardButton(text="🖼 Rasmni o'zgartirish", callback_data=f"edit_image_{event_id}"),
-        InlineKeyboardButton(text="🔙 Orqaga", callback_data="admin_manage_events")
-    )
-
-    return keyboard
+# EDIT FUNKSIYASI O'CHIRILDI - FAQAT DELETE QOLDIRILDI
+# def get_event_edit_options_keyboard(event_id: int) -> InlineKeyboardMarkup:
+#     """Keyboard with options to edit different fields of an event"""
+#     keyboard = InlineKeyboardMarkup(row_width=1)
+#
+#     keyboard.add(
+#         InlineKeyboardButton(text="📝 Nomini o'zgartirish", callback_data=f"edit_title_{event_id}"),
+#         InlineKeyboardButton(text="📄 Tavsifni o'zgartirish", callback_data=f"edit_desc_{event_id}"),
+#         InlineKeyboardButton(text="📅 Sanani o'zgartirish", callback_data=f"edit_date_{event_id}"),
+#         InlineKeyboardButton(text="⏰ Vaqtni o'zgartirish", callback_data=f"edit_time_{event_id}"),
+#         InlineKeyboardButton(text="📍 Manzilni o'zgartirish", callback_data=f"edit_location_{event_id}"),
+#         InlineKeyboardButton(text="🔗 Havolani o'zgartirish", callback_data=f"edit_link_{event_id}"),
+#         InlineKeyboardButton(text="🖼 Rasmni o'zgartirish", callback_data=f"edit_image_{event_id}"),
+#         InlineKeyboardButton(text="🔙 Orqaga", callback_data="admin_manage_events")
+#     )
+#
+#     return keyboard
 
 
 def get_delete_confirm_keyboard(event_id: int) -> InlineKeyboardMarkup:

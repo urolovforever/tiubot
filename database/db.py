@@ -353,12 +353,15 @@ class Database:
         try:
             if upcoming_only:
                 # Only get future events
+                # Convert DD.MM.YYYY to YYYY-MM-DD for comparison
                 c.execute("""SELECT * FROM events
-                            WHERE date >= date('now')
-                            ORDER BY date ASC, time ASC""")
+                            WHERE substr(date, 7, 4) || '-' || substr(date, 4, 2) || '-' || substr(date, 1, 2) >= date('now')
+                            ORDER BY substr(date, 7, 4) || substr(date, 4, 2) || substr(date, 1, 2) ASC, time ASC""")
             else:
                 # Get all events, sorted by date ascending (nearest first)
-                c.execute("SELECT * FROM events ORDER BY date ASC, time ASC")
+                # Convert DD.MM.YYYY to YYYY-MM-DD for sorting
+                c.execute("""SELECT * FROM events
+                            ORDER BY substr(date, 7, 4) || substr(date, 4, 2) || substr(date, 1, 2) ASC, time ASC""")
             return c.fetchall()
         except Exception as e:
             logger.error(f"Error getting events: {e}")

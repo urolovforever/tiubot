@@ -222,14 +222,8 @@ async def process_event_date_quick(message: types.Message, state: FSMContext):
     # Preview yuborish
     await message.answer_photo(
         photo=data['photo_id'],
-        caption=f"{data['caption']}\n\n<b>📅 Sana: {date_str}</b>",
+        caption=f"{data['caption']}\n\n<b>📅 Sana: {date_str}</b>\n\n👆 Tadbir shu ko'rinishda e'lon qilinadi.",
         parse_mode='HTML',
-        reply_markup=keyboard
-    )
-
-    await message.answer(
-        "👆 Tadbir shu ko'rinishda e'lon qilinadi.\n\n"
-        "Tasdiqlaysizmi?",
         reply_markup=keyboard
     )
 
