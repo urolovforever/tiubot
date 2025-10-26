@@ -59,25 +59,56 @@ def parse_date_from_text(text: str) -> str:
 
 
 async def quick_event_start(message: types.Message, state: FSMContext):
-    """Admin tez tadbir qo'shishni boshlaydi"""
+    """Admin tadbir qo'shishni boshlaydi"""
     user_id = message.from_user.id
 
     if not is_admin(user_id):
         return
 
     await message.answer(
-        "📸 <b>Tez tadbir qo'shish</b>\n\n"
-        "Tadbirni Telegram post sifatida yuboring:\n"
-        "• Rasm + Caption (tadbir haqida ma'lumot)\n\n"
-        "Caption'da quyidagilarni yozing:\n"
-        "• Tadbir nomi\n"
-        "• Tavsif\n"
-        "• Vaqt\n"
-        "• Manzil\n"
-        "• Link (agar kerak bo'lsa)\n\n"
-        "Telegram post formatida yozing (emoji, hashtag bilan).",
+        "📝 <b>Tadbir qo'shish</b>\n\n"
+        "1️⃣ Tadbir nomini kiriting:\n\n"
+        "Masalan:\n"
+        "• Ochiq eshiklar kuni\n"
+        "• Yuridik kitoblar yarmarkasi\n"
+        "• Startup tanlov",
         parse_mode='HTML',
         reply_markup=get_cancel_keyboard(user_id)
+    )
+
+    await EventQuickCreateState.waiting_for_title.set()
+
+
+async def process_event_title(message: types.Message, state: FSMContext):
+    """Tadbir nomini qabul qilish"""
+    user_id = message.from_user.id
+
+    # Bekor qilish
+    if message.text in ['❌ Bekor qilish', '❌ Отмена', '❌ Cancel']:
+        await state.finish()
+        await message.answer(
+            "❌ Bekor qilindi",
+            reply_markup=get_admin_keyboard(user_id)
+        )
+        return
+
+    # Nomni saqlash
+    title = message.text.strip()
+    await state.update_data(title=title)
+
+    # Rasm + caption so'rash
+    await message.answer(
+        "📸 <b>2️⃣ Rasm va tavsif yuboring</b>\n\n"
+        "Tadbir haqida to'liq ma'lumot:\n"
+        "• Rasm yuklang\n"
+        "• Caption'da tavsif yozing\n\n"
+        "Caption'da:\n"
+        "• Tadbir haqida batafsil\n"
+        "• Vaqt, manzil\n"
+        "• Link (kerak bo'lsa)\n"
+        "• Emoji va hashtag ishlatish mumkin\n\n"
+        "Telegram post formatida yuboring.",
+        parse_mode='HTML'
     )
 
     await EventQuickCreateState.waiting_for_post.set()
@@ -100,8 +131,7 @@ async def process_event_post(message: types.Message, state: FSMContext):
     if not message.photo:
         await message.answer(
             "❌ Rasm yuborish kerak!\n\n"
-            "Telegram post formatida:\n"
-            "• Rasm + Caption\n\n"
+            "Rasm + Caption formatida yuboring.\n\n"
             "Qaytadan yuboring yoki bekor qiling."
         )
         return
@@ -109,7 +139,7 @@ async def process_event_post(message: types.Message, state: FSMContext):
     # Caption bo'lishi kerak
     if not message.caption:
         await message.answer(
-            "❌ Caption (tadbir haqida ma'lumot) yozish kerak!\n\n"
+            "❌ Caption (tadbir tavsifi) yozish kerak!\n\n"
             "Rasm bilan birga caption yozing.\n\n"
             "Qaytadan yuboring yoki bekor qiling."
         )
@@ -118,18 +148,15 @@ async def process_event_post(message: types.Message, state: FSMContext):
     # Ma'lumotlarni saqlash
     photo_id = message.photo[-1].file_id
     caption = message.caption_html  # HTML formatda saqlash (bold, emoji saqlanadi)
-    title = extract_title_from_caption(caption)
 
     await state.update_data(
         photo_id=photo_id,
-        caption=caption,
-        title=title,
-        message_id=message.message_id
+        caption=caption
     )
 
     # Sanani so'rash
     await message.answer(
-        "📅 <b>Tadbir sanasini kiriting</b>\n\n"
+        "📅 <b>3️⃣ Tadbir sanasini kiriting</b>\n\n"
         "Format: DD.MM.YYYY\n\n"
         "Masalan:\n"
         "• 15.02.2025\n"
@@ -265,17 +292,27 @@ async def process_event_confirmation(callback: types.CallbackQuery, state: FSMCo
 
 
 def register_quick_event_handlers(dp: Dispatcher):
-    """Tez tadbir qo'shish handler'larini ro'yxatdan o'tkazish"""
+    """Tadbir qo'shish handler'larini ro'yxatdan o'tkazish"""
 
     # Boshlash
     dp.register_message_handler(
         quick_event_start,
         lambda message: message.text in [
+            '➕ Tadbir qo\'shish',
             '➕ Tez tadbir qo\'shish',
+            '➕ Добавить мероприятие',
             '➕ Быстро добавить событие',
+            '➕ Add Event',
             '➕ Quick Add Event'
         ] and is_admin(message.from_user.id),
         state='*'
+    )
+
+    # Nom qabul qilish
+    dp.register_message_handler(
+        process_event_title,
+        content_types=['text'],
+        state=EventQuickCreateState.waiting_for_title
     )
 
     # Rasm + caption qabul qilish

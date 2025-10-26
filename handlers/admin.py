@@ -934,23 +934,26 @@ def register_admin_handlers(dp: Dispatcher):
     )
 
     dp.register_message_handler(process_admin_reply, state=AdminReplyState.waiting_for_reply)
-    dp.register_message_handler(
-        add_event_handler,
-        lambda message: message.text in ['➕ Tadbir qo\'shish', '➕ Добавить мероприятие'] and is_admin(
-            message.from_user.id),
-        state='*'
-    )
-    dp.register_message_handler(process_event_title, state=EventCreateState.waiting_for_title)
-    dp.register_message_handler(process_event_description, state=EventCreateState.waiting_for_description)
-    dp.register_message_handler(process_event_date, state=EventCreateState.waiting_for_date)
-    dp.register_message_handler(process_event_time, state=EventCreateState.waiting_for_time)
-    dp.register_message_handler(process_event_location, state=EventCreateState.waiting_for_location)
-    dp.register_message_handler(process_event_registration_link, state=EventCreateState.waiting_for_registration_link)
-    dp.register_message_handler(
-        process_event_image,
-        content_types=['text', 'photo', 'document'],
-        state=EventCreateState.waiting_for_image
-    )
+
+    # ESKI USUL - O'CHIRILDI (event_quick_create.py ishlatiladi)
+    # dp.register_message_handler(
+    #     add_event_handler,
+    #     lambda message: message.text in ['➕ Tadbir qo\'shish', '➕ Добавить мероприятие'] and is_admin(
+    #         message.from_user.id),
+    #     state='*'
+    # )
+    # dp.register_message_handler(process_event_title, state=EventCreateState.waiting_for_title)
+    # dp.register_message_handler(process_event_description, state=EventCreateState.waiting_for_description)
+    # dp.register_message_handler(process_event_date, state=EventCreateState.waiting_for_date)
+    # dp.register_message_handler(process_event_time, state=EventCreateState.waiting_for_time)
+    # dp.register_message_handler(process_event_location, state=EventCreateState.waiting_for_location)
+    # dp.register_message_handler(process_event_registration_link, state=EventCreateState.waiting_for_registration_link)
+    # dp.register_message_handler(
+    #     process_event_image,
+    #     content_types=['text', 'photo', 'document'],
+    #     state=EventCreateState.waiting_for_image
+    # )
+
     dp.register_message_handler(
         manage_events_handler,
         lambda message: message.text in ['📝 Tadbirlarni boshqarish', '📝 Управление мероприятиями'] and is_admin(

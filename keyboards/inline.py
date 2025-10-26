@@ -54,8 +54,8 @@ def get_event_emoji(title: str) -> str:
 def get_events_inline_keyboard(events: list) -> InlineKeyboardMarkup:
     """
     Create inline keyboard for events list
-    Each button shows: emoji + event title + date
-    Format: 🎓 Ochiq eshiklar kuni - 15.02
+    Each button shows only event title (no date, no emoji)
+    Format: Ochiq eshiklar kuni
     """
     keyboard = InlineKeyboardMarkup(row_width=1)
 
@@ -63,25 +63,15 @@ def get_events_inline_keyboard(events: list) -> InlineKeyboardMarkup:
         # event structure: (id, title, description, date, time, location, registration_link, image_id, created_at)
         event_id = event[0]
         title = event[1]
-        date = event[3]
 
-        # Get emoji for event
-        emoji = get_event_emoji(title)
-
-        # Format date to short version
-        short_date = parse_event_date(date)
-
-        # Truncate title if too long (max 40 chars for button)
-        max_title_length = 40
+        # Truncate title if too long (max 50 chars for button)
+        max_title_length = 50
         display_title = title if len(title) <= max_title_length else title[:max_title_length-3] + '...'
 
-        # Create button text
-        button_text = f"{emoji} {display_title} - {short_date}"
-
-        # Add button with callback data
+        # Add button with callback data - faqat nom
         keyboard.add(
             InlineKeyboardButton(
-                text=button_text,
+                text=display_title,
                 callback_data=f"event_{event_id}"
             )
         )

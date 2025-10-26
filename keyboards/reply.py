@@ -139,7 +139,7 @@ def get_admin_keyboard(user_id: int) -> ReplyKeyboardMarkup:
             '✅ Javob berilganlar',
             '📊 Statistika',
             '📢 Broadcast',
-            '➕ Tez tadbir qo\'shish',  # Yangi
+            '➕ Tadbir qo\'shish',
             '📝 Tadbirlarni boshqarish'
         ],
         'ru': [
@@ -147,7 +147,7 @@ def get_admin_keyboard(user_id: int) -> ReplyKeyboardMarkup:
             '✅ Отвеченные',
             '📊 Статистика',
             '📢 Рассылка',
-            '➕ Быстро добавить событие',  # Yangi
+            '➕ Добавить мероприятие',
             '📝 Управление мероприятиями'
         ],
         'en': [
@@ -155,7 +155,7 @@ def get_admin_keyboard(user_id: int) -> ReplyKeyboardMarkup:
             '✅ Answered',
             '📊 Statistics',
             '📢 Broadcast',
-            '➕ Quick Add Event',  # Yangi
+            '➕ Add Event',
             '📝 Manage Events'
         ]
     }
