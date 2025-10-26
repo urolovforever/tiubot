@@ -133,12 +133,12 @@ def get_admin_keyboard(user_id: int) -> ReplyKeyboardMarkup:
     lang = db.get_user_language(user_id)
     keyboard = ReplyKeyboardMarkup(resize_keyboard=True, row_width=2)
 
+    # Broadcast button o'chirildi - endi /broadcast komandasi ishlatiladi
     buttons = {
         'uz': [
             '📬 Yangi murojaatlar',
             '✅ Javob berilganlar',
             '📊 Statistika',
-            '📢 Broadcast',
             '➕ Tadbir qo\'shish',
             '📝 Tadbirlarni boshqarish'
         ],
@@ -146,7 +146,6 @@ def get_admin_keyboard(user_id: int) -> ReplyKeyboardMarkup:
             '📬 Новые обращения',
             '✅ Отвеченные',
             '📊 Статистика',
-            '📢 Рассылка',
             '➕ Добавить мероприятие',
             '📝 Управление мероприятиями'
         ],
@@ -154,7 +153,6 @@ def get_admin_keyboard(user_id: int) -> ReplyKeyboardMarkup:
             '📬 New Applications',
             '✅ Answered',
             '📊 Statistics',
-            '📢 Broadcast',
             '➕ Add Event',
             '📝 Manage Events'
         ]

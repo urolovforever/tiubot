@@ -1,10 +1,12 @@
 from aiogram import types, Dispatcher
 from aiogram.dispatcher import FSMContext
 from keyboards.reply import (get_admin_keyboard, get_cancel_keyboard, get_events_keyboard,
-                             get_main_keyboard, get_statistics_keyboard, get_broadcast_confirm_keyboard,
+                             get_main_keyboard, get_statistics_keyboard,
                              get_skip_keyboard)
+# get_broadcast_confirm_keyboard endi ishlatilmaydi
 from database.db import Database
-from states.forms import AdminReplyState, EventCreateState, EventDeleteState, BroadcastState
+from states.forms import AdminReplyState, EventCreateState, EventDeleteState
+# BroadcastState endi universal_broadcast.py da ishlatiladi
 from utils.helpers import t, is_admin
 from datetime import datetime
 from config import ADMIN_IDS
@@ -328,219 +330,9 @@ async def show_monthly_statistics(message: types.Message):
 
 
 # ==================== BROADCAST ====================
-
-async def broadcast_start_handler(message: types.Message, state: FSMContext):
-    user_id = message.from_user.id
-
-    if not is_admin(user_id):
-        return
-
-    lang = db.get_user_language(user_id)
-
-    # Foydalanuvchilar sonini ko'rsatish
-    users_count = len(db.get_all_users())
-
-    texts = {
-        'uz': f'''📢 Broadcast xabari
-
-Hozirgi foydalanuvchilar soni: {users_count}
-
-Xabarni yozing (matn, rasm yoki video):''',
-
-        'ru': f'''📢 Рассылка сообщения
-
-Текущее количество пользователей: {users_count}
-
-Напишите сообщение (текст, фото или видео):''',
-
-        'en': f'''📢 Broadcast Message
-
-Current number of users: {users_count}
-
-Write the message (text, photo or video):'''
-    }
-
-    await message.answer(
-        texts.get(lang, texts['uz']),
-        reply_markup=get_cancel_keyboard(user_id)
-    )
-    await BroadcastState.waiting_for_message.set()
-
-
-async def broadcast_process_message(message: types.Message, state: FSMContext):
-    user_id = message.from_user.id
-
-    if message.text in ['❌ Bekor qilish', '❌ Отмена', '❌ Cancel']:
-        await state.finish()
-        await message.answer(
-            '❌ Broadcast bekor qilindi',
-            reply_markup=get_admin_keyboard(user_id)
-        )
-        return
-
-    # Xabarni saqlash
-    broadcast_data = {
-        'text': message.text if message.text else message.caption,
-        'photo': message.photo[-1].file_id if message.photo else None,
-        'video': message.video.file_id if message.video else None,
-        'document': message.document.file_id if message.document else None
-    }
-
-    await state.update_data(broadcast_data=broadcast_data)
-
-    # Tasdiqlash
-    users_count = len(db.get_all_users())
-    lang = db.get_user_language(user_id)
-
-    preview = broadcast_data['text'] if broadcast_data['text'] else '[Media fayl]'
-
-    texts = {
-        'uz': f'''📢 Broadcast tasdiqlansinmi?
-
-👥 Foydalanuvchilar: {users_count} ta
-
-📝 Xabar:
-{preview[:200]}{'...' if len(preview) > 200 else ''}
-
-Yuborilsinmi?''',
-
-        'ru': f'''📢 Подтвердить рассылку?
-
-👥 Пользователи: {users_count}
-
-📝 Сообщение:
-{preview[:200]}{'...' if len(preview) > 200 else ''}
-
-Отправить?''',
-
-        'en': f'''📢 Confirm broadcast?
-
-👥 Users: {users_count}
-
-📝 Message:
-{preview[:200]}{'...' if len(preview) > 200 else ''}
-
-Send?'''
-    }
-
-    await message.answer(
-        texts.get(lang, texts['uz']),
-        reply_markup=get_broadcast_confirm_keyboard(user_id)
-    )
-    await BroadcastState.waiting_for_confirmation.set()
-
-
-async def broadcast_confirm(message: types.Message, state: FSMContext):
-    user_id = message.from_user.id
-    lang = db.get_user_language(user_id)
-
-    if message.text in ['❌ Bekor qilish', '❌ Отмена', '❌ Cancel']:
-        await state.finish()
-        await message.answer(
-            '❌ Broadcast bekor qilindi',
-            reply_markup=get_admin_keyboard(user_id)
-        )
-        return
-
-    if message.text not in ['✅ Ha, yuborish', '✅ Да, отправить', '✅ Yes, send']:
-        await message.answer('❌ Noto\'g\'ri tanlov')
-        return
-
-    # Broadcast yuborish
-    data = await state.get_data()
-    broadcast_data = data.get('broadcast_data')
-
-    users = db.get_all_users()
-
-    sending_texts = {
-        'uz': f'📤 Xabar yuborilmoqda...\n\nJami: {len(users)} ta',
-        'ru': f'📤 Отправка сообщения...\n\nВсего: {len(users)}',
-        'en': f'📤 Sending message...\n\nTotal: {len(users)}'
-    }
-
-    status_msg = await message.answer(
-        sending_texts.get(lang, sending_texts['uz']),
-        reply_markup=get_admin_keyboard(user_id)
-    )
-
-    success = 0
-    failed = 0
-
-    for user_id_target in users:
-        try:
-            if broadcast_data['photo']:
-                await message.bot.send_photo(
-                    user_id_target,
-                    broadcast_data['photo'],
-                    caption=broadcast_data['text']
-                )
-            elif broadcast_data['video']:
-                await message.bot.send_video(
-                    user_id_target,
-                    broadcast_data['video'],
-                    caption=broadcast_data['text']
-                )
-            elif broadcast_data['document']:
-                await message.bot.send_document(
-                    user_id_target,
-                    broadcast_data['document'],
-                    caption=broadcast_data['text']
-                )
-            else:
-                await message.bot.send_message(
-                    user_id_target,
-                    broadcast_data['text']
-                )
-
-            success += 1
-
-            # Har 10 ta xabardan keyin status yangilash
-            if success % 10 == 0:
-                try:
-                    await message.answer(
-                        f'📤 Yuborilmoqda...\n\n✅ Yuborildi: {success}\n❌ Xatolik: {failed}\n⏳ Qoldi: {len(users) - success - failed}'
-                    )
-                except:
-                    pass
-
-            await asyncio.sleep(0.05)  # Spam oldini olish
-
-        except Exception as e:
-            failed += 1
-            logger.error(f'Broadcast error for user {user_id_target}: {e}')
-
-    # Yakuniy natija
-    result_texts = {
-        'uz': f'''✅ Broadcast yakunlandi!
-
-✅ Muvaffaqiyatli: {success}
-❌ Xatolik: {failed}
-📊 Jami: {len(users)}
-
-📅 {datetime.now().strftime("%Y-%m-%d %H:%M")}''',
-
-        'ru': f'''✅ Рассылка завершена!
-
-✅ Успешно: {success}
-❌ Ошибок: {failed}
-📊 Всего: {len(users)}
-
-📅 {datetime.now().strftime("%Y-%m-%d %H:%M")}''',
-
-        'en': f'''✅ Broadcast completed!
-
-✅ Successful: {success}
-❌ Failed: {failed}
-📊 Total: {len(users)}
-
-📅 {datetime.now().strftime("%Y-%m-%d %H:%M")}'''
-    }
-
-    await status_msg.edit_text(
-        result_texts.get(lang, result_texts['uz'])
-    )
-
-    await state.finish()
+# ESKI BUTTON-BASED BROADCAST O'CHIRILDI
+# Endi /broadcast komandasi ishlatiladi (universal_broadcast.py)
+# Eski handler'lar git history'dan topish mumkin
 
 
 async def add_event_handler(message: types.Message, state: FSMContext):
@@ -919,21 +711,22 @@ def register_admin_handlers(dp: Dispatcher):
         lambda message: message.text in ['📆 Oylik', '📆 Месячная', '📆 Monthly'] and is_admin(message.from_user.id)
     )
 
-    # Broadcast
-    dp.register_message_handler(
-        broadcast_start_handler,
-        lambda message: message.text in ['📢 Broadcast', '📢 Рассылка'] and is_admin(message.from_user.id),
-        state='*'
-    )
-    dp.register_message_handler(
-        broadcast_process_message,
-        content_types=['text', 'photo', 'video', 'document'],
-        state=BroadcastState.waiting_for_message
-    )
-    dp.register_message_handler(
-        broadcast_confirm,
-        state=BroadcastState.waiting_for_confirmation
-    )
+    # Broadcast - ESKI BUTTON-BASED METHOD O'CHIRILDI
+    # Endi /broadcast komandasi ishlatiladi (universal_broadcast.py)
+    # dp.register_message_handler(
+    #     broadcast_start_handler,
+    #     lambda message: message.text in ['📢 Broadcast', '📢 Рассылка'] and is_admin(message.from_user.id),
+    #     state='*'
+    # )
+    # dp.register_message_handler(
+    #     broadcast_process_message,
+    #     content_types=['text', 'photo', 'video', 'document'],
+    #     state=BroadcastState.waiting_for_content
+    # )
+    # dp.register_message_handler(
+    #     broadcast_confirm,
+    #     state=BroadcastState.waiting_for_confirmation
+    # )
 
     dp.register_message_handler(process_admin_reply, state=AdminReplyState.waiting_for_reply)
 
