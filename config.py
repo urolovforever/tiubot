@@ -10,6 +10,19 @@ ADMIN_IDS = [1920079641]  # O'z telegram ID laringizni kiriting
 # Channel settings
 DIGEST_CHANNEL_ID = os.getenv('DIGEST_CHANNEL_ID', '-1003285608799')  # Hafta dayjesti kanali ID
 
+# Library channel settings
+LIBRARY_CHANNELS = {
+    1: {'username': '@tiu_library_top', 'id': None},  # TOP-ADABIYOTLAR
+    2: {'username': '@tiu_library_economics', 'id': None},  # IQTISODIY ADABIYOTLAR
+    3: {'username': '@tiu_library_fiction', 'id': None},  # BADIY ADABIYOTLAR
+    4: {'username': '@tiu_library_it', 'id': None},  # IT SOHA
+    5: {'username': '@tiu_library_education', 'id': None},  # TA'LIM ADABIYOTLARI
+    6: {'username': '@tiu_library_languages', 'id': None},  # XORIJIY TIL ADABIYOTLARI
+    7: {'username': '@tiu_library_law', 'id': None},  # HUQUQIY SOHA
+    8: {'username': '@tiu_library_science', 'id': None},  # ILMIY ADABIYOTLAR
+    9: {'username': '@tiu_library_other', 'id': None},  # BOSHQA TURDAGI
+}
+
 # Database settings
 DATABASE_NAME = 'tiu_bot.db'
 
