@@ -100,6 +100,14 @@ class Database:
                       image_id TEXT,
                       created_at TEXT)''')
 
+        # Channel posts table - to store latest digest post
+        c.execute('''CREATE TABLE IF NOT EXISTS channel_posts
+                     (id INTEGER PRIMARY KEY AUTOINCREMENT,
+                      channel_id TEXT,
+                      message_id INTEGER,
+                      post_date TEXT,
+                      UNIQUE(channel_id))''')
+
         conn.commit()
         conn.close()
         logger.info("Database initialized successfully")
@@ -533,5 +541,38 @@ class Database:
         except Exception as e:
             logger.error(f"Error getting groups: {e}")
             return []
+        finally:
+            conn.close()
+
+    def save_channel_post(self, channel_id: str, message_id: int):
+        """Save or update the latest channel post message ID"""
+        conn = self.get_connection()
+        c = conn.cursor()
+        try:
+            c.execute(
+                '''INSERT OR REPLACE INTO channel_posts (channel_id, message_id, post_date)
+                   VALUES (?, ?, ?)''',
+                (channel_id, message_id, datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
+            )
+            conn.commit()
+        except Exception as e:
+            logger.error(f"Error saving channel post: {e}")
+        finally:
+            conn.close()
+
+    def get_channel_post(self, channel_id: str) -> Optional[int]:
+        """Get the latest channel post message ID"""
+        conn = self.get_connection()
+        c = conn.cursor()
+        try:
+            c.execute(
+                "SELECT message_id FROM channel_posts WHERE channel_id=?",
+                (channel_id,)
+            )
+            result = c.fetchone()
+            return result[0] if result else None
+        except Exception as e:
+            logger.error(f"Error getting channel post: {e}")
+            return None
         finally:
             conn.close()

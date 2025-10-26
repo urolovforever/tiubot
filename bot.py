@@ -18,6 +18,7 @@ from handlers.events import register_events_handlers
 from handlers.event_quick_create import register_quick_event_handlers  # YANGI
 from handlers.applications import register_applications_handlers
 from handlers.universal_broadcast import register_universal_broadcast_handlers  # UNIVERSAL BROADCAST
+from handlers.channel_handler import register_channel_handlers  # CHANNEL POST TRACKER
 from handlers.admin import register_admin_handlers
 
 # Import event reminder system
@@ -61,6 +62,9 @@ def register_all_handlers(dp: Dispatcher):
     register_schedule_handlers(dp)
     register_events_handlers(dp)
     register_applications_handlers(dp)
+
+    # Channel handlers (before admin to catch channel posts)
+    register_channel_handlers(dp)  # CHANNEL POST TRACKER - Kanaldan postlarni saqlash
 
     # Admin handlers (must be last)
     register_quick_event_handlers(dp)  # YANGI - Tez tadbir qo'shish
