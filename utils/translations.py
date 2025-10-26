@@ -23,6 +23,7 @@ TRANSLATIONS = {
 
         # Schedule
         'choose_faculty': '📚 Fakultetni tanlang:',
+        'choose_direction': '🎯 Yo\'nalishni tanlang:',
         'choose_course': '🎓 Kursni tanlang:',
         'choose_group': '👥 Guruhni tanlang:',
         'schedule_not_found': '❌ Bu guruh uchun jadval topilmadi',
@@ -132,6 +133,7 @@ TRANSLATIONS = {
 
         # Schedule
         'choose_faculty': '📚 Выберите факультет:',
+        'choose_direction': '🎯 Выберите направление:',
         'choose_course': '🎓 Выберите курс:',
         'choose_group': '👥 Выберите группу:',
         'schedule_not_found': '❌ Расписание не найдено',
@@ -240,6 +242,7 @@ TRANSLATIONS = {
 
         # Schedule
         'choose_faculty': '📚 Choose faculty:',
+        'choose_direction': '🎯 Choose direction:',
         'choose_course': '🎓 Choose course:',
         'choose_group': '👥 Choose group:',
         'schedule_not_found': '❌ Schedule not found for this group',

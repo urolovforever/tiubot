@@ -78,16 +78,37 @@ def get_faculty_keyboard(user_id: int) -> ReplyKeyboardMarkup:
     return keyboard
 
 
-def get_course_keyboard(user_id: int) -> ReplyKeyboardMarkup:
-    from config import COURSES
+def get_direction_keyboard(user_id: int, faculty: str) -> ReplyKeyboardMarkup:
+    from config import FACULTIES
+    from database.db import Database
+
+    lang = db.get_user_language(user_id)
+
+    keyboard = ReplyKeyboardMarkup(resize_keyboard=True, row_width=2)
+    faculties_lang = FACULTIES.get(lang, FACULTIES['uz'])
+
+    if faculty in faculties_lang:
+        for direction in faculties_lang[faculty]:
+            keyboard.insert(KeyboardButton(direction))
+
+    keyboard.add(KeyboardButton(t(user_id, 'back')))
+    return keyboard
+
+
+def get_course_keyboard(user_id: int, faculty: str, direction: str) -> ReplyKeyboardMarkup:
+    from config import FACULTIES
     from database.db import Database
     from utils.helpers import t
 
     lang = db.get_user_language(user_id)
 
     keyboard = ReplyKeyboardMarkup(resize_keyboard=True, row_width=2)
-    for course in COURSES.get(lang, COURSES['uz']):
-        keyboard.insert(KeyboardButton(course))
+    faculties_lang = FACULTIES.get(lang, FACULTIES['uz'])
+
+    if faculty in faculties_lang and direction in faculties_lang[faculty]:
+        for course in faculties_lang[faculty][direction]:
+            keyboard.insert(KeyboardButton(course))
+
     keyboard.add(KeyboardButton(t(user_id, 'back')))
     return keyboard
 

@@ -544,6 +544,39 @@ class Database:
         finally:
             conn.close()
 
+    def get_groups_by_faculty_direction_course(self, faculty: str, direction: str, course: str) -> List[str]:
+        """Get groups by faculty, direction, and course"""
+        conn = self.get_connection()
+        c = conn.cursor()
+        try:
+            c.execute(
+                "SELECT DISTINCT group_name FROM schedules WHERE faculty=? AND direction=? AND course=?",
+                (faculty, direction, course)
+            )
+            return [row[0] for row in c.fetchall()]
+        except Exception as e:
+            logger.error(f"Error getting groups by faculty, direction, course: {e}")
+            return []
+        finally:
+            conn.close()
+
+    def get_schedule_with_direction(self, faculty: str, direction: str, course: str, group_name: str) -> Optional[str]:
+        """Get schedule image by faculty, direction, course, and group"""
+        conn = self.get_connection()
+        c = conn.cursor()
+        try:
+            c.execute(
+                "SELECT image_id FROM schedules WHERE faculty=? AND direction=? AND course=? AND group_name=?",
+                (faculty, direction, course, group_name)
+            )
+            result = c.fetchone()
+            return result[0] if result else None
+        except Exception as e:
+            logger.error(f"Error getting schedule with direction: {e}")
+            return None
+        finally:
+            conn.close()
+
     def save_channel_post(self, channel_id: str, message_id: int):
         """Save or update the latest channel post message ID"""
         conn = self.get_connection()
