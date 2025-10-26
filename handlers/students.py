@@ -16,19 +16,16 @@ def get_students_submenu_keyboard(user_id: int) -> ReplyKeyboardMarkup:
     buttons = {
         'uz': [
             '📅 Dars jadvali',
-            '🧾 To\'lov tizimi',
             '📚 Kutubxona / resurslar',
             '🎉 Talabalar hayoti / klublar'
         ],
         'ru': [
             '📅 Расписание занятий',
-            '🧾 Система оплаты',
             '📚 Библиотека / ресурсы',
             '🎉 Студенческая жизнь / клубы'
         ],
         'en': [
             '📅 Class schedule',
-            '🧾 Payment system',
             '📚 Library / resources',
             '🎉 Student life / clubs'
         ]
@@ -37,7 +34,7 @@ def get_students_submenu_keyboard(user_id: int) -> ReplyKeyboardMarkup:
     for btn in buttons.get(lang, buttons['uz']):
         keyboard.insert(KeyboardButton(btn))
 
-    keyboard.add(KeyboardButton(t(user_id, 'back')))
+    keyboard.insert(KeyboardButton(t(user_id, 'back')))
     return keyboard
 
 
@@ -148,53 +145,6 @@ async def process_group(message: types.Message, state: FSMContext):
         reply_markup=get_main_keyboard(user_id)
     )
 
-async def payment_system_info(message: types.Message):
-    user_id = message.from_user.id
-    lang = db.get_user_language(user_id)
-
-    texts = {
-        'uz': '''🧾 To'lov tizimi
-
-💳 Online: payment.tiu.uz
-💳 Click, Payme, Uzcard
-🏦 Bank o'tkazmasi
-
-Muddatlar:
-📅 1-semestr: Sentyabr
-📅 2-semestr: Fevral
-
-📞 +998 71 200 09 09''',
-
-        'ru': '''🧾 Система оплаты
-
-💳 Онлайн: payment.tiu.uz
-💳 Click, Payme, Uzcard
-🏦 Банковский перевод
-
-Сроки:
-📅 1 семестр: Сентябрь
-📅 2 семестр: Февраль
-
-📞 +998 71 200 09 09''',
-
-        'en': '''🧾 Payment System
-
-💳 Online: payment.tiu.uz
-💳 Click, Payme, Uzcard
-🏦 Bank transfer
-
-Deadlines:
-📅 Semester 1: September
-📅 Semester 2: February
-
-📞 +998 71 200 09 09'''
-    }
-
-    await message.answer(
-        texts.get(lang, texts['uz']),
-        reply_markup=get_students_submenu_keyboard(user_id)
-    )
-
 
 async def library_resources_info(message: types.Message):
     user_id = message.from_user.id
@@ -302,14 +252,6 @@ def register_students_handlers(dp: Dispatcher):
     dp.register_message_handler(process_group, state=ScheduleStates.waiting_for_group)
 
     dp.register_message_handler(
-        payment_system_info,
-        lambda message: message.text in [
-            '🧾 To\'lov tizimi',
-            '🧾 Система оплаты',
-            '🧾 Payment system'
-        ]
-    )
-    dp.register_message_handler(
         library_resources_info,
         lambda message: message.text in [
             '📚 Kutubxona / resurslar',
@@ -317,11 +259,13 @@ def register_students_handlers(dp: Dispatcher):
             '📚 Library / resources'
         ]
     )
-    dp.register_message_handler(
-        student_life_info,
-        lambda message: message.text in [
-            '🎉 Talabalar hayoti / klublar',
-            '🎉 Студенческая жизнь / клубы',
-            '🎉 Student life / clubs'
-        ]
-    )
+
+    def register_student_life_handlers(dp: Dispatcher):
+        dp.register_message_handler(
+            student_life_info,
+            lambda message: message.text in [
+                '🎉 Talabalar hayoti / klublar',
+                '🎉 Студенческая жизнь / клубы',
+                '🎉 Student life / clubs'
+            ]
+        )

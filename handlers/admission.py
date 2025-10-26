@@ -62,125 +62,281 @@ async def admission_requirements_info(message: types.Message):
     lang = db.get_user_language(user_id)
 
     texts = {
-        'uz': '''📋 Qabul shartlari
+        'uz': '''📋 <b>TIUga qabul quyidagi talablarga asosan amalga oshiriladi:</b>
 
-Hujjatlar:
-✅ O'rta ma'lumot hujjati
-✅ Pasport nusxasi
-✅ 3x4 fotosurat (6 ta)
-✅ Kirish imtihonlari natijasi
+<b>1. Ta’lim darajasi:</b>
+11-sinf yoki kollej/litsey bitiruvchisi
 
-Imtihonlar:
-📝 Matematika / Ingliz / Mantiq
-📅 Iyun - Avgust
+<b>2. Hujjatlar ro‘yxati:</b>
+- Passport yoki ID karta
+- Attestat/Diplom (ilovasi bilan)
+- 3×4 rasm (elektron ko‘rinishda)
+- IELTS / TOPIK / boshqa sertifikat (mavjud bo‘lsa — ustunlik beradi)
 
-Ariza muddati:
-🗓 1-iyun - 20-avgust
+<b>3. Qabul jarayoni:</b>
+- Onlayn ariza topshirish
+- Ichki test yoki suhbat (yo‘nalishdan kelib chiqib)
+- Natijalar test yakunlangach e'lon qilinadi
 
-📞 Ma'lumot: +998 71 200 09 09''',
+<b>4. O‘qish shakllari:</b>
+Kunduzgi / Sirtqi / Masofaviy
 
-        'ru': '''📋 Условия поступления
+<b>5. To‘lov turi:</b>
+Kontrakt yoki grant (cheklangan kvota)
 
-Документы:
-✅ Документ о среднем образовании
-✅ Копия паспорта
-✅ Фото 3x4 (6 шт)
-✅ Результаты экзаменов
+ℹ️ <b>Eslatma:</b>
+Til sertifikati majburiy emas, mavjud bo‘lsa imtihondan ozod qilinishi yoki chegirma berilishi mumkin.
 
-Экзамены:
-📝 Математика / Английский / Логика
-📅 Июнь - Август
+Qabul kvotalari cheklangan, joylar to‘ldirilgandan so‘ng qabul yopiladi.
+''',
 
-Срок подачи:
-🗓 1 июня - 20 августа
+        'ru': '''📋 <b>Приём в ТИУ осуществляется на основе следующих требований:</b>
 
-📞 Информация: +998 71 200 09 09''',
+<b>1. Уровень образования:</b>
+Выпускник 11 класса или колледжа/лицея
 
-        'en': '''📋 Admission Requirements
+<b>2. Список документов:</b>
+- Паспорт или ID-карта
+- Аттестат/диплом (с приложением)
+- Фото 3×4 (в электронном виде)
+- IELTS / TOPIK / другие сертификаты (если есть — дают преимущество)
 
-Documents:
-✅ Secondary education certificate
-✅ Passport copy
-✅ 3x4 photos (6 pcs)
-✅ Exam results
+<b>3. Процесс поступления:</b>
+- Подача онлайн-заявки
+- Внутренний тест или собеседование (в зависимости от направления)
+- Результаты объявляются после завершения тестов
 
-Exams:
-📝 Math / English / Logic
-📅 June - August
+<b>4. Формы обучения:</b>
+Очная / Заочная / Дистанционная
 
-Application deadline:
-🗓 June 1 - August 20
+<b>5. Тип оплаты:</b>
+Контракт или грант (ограниченная квота)
 
-📞 Info: +998 71 200 09 09'''
+ℹ️ <b>Примечание:</b>
+Языковой сертификат не обязателен, но если он есть — можно получить освобождение от экзамена или скидку.
+
+Количество мест ограничено — прием закрывается после заполнения квоты.
+''',
+
+        'en': '''📋 <b>Admission to TIU is carried out based on the following requirements:</b>
+
+<b>1. Education Level:</b>
+High school or college/lyceum graduate
+
+<b>2. Required Documents:</b>
+- Passport or ID card
+- Certificate/Diploma (with transcript)
+- 3×4 photo (digital format)
+- IELTS / TOPIK / other certificates (if available — gives an advantage)
+
+<b>3. Admission Process:</b>
+- Submit online application
+- Internal test or interview (depending on program)
+- Results are announced after testing
+
+<b>4. Study Formats:</b>
+Full-time / Part-time / Online
+
+<b>5. Payment Type:</b>
+Contract or scholarship (limited quota)
+
+ℹ️ <b>Note:</b>
+A language certificate is not mandatory. If available, it may provide exam exemption or a discount.
+
+Seats are limited — admission closes once the quota is filled.
+'''
     }
 
     await message.answer(
         texts.get(lang, texts['uz']),
-        reply_markup=get_admission_submenu_keyboard(user_id)
+        reply_markup=get_admission_submenu_keyboard(user_id),
+        parse_mode="HTML"
     )
+
+
 
 
 async def payment_grant_info(message: types.Message):
     user_id = message.from_user.id
     lang = db.get_user_language(user_id)
 
-    texts = {
-        'uz': '''💰 To'lov va grant tizimi
+    # 1-XABAR: Yo'nalishlar va kontrakt narxlari
+    texts_1 = {
+        'uz': '''📚 <b>TIU'da mavjud yo'nalishlar va kontrakt narxlari</b>
 
-Kontrakt:
-💳 12,000,000 - 20,000,000 so'm/yil
+<b>Kunduzgi ta’lim:</b>
+• Yurisprudensiya — 25,000,000 so‘m
+• Bank ishi — 19,000,000 so‘m
+• Buxgalteriya hisobi — 19,000,000 so‘m
+• Iqtisodiyot — 19,000,000 so‘m
+• Marketing — 19,000,000 so‘m
+• Menejment — 19,000,000 so‘m
+• Moliya va moliyaviy texnologiyalar — 19,000,000 so‘m
+• Jahon iqtisodiyoti va xalqaro iqtisodiy munosabatlar — 19,000,000 so‘m
+• Axborot tizimlari va texnologiyalari — 19,000,000 so‘m
+• Kiberxavfsizlik injiniringi — 19,000,000 so‘m
+• Kompyuter injiniringi — 19,000,000 so‘m
+• Dasturiy injiniring — 19,000,000 so‘m
+• Maktabgacha ta’lim — 16,000,000 so‘m
+• Boshlang‘ich ta’lim — 16,000,000 so‘m
+• Psixologiya — 16,000,000 so‘m
+• Ingliz tili va adabiyoti — 19,000,000 so‘m
+• Koreys tili va adabiyoti — 19,000,000 so‘m
 
-Grant:
-🏆 100% - A'lo natija
-🥈 50% - Yuqori ball
-🥉 25% - Yaxshi natija
+<b>Masofaviy ta’lim:</b>
+• Yurisprudensiya — 20,000,000 so‘m
+• Bank ishi — 16,000,000 so‘m
+• Jahon iqtisodiyoti — 16,000,000 so‘m
+• Buxgalteriya hisobi — 16,000,000 so‘m
+• Marketing — 16,000,000 so‘m
+• Menejment — 16,000,000 so‘m
+• Moliya va moliyaviy texnologiyalar — 16,000,000 so‘m
+• Iqtisodiyot — 16,000,000 so‘m
+• Dasturiy injiniring — 16,000,000 so‘m
+• Kompyuter injiniringi — 16,000,000 so‘m
+• Kiberxavfsizlik injiniringi — 16,000,000 so‘m
+• Axborot tizimlari va texnologiyalari — 16,000,000 so‘m
+• Psixologiya — 16,000,000 so‘m
+• Maktabgacha ta’lim — 15,000,000 so‘m
+• Boshlang‘ich ta’lim — 15,000,000 so‘m''',
 
-To'lov:
-✅ Bir martalik (-5%)
-✅ Yarim yillik
-✅ Oylik
+        'ru': '''📚 <b>Направления и стоимость обучения в TIU</b>
 
-📞 +998 71 200 09 09''',
+<b>Очная форма:</b>
+• Юриспруденция — 25,000,000 сум
+• Банковское дело — 19,000,000 сум
+• Бухгалтерский учет — 19,000,000 сум
+• Экономика — 19,000,000 сум
+• Маркетинг — 19,000,000 сум
+• Менеджмент — 19,000,000 сум
+• Финансы и финансовые технологии — 19,000,000 сум
+• Мировая экономика и международные экономические отношения — 19,000,000 сум
+• Информационные системы и технологии — 19,000,000 сум
+• Кибербезопасность — 19,000,000 сум
+• Компьютерная инженерия — 19,000,000 сум
+• Программная инженерия — 19,000,000 сум
+• Дошкольное образование — 16,000,000 сум
+• Начальное образование — 16,000,000 сум
+• Психология — 16,000,000 сум
+• Английский язык и литература — 19,000,000 сум
+• Корейский язык и литература — 19,000,000 сум
 
-        'ru': '''💰 Оплата и гранты
+<b>Дистанционная форма:</b>
+• Юриспруденция — 20,000,000 сум
+• Банковское дело — 16,000,000 сум
+• Мировая экономика — 16,000,000 сум
+• Бухгалтерский учет — 16,000,000 сум
+• Маркетинг — 16,000,000 сум
+• Менеджмент — 16,000,000 сум
+• Финансы и финансовые технологии — 16,000,000 сум
+• Экономика — 16,000,000 сум
+• Программная инженерия — 16,000,000 сум
+• Компьютерная инженерия — 16,000,000 сум
+• Кибербезопасность — 16,000,000 сум
+• Информационные системы и технологии — 16,000,000 сум
+• Психология — 16,000,000 сум
+• Дошкольное образование — 15,000,000 сум
+• Начальное образование — 15,000,000 сум''',
 
-Контракт:
-💳 12,000,000 - 20,000,000 сум/год
+        'en': '''📚 <b>TIU Programs and Tuition Fees</b>
 
-Гранты:
-🏆 100% - Отличный результат
-🥈 50% - Высокий балл
-🥉 25% - Хороший результат
+<b>Full-time Programs:</b>
+• Law — 25,000,000 UZS
+• Banking — 19,000,000 UZS
+• Accounting — 19,000,000 UZS
+• Economics — 19,000,000 UZS
+• Marketing — 19,000,000 UZS
+• Management — 19,000,000 UZS
+• Finance and Financial Technologies — 19,000,000 UZS
+• World Economy and International Relations — 19,000,000 UZS
+• Information Systems and Technologies — 19,000,000 UZS
+• Cybersecurity Engineering — 19,000,000 UZS
+• Computer Engineering — 19,000,000 UZS
+• Software Engineering — 19,000,000 UZS
+• Preschool Education — 16,000,000 UZS
+• Primary Education — 16,000,000 UZS
+• Psychology — 16,000,000 UZS
+• English Language and Literature — 19,000,000 UZS
+• Korean Language and Literature — 19,000,000 UZS
 
-Оплата:
-✅ Единовременная (-5%)
-✅ Полугодовая
-✅ Ежемесячная
-
-📞 +998 71 200 09 09''',
-
-        'en': '''💰 Payment and Grants
-
-Contract:
-💳 12,000,000 - 20,000,000 UZS/year
-
-Grants:
-🏆 100% - Excellent result
-🥈 50% - High score
-🥉 25% - Good result
-
-Payment:
-✅ One-time (-5%)
-✅ Semi-annual
-✅ Monthly
-
-📞 +998 71 200 09 09'''
+<b>Online Programs:</b>
+• Law — 20,000,000 UZS
+• Banking — 16,000,000 UZS
+• World Economy — 16,000,000 UZS
+• Accounting — 16,000,000 UZS
+• Marketing — 16,000,000 UZS
+• Management — 16,000,000 UZS
+• Finance and Financial Technologies — 16,000,000 UZS
+• Economics — 16,000,000 UZS
+• Software Engineering — 16,000,000 UZS
+• Computer Engineering — 16,000,000 UZS
+• Cybersecurity Engineering — 16,000,000 UZS
+• Information Systems and Technologies — 16,000,000 UZS
+• Psychology — 16,000,000 UZS
+• Preschool Education — 15,000,000 UZS
+• Primary Education — 15,000,000 UZS'''
     }
 
+    # 2-XABAR: Grant tizimi
+    texts_2 = {
+        'uz': '''🎓 <b>TIU Grant Tizimi</b>
+
+🏆 100% — To‘liq grant  
+🥇 75% — Yuqori chegirma  
+🥈 50% — O‘rtacha chegirma  
+🥉 25% — Qisman chegirma  
+
+<b>Grantlar quyidagilarga beriladi:</b>
+• Imtihon natijalari
+• IELTS / TOPIK / Xalqaro sertifikatlar
+• Iqtidor, portfel, diplom va medallar
+
+🎓 TIU talabalari davlat grantlarida ham ishtirok etishlari mumkin.
+''',
+
+        'ru': '''🎓 <b>Грантовая система TIU</b>
+
+🏆 100% — Полный грант  
+🥇 75% — Высокая скидка  
+🥈 50% — Средняя скидка  
+🥉 25% — Частичная скидка  
+
+<b>Гранты предоставляются на основе:</b>
+• Результатов экзамена
+• IELTS / TOPIK / международных сертификатов
+• Таланта, портфолио, дипломов и медалей
+
+🎓 Студенты TIU могут участвовать в государственных грантах.
+''',
+
+        'en': '''🎓 <b>TIU Grant System</b>
+
+🏆 100% — Full Scholarship  
+🥇 75% — High Scholarship  
+🥈 50% — Medium Scholarship  
+🥉 25% — Partial Scholarship  
+
+<b>Grants are awarded based on:</b>
+• Entrance exam performance
+• IELTS / TOPIK / international certificates
+• Talent, portfolio, awards, and achievements
+
+🎓 TIU students are also eligible for state scholarship competitions.
+'''
+    }
+
+    # Xabarlar ketma-ket yuboriladi
     await message.answer(
-        texts.get(lang, texts['uz']),
-        reply_markup=get_admission_submenu_keyboard(user_id)
+        texts_1.get(lang, texts_1['uz']),
+        reply_markup=get_admission_submenu_keyboard(user_id),
+        parse_mode="HTML"
     )
+
+    await message.answer(
+        texts_2.get(lang, texts_2['uz']),
+        parse_mode="HTML"
+    )
+
 
 
 async def online_registration_info(message: types.Message):
@@ -188,44 +344,30 @@ async def online_registration_info(message: types.Message):
     lang = db.get_user_language(user_id)
 
     texts = {
-        'uz': '''🌐 Online ro'yxatdan o'tish
+        'uz': '''📢 Hurmatli abituriyentlar!
 
-Qadamlar:
-1️⃣ apply.tiu.uz ga kiring
-2️⃣ Ma'lumotlarni kiriting
-3️⃣ Yo'nalish tanlang
-4️⃣ Hujjat yuklang
-5️⃣ Tasdiqlang
+Toshkent Xalqaro Universitetining joriy yil uchun qabul jarayonlari rasman yakunlandi. Ariza topshirgan barcha nomzodlarga minnatdorchilik bildiramiz. Qabul natijalari shaxsiy kabinet orqali bosqichma-bosqich e’lon qilib boriladi.
 
-🌐 apply.tiu.uz''',
+Keyingi o‘quv yili uchun qabul sanalari qo‘shimcha ravishda e’lon qilinadi.''',
 
-        'ru': '''🌐 Онлайн регистрация
+        'ru': '''📢 Уважаемые абитуриенты!
 
-Шаги:
-1️⃣ Зайдите на apply.tiu.uz
-2️⃣ Введите данные
-3️⃣ Выберите направление
-4️⃣ Загрузите документы
-5️⃣ Подтвердите
+Процесс приема в Ташкентский Международный Университет на текущий год официально завершён. Благодарим всех подавших заявки. Результаты приёма будут объявляться поэтапно через личный кабинет.
 
-🌐 apply.tiu.uz''',
+Даты приема на следующий учебный год будут объявлены дополнительно.''',
 
-        'en': '''🌐 Online Registration
+        'en': '''📢 Dear applicants!
 
-Steps:
-1️⃣ Visit apply.tiu.uz
-2️⃣ Enter information
-3️⃣ Choose program
-4️⃣ Upload documents
-5️⃣ Confirm
+The admission process for this academic year at Tashkent International University has officially been completed. We thank all applicants who submitted their applications. Admission results will be gradually announced through the personal account.
 
-🌐 apply.tiu.uz'''
+The admission dates for the next academic year will be announced additionally.'''
     }
 
     await message.answer(
         texts.get(lang, texts['uz']),
         reply_markup=get_admission_submenu_keyboard(user_id)
     )
+
 
 
 async def admission_contact_info(message: types.Message):
@@ -233,41 +375,38 @@ async def admission_contact_info(message: types.Message):
     lang = db.get_user_language(user_id)
 
     texts = {
-        'uz': '''📞 Qabul bo'limi
+        'uz': '''❓ Savolingiz bormi?
+TIU Qabul bo‘limi sizga yordam beradi.
 
-☎️ +998 71 200 09 09
-📧 admission@tiu.uz
-📱 @tiu_admission
+📞 Telefon: +998 (95) 131-55-55
+✉️ Telegram: https://t.me/tiuqabul
 
-Ish vaqti:
-🕐 Dush-Juma: 9:00-18:00
-🕐 Shanba: 9:00-13:00''',
+🌐 www.tiu.uz''',
 
-        'ru': '''📞 Приемная комиссия
+        'ru': '''❓ У вас есть вопросы?
+Приемная комиссия TIU поможет вам.
 
-☎️ +998 71 200 09 09
-📧 admission@tiu.uz
-📱 @tiu_admission
+📞 Телефон: +998 (95) 131-55-55
+✉️ Telegram: https://t.me/tiuqabul
 
-Время работы:
-🕐 Пн-Пт: 9:00-18:00
-🕐 Суббота: 9:00-13:00''',
+🌐 www.tiu.uz''',
 
-        'en': '''📞 Admissions Office
+        'en': '''❓ Got questions?
+TIU Admissions Office is here to help.
 
-☎️ +998 71 200 09 09
-📧 admission@tiu.uz
-📱 @tiu_admission
+📞 Phone: +998 (95) 131-55-55
+✉️ Telegram: https://t.me/tiuqabul
 
-Working hours:
-🕐 Mon-Fri: 9:00-18:00
-🕐 Saturday: 9:00-13:00'''
+🌐 www.tiu.uz'''
     }
 
     await message.answer(
         texts.get(lang, texts['uz']),
+        parse_mode="HTML",
+        disable_web_page_preview=True,
         reply_markup=get_admission_submenu_keyboard(user_id)
     )
+
 
 
 async def faq_info(message: types.Message):
@@ -275,59 +414,172 @@ async def faq_info(message: types.Message):
     lang = db.get_user_language(user_id)
 
     texts = {
-        'uz': '''❓ Tez-tez so'raladigan savollar
+        'uz': """❓ Tez-tez so'raladigan savollar
 
-1️⃣ Qabul qachon?
-   → 1-iyun - 20-avgust
+1. TIUga qabul qachon boshlanadi?
+Qabul onlayn tarzda <a href="https://qabul.tiu.uz">qabul.tiu.uz</a> portali orqali amalga oshiriladi. Yangi qabul sanalari rasmiy sahifalarda e’lon qilinadi.
 
-2️⃣ Xalqaro diplom bormi?
-   → Ha, qo'sh diplom dasturlari
+2. Qanday hujjatlar kerak bo‘ladi?
+- Passport yoki ID
+- Attestat yoki Diplom (ilova bilan)
+- IELTS/TOPIK (bo‘lsa — ustunlik beradi)
 
-3️⃣ Yotoqxona bormi?
-   → Ha, zamonaviy turar joy
+3. Qabul qanday shaklda? Test bormi yoki suhbatmi?
+Yo‘nalishga qarab ichki test yoki suhbat o‘tkaziladi. Ba’zi hollarda sertifikatga ega abituriyentlar imtihondan ozod qilinishi mumkin.
 
-4️⃣ Grant minimal ball?
-   → 100%: 180+, 50%: 160+
+4. Ta’lim shakllari qanaqa?
+- Kunduzgi
+- Masofaviy (online)
+TIUda sirtqi ta’lim yo‘q, uning o‘rnini masofaviy ta’lim to‘liq qoplaydi.
 
-📞 +998 71 200 09 09''',
+5. Masofaviy ta’lim qanday o‘qitiladi?
+Onlayn platforma orqali video darslar, testlar, vebinarlar va semestr yakunida 1–2 marta oflayn nazoratlar asosida o‘qitiladi. Diplom kunduzgi bilan teng kuchga ega.
 
-        'ru': '''❓ Частые вопросы
+6. Kontrakt narxlari qancha?
+Yo‘nalishlarga qarab 15 mln dan 25 mln so‘mgacha.
+To‘liq ro‘yxat: https://qabul.tiu.uz/
 
-1️⃣ Когда прием?
-   → 1 июня - 20 августа
+7. Grantlar bormi?
+Ha. TIUda 25%, 50%, 75% va 100% universitet grantlari mavjud.
+Bundan tashqari, davlat grantlarida ishtirok etish imkoniyati ham bor.
 
-2️⃣ Есть международный диплом?
-   → Да, программы двойного диплома
+8. Chet tili sertifikati bo‘lsa nima bo‘ladi?
+B2 va undan yuqori darajadagi sertifikat bo‘lsa, abituriyent chet tili testidan ozod etiladi.
 
-3️⃣ Есть общежитие?
-   → Да, современное жилье
+9. Yotoqxona bormi?
+Ha, 300 o‘rinli talabalar yotoqxonasi mavjud.
+Batafsil ma’lumot uchun qo‘ng‘iroq orqali murojaat qilinadi.
 
-4️⃣ Минимум для гранта?
-   → 100%: 180+, 50%: 160+
+10. TIU diplomi tan olinadimi?
+TIU litsenziyaga ega va diplom davlat tomonidan tan olinadi.
+Litsenziya havolasi: https://www.tiu.uz/regulations
 
-📞 +998 71 200 09 09''',
+11. Qaysi yo‘nalishlar mavjud?
+Kunduzgi va masofaviy ta’lim uchun bir nechta yo‘nalishlar mavjud.
+To‘liq ro‘yxat bot ichida alohida bo‘lim sifatida ko‘rsatilgan.
 
-        'en': '''❓ FAQ
+12. O‘qish qayerda joylashgan?
+📍 Manzil: Toshkent shahar, Yunusobod tumani, Kichik halqa yo‘li, 7-uy
 
-1️⃣ When is admission?
-   → June 1 - August 20
+13. Qanday ro‘yxatdan o‘tsam bo‘ladi?
+Onlayn ro‘yxatdan o‘tish havolasi: https://qabul.tiu.uz/
 
-2️⃣ International diploma?
-   → Yes, double degree programs
+14. Bir yo‘nalish yopilgan bo‘lsa, boshqa variant bormi?
+Ha. Agar kunduzgi kvotalar to‘lib qolgan bo‘lsa, abituriyent masofaviy ta’lim yoki boshqa kunduzgi yo‘nalishni tanlashi mumkin.
+""",
 
-3️⃣ Dormitory available?
-   → Yes, modern housing
+        'ru': """❓ Часто задаваемые вопросы
 
-4️⃣ Grant minimum score?
-   → 100%: 180+, 50%: 160+
+1. Когда начинается прием в TIU?
+Прием осуществляется онлайн через портал <a href="https://qabul.tiu.uz">qabul.tiu.uz</a>. Новые даты приема публикуются на официальных страницах.
 
-📞 +998 71 200 09 09'''
+2. Какие документы необходимы?
+- Паспорт или ID-карта
+- Аттестат или Диплом (с приложением)
+- IELTS/TOPIK (при наличии — дает преимущество)
+
+3. Как проходит прием? Тест или собеседование?
+В зависимости от направления проводится внутренний тест или собеседование. В некоторых случаях абитуриенты с сертификатами могут быть освобождены от экзамена.
+
+4. Формы обучения:
+- Очная
+- Дистанционная (online)
+В TIU нет заочного обучения, его полностью заменяет дистанционная форма.
+
+5. Как проходит дистанционное обучение?
+Через онлайн-платформу: видео-уроки, тесты, вебинары и 1–2 офлайн контроля в конце семестра. Диплом имеет такую же силу, как и очный.
+
+6. Стоимость контракта?
+От 15 до 25 млн сум в зависимости от направления.
+Полный список: https://qabul.tiu.uz/
+
+7. Есть ли гранты?
+Да. В TIU доступны 25%, 50%, 75% и 100% университетские гранты, а также возможность участия в государственных грантах.
+
+8. Что если есть сертификат по иностранному языку?
+С уровнем B2 и выше абитуриент освобождается от теста по иностранному языку.
+
+9. Есть ли общежитие?
+Да, есть общежитие на 300 мест.
+Подробности уточняются по телефону.
+
+10. Признается ли диплом TIU?
+TIU имеет государственную лицензию, диплом признается государством.
+Лицензия: https://www.tiu.uz/regulations
+
+11. Какие направления доступны?
+Список направлений для очной и дистанционной формы указан в отдельном разделе бота.
+
+12. Где находится университет?
+📍 Адрес: г. Ташкент, Юнусабадский район, Кичик Халка Йули, дом 7
+
+13. Как зарегистрироваться?
+Онлайн регистрация: https://qabul.tiu.uz/
+
+14. Если направление закрыто, есть ли альтернатива?
+Да. Можно выбрать другое очное направление или дистанционную форму.
+""",
+
+        'en': """❓ Frequently Asked Questions
+
+1. When does admission to TIU start?
+Admission is conducted online via <a href="https://qabul.tiu.uz">qabul.tiu.uz</a>. New admission dates are announced on official pages.
+
+2. What documents are required?
+- Passport or ID card
+- High school certificate or Diploma (with transcript)
+- IELTS/TOPIK (if available — it gives an advantage)
+
+3. How is the admission process? Test or interview?
+Depending on the program, there may be an internal test or interview. Applicants with certain certificates may be exempt from exams.
+
+4. Modes of study:
+- Full-time (On-campus)
+- Distance (Online)
+TIU does not offer part-time study; distance learning fully replaces it.
+
+5. How is distance learning conducted?
+Through an online platform: video lessons, tests, webinars, and 1–2 offline assessments per semester. The diploma is fully equivalent to full-time.
+
+6. Tuition fees:
+From 15 million to 25 million UZS depending on the program.
+Full list: https://qabul.tiu.uz/
+
+7. Are scholarships available?
+Yes. TIU offers 25%, 50%, 75% and 100% university scholarships. There is also an opportunity to participate in state scholarships.
+
+8. What if I have a foreign language certificate?
+If the certificate is B2 level or higher, the applicant is exempt from the foreign language exam.
+
+9. Is there a dormitory?
+Yes, a dormitory for 300 students is available.
+Details can be clarified by phone.
+
+10. Is the TIU diploma recognized?
+TIU has a state license and its diploma is officially recognized.
+License link: https://www.tiu.uz/regulations
+
+11. Which programs are available?
+The full list of programs for full-time and distance study is shown in the bot in a separate section.
+
+12. Where is the university located?
+📍 Address: Tashkent city, Yunusabad district, Kichik Halqa Yo‘li, 7
+
+13. How do I apply?
+Online application: https://qabul.tiu.uz/
+
+14. If a program is full, are there alternatives?
+Yes. You may choose another full-time program or distance study.
+"""
     }
 
     await message.answer(
         texts.get(lang, texts['uz']),
-        reply_markup=get_admission_submenu_keyboard(user_id)
+        parse_mode="HTML",
+        disable_web_page_preview=True,
+        reply_markup=get_admission_submenu_keyboard(user_id),
     )
+
 
 
 def register_admission_handlers(dp: Dispatcher):
