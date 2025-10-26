@@ -16,113 +16,227 @@ DATABASE_NAME = 'tiu_bot.db'
 # Faculties
 FACULTIES = {
     'uz': {
-        'Xalqaro munosabatlar': {
+        'Yurisprudensiya': {
             'Yurisprudensiya': {
-                '1-kurs': ['YU-101', 'YU-102'],
-                '2-kurs': ['YU-201', 'YU-202'],
-                '3-kurs': ['YU-301'],
-                '4-kurs': ['YU-401']
+                '1-kurs': ['xq-1-1', 'xq-1-2'],
+                '2-kurs': ['xq-2-1', 'xq-2-2']
+            }
+        },
+        'Biznes va innovatsion ta\'lim': {
+            'Bank ishi': {
+                '1-kurs': ['b-1-1'],
+                '2-kurs': []
+            },
+            'Buxgalteriya hisobi': {
+                '1-kurs': ['bh-1-5'],
+                '2-kurs': []
             },
             'Iqtisodiyot': {
-                '1-kurs': ['IQ-101', 'IQ-102'],
-                '2-kurs': ['IQ-201', 'IQ-202'],
-                '3-kurs': ['IQ-301'],
-                '4-kurs': ['IQ-401']
+                '1-kurs': ['i-1-9'],
+                '2-kurs': []
             },
-            'Siyosatshunoslik': {
-                '1-kurs': ['SI-101'],
-                '2-kurs': ['SI-201'],
-                '3-kurs': ['SI-301'],
-                '4-kurs': ['SI-401']
+            'Marketing': {
+                '1-kurs': [],
+                '2-kurs': []
             },
-            'Xalqaro huquq': {
-                '1-kurs': ['XH-101'],
-                '2-kurs': ['XH-201'],
-                '3-kurs': ['XH-301'],
-                '4-kurs': ['XH-401']
+            'Menejment': {
+                '1-kurs': [],
+                '2-kurs': []
             },
-            # Shu tarzda 18 ta yo‘nalishni shu fakultetga qo‘shish mumkin
-        },
-        'Axborot texnologiyalari': {
-            'Kiberxavfsizlik': {
-                '1-kurs': ['KB-101', 'KB-102'],
-                '2-kurs': ['KB-201', 'KB-202'],
-                '3-kurs': ['KB-301'],
-                '4-kurs': ['KB-401']
+            'Moliya va moliyaviy texnologiyalar': {
+                '1-kurs': [],
+                '2-kurs': []
+            },
+            'Jahon iqtisodiyoti va xalqaro iqtisodiy munosabatlar': {
+                '1-kurs': [],
+                '2-kurs': []
+            },
+            'Axborot tizimlari va texnologiyalari': {
+                '1-kurs': [],
+                '2-kurs': []
+            },
+            'Kiberxavfsizlik injiniringi': {
+                '1-kurs': [],
+                '2-kurs': []
+            },
+            'Kompyuter injiniringi': {
+                '1-kurs': [],
+                '2-kurs': []
             },
             'Dasturiy injiniring': {
-                '1-kurs': ['DI-101', 'DI-102'],
-                '2-kurs': ['DI-201', 'DI-202'],
-                '3-kurs': ['DI-301'],
-                '4-kurs': ['DI-401']
+                '1-kurs': [],
+                '2-kurs': []
             },
-            'Kompyuter injiniring': {
-                '1-kurs': ['KI-101'],
-                '2-kurs': ['KI-201'],
-                '3-kurs': ['KI-301'],
-                '4-kurs': ['KI-401']
+            'Maktabgacha ta\'lim': {
+                '1-kurs': [],
+                '2-kurs': []
             },
-            'Sun’iy intellekt': {
-                '1-kurs': ['AI-101'],
-                '2-kurs': ['AI-201'],
-                '3-kurs': ['AI-301'],
-                '4-kurs': ['AI-401']
+            'Boshlang\'ich ta\'lim': {
+                '1-kurs': [],
+                '2-kurs': []
             },
-            # Bu yerda ham 18 tagacha yo‘nalish qo‘shish mumkin
+            'Psixologiya': {
+                '1-kurs': [],
+                '2-kurs': []
+            },
+            'Xorijiy tili va adabiyoti: ingliz tili': {
+                '1-kurs': [],
+                '2-kurs': []
+            },
+            'Filologiya va tillarni o\'qitish (koreys tili)': {
+                '1-kurs': [],
+                '2-kurs': []
+            }
         }
     },
 
     'ru': {
-        'Международные отношения': {
+        'Юриспруденция': {
             'Юриспруденция': {
-                '1-курс': ['Ю-101', 'Ю-102'],
-                '2-курс': ['Ю-201', 'Ю-202'],
-                '3-курс': ['Ю-301'],
-                '4-курс': ['Ю-401']
+                '1-курс': ['xq-1-1', 'xq-1-2'],
+                '2-курс': ['xq-2-1', 'xq-2-2']
+            }
+        },
+        'Бизнес и инновационное образование': {
+            'Банковское дело': {
+                '1-курс': ['b-1-1'],
+                '2-курс': []
+            },
+            'Бухгалтерский учет': {
+                '1-курс': ['bh-1-5'],
+                '2-курс': []
             },
             'Экономика': {
-                '1-курс': ['ЭК-101', 'ЭК-102'],
-                '2-курс': ['ЭК-201', 'ЭК-202'],
-                '3-курс': ['ЭК-301'],
-                '4-курс': ['ЭК-401']
+                '1-курс': ['i-1-9'],
+                '2-курс': []
             },
-            # ...
-        },
-        'Информационные технологии': {
-            'Кибербезопасность': {
-                '1-курс': ['КБ-101', 'КБ-102'],
-                '2-курс': ['КБ-201', 'КБ-202'],
-                '3-курс': ['КБ-301'],
-                '4-курс': ['КБ-401']
+            'Маркетинг': {
+                '1-курс': [],
+                '2-курс': []
             },
-            # ...
+            'Менеджмент': {
+                '1-курс': [],
+                '2-курс': []
+            },
+            'Финансы и финансовые технологии': {
+                '1-курс': [],
+                '2-курс': []
+            },
+            'Мировая экономика и международные экономические отношения': {
+                '1-курс': [],
+                '2-курс': []
+            },
+            'Информационные системы и технологии': {
+                '1-курс': [],
+                '2-курс': []
+            },
+            'Инжиниринг кибербезопасности': {
+                '1-курс': [],
+                '2-курс': []
+            },
+            'Компьютерный инжиниринг': {
+                '1-курс': [],
+                '2-курс': []
+            },
+            'Программный инжиниринг': {
+                '1-курс': [],
+                '2-курс': []
+            },
+            'Дошкольное образование': {
+                '1-курс': [],
+                '2-курс': []
+            },
+            'Начальное образование': {
+                '1-курс': [],
+                '2-курс': []
+            },
+            'Психология': {
+                '1-курс': [],
+                '2-курс': []
+            },
+            'Иностранный язык и литература: английский язык': {
+                '1-курс': [],
+                '2-курс': []
+            },
+            'Филология и обучение языкам (корейский язык)': {
+                '1-курс': [],
+                '2-курс': []
+            }
         }
     },
 
     'en': {
-        'International Relations': {
+        'Law': {
             'Law': {
-                '1st year': ['LAW-101', 'LAW-102'],
-                '2nd year': ['LAW-201', 'LAW-202'],
-                '3rd year': ['LAW-301'],
-                '4th year': ['LAW-401']
+                '1st year': ['xq-1-1', 'xq-1-2'],
+                '2nd year': ['xq-2-1', 'xq-2-2']
+            }
+        },
+        'Business and Innovative Education': {
+            'Banking': {
+                '1st year': ['b-1-1'],
+                '2nd year': []
+            },
+            'Accounting': {
+                '1st year': ['bh-1-5'],
+                '2nd year': []
             },
             'Economics': {
-                '1st year': ['ECO-101', 'ECO-102'],
-                '2nd year': ['ECO-201', 'ECO-202'],
-                '3rd year': ['ECO-301'],
-                '4th year': ['ECO-401']
+                '1st year': ['i-1-9'],
+                '2nd year': []
             },
-            # ...
-        },
-        'Information Technology': {
-            'Cybersecurity': {
-                '1st year': ['CS-101', 'CS-102'],
-                '2nd year': ['CS-201', 'CS-202'],
-                '3rd year': ['CS-301'],
-                '4th year': ['CS-401']
+            'Marketing': {
+                '1st year': [],
+                '2nd year': []
             },
-            # ...
+            'Management': {
+                '1st year': [],
+                '2nd year': []
+            },
+            'Finance and Financial Technologies': {
+                '1st year': [],
+                '2nd year': []
+            },
+            'World Economy and International Economic Relations': {
+                '1st year': [],
+                '2nd year': []
+            },
+            'Information Systems and Technologies': {
+                '1st year': [],
+                '2nd year': []
+            },
+            'Cybersecurity Engineering': {
+                '1st year': [],
+                '2nd year': []
+            },
+            'Computer Engineering': {
+                '1st year': [],
+                '2nd year': []
+            },
+            'Software Engineering': {
+                '1st year': [],
+                '2nd year': []
+            },
+            'Preschool Education': {
+                '1st year': [],
+                '2nd year': []
+            },
+            'Primary Education': {
+                '1st year': [],
+                '2nd year': []
+            },
+            'Psychology': {
+                '1st year': [],
+                '2nd year': []
+            },
+            'Foreign Language and Literature: English': {
+                '1st year': [],
+                '2nd year': []
+            },
+            'Philology and Language Teaching (Korean)': {
+                '1st year': [],
+                '2nd year': []
+            }
         }
     }
 }
