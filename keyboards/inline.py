@@ -96,14 +96,18 @@ def get_event_details_inline_keyboard(event_id: int, registration_link: str = No
     """
     keyboard = InlineKeyboardMarkup(row_width=1)
 
-    # Add registration button if link is provided
+    # Add registration button if link is provided and valid
     if registration_link:
-        keyboard.add(
-            InlineKeyboardButton(
-                text="🔗 Ro'yxatdan o'tish",
-                url=registration_link
+        # Validate URL: must be a single valid URL without emojis or spaces (except %20)
+        link = registration_link.strip()
+        # Check if it's a valid single URL (starts with http/https and no newlines/emojis)
+        if (link.startswith('http://') or link.startswith('https://')) and '\n' not in link and len(link.split()) == 1:
+            keyboard.add(
+                InlineKeyboardButton(
+                    text="🔗 Ro'yxatdan o'tish",
+                    url=link
+                )
             )
-        )
 
     # Back to events list button
     keyboard.add(

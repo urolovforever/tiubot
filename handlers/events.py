@@ -77,8 +77,11 @@ async def event_callback_handler(callback: CallbackQuery):
 
     text += f"📍 <b>Joylashuv:</b> {location}\n"
 
+    # Only show registration link in caption if it's a valid single URL
     if registration_link:
-        text += f"\n🔗 <b>Ro'yxatdan o'tish:</b> <a href='{registration_link}'>Bu yerga bosing</a>\n"
+        link = registration_link.strip()
+        if (link.startswith('http://') or link.startswith('https://')) and '\n' not in link and len(link.split()) == 1:
+            text += f"\n🔗 <b>Ro'yxatdan o'tish:</b> <a href='{link}'>Bu yerga bosing</a>\n"
 
     text += f"\n#TIUevents"
 
