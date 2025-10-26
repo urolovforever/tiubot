@@ -5,6 +5,7 @@ from utils.helpers import t
 from keyboards.inline import get_events_inline_keyboard
 from config import DIGEST_CHANNEL_ID
 import logging
+from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton, InputFile
 
 db = Database()
 logger = logging.getLogger(__name__)
@@ -58,79 +59,49 @@ async def news_menu_handler(message: types.Message):
     )
 
 
-async def latest_news_handler(message: types.Message):
-    user_id = message.from_user.id
-    lang = db.get_user_language(user_id)
-
-    texts = {
-        'uz': '''🆕 So'nggi yangiliklar
-
-📱 Telegram: @tiuofficial
-📷 Instagram: @tiuofficial
-
-Obuna bo'ling!
-
-🌐 www.tiu.uz/news''',
-
-        'ru': '''🆕 Последние новости
-
-📱 Telegram: @tiuofficial
-📷 Instagram: @tiuofficial
-
-Подпишитесь!
-
-🌐 www.tiu.uz/news''',
-
-        'en': '''🆕 Latest News
-
-📱 Telegram: @tiuofficial
-📷 Instagram: @tiuofficial
-
-Subscribe!
-
-🌐 www.tiu.uz/news'''
-    }
-
-    await message.answer(
-        texts.get(lang, texts['uz']),
-        reply_markup=get_news_submenu_keyboard(user_id)
-    )
-
-
 async def video_news_handler(message: types.Message):
     user_id = message.from_user.id
     lang = db.get_user_language(user_id)
 
     texts = {
-        'uz': '''🎥 Video yangiliklar
+        'uz': '''
 
-📺 YouTube: @tiuofficial
-📷 Instagram Reels
-🎬 TikTok: @tiuofficial
+Tashkent International Universityning rasmiy yangilik va e’lonlarini quyidagi platformalarda kuzatib boring:
+''',
+        'ru': '''
 
-Obuna bo'ling!''',
+Следите за официальными новостями и объявлениями Tashkent International University на следующих платформах:
+''',
+        'en': '''
 
-        'ru': '''🎥 Видео новости
-
-📺 YouTube: @tiuofficial
-📷 Instagram Reels
-🎬 TikTok: @tiuofficial
-
-Подпишитесь!''',
-
-        'en': '''🎥 Video News
-
-📺 YouTube: @tiuofficial
-📷 Instagram Reels
-🎬 TikTok: @tiuofficial
-
-Subscribe!'''
+Follow the official news and announcements of Tashkent International University on the following platforms:
+'''
     }
 
-    await message.answer(
-        texts.get(lang, texts['uz']),
-        reply_markup=get_news_submenu_keyboard(user_id)
-    )
+    keyboard = InlineKeyboardMarkup(inline_keyboard=[
+        [InlineKeyboardButton(text="Telegram", url="https://t.me/tiu_edu")],
+        [InlineKeyboardButton(text="Instagram", url="https://www.instagram.com/tiuofficial/")],
+        [InlineKeyboardButton(text="Facebook", url="https://www.facebook.com/profile.php?id=100095487825640")],
+        [InlineKeyboardButton(text="YouTube", url="https://www.youtube.com/@tiu_uz")],
+        [InlineKeyboardButton(text="Twitter", url="https://x.com/tiuofficial_")],
+        [InlineKeyboardButton(text="Web-site", url="http://www.tiu.uz/")]
+    ])
+
+    photo_path = "/home/nizomjon/PycharmProjects/Tiu_bot/photos/ck.jpg"  # Rasm joylashgan joy
+
+    try:
+        await message.answer_photo(
+            photo=InputFile(photo_path),
+            caption=texts.get(lang, texts['uz']),
+            reply_markup=keyboard,
+            parse_mode="HTML"
+        )
+    except:
+        await message.answer(
+            texts.get(lang, texts['uz']),
+            reply_markup=keyboard,
+            parse_mode="HTML"
+        )
 
 
 async def events_calendar_handler(message: types.Message):
@@ -145,9 +116,9 @@ async def events_calendar_handler(message: types.Message):
 
     if not events:
         texts = {
-            'uz': '📭 Hozircha rejalashtirilgan tadbirlar yo\'q.\n\n📱 @tiuofficial',
-            'ru': '📭 Пока нет запланированных мероприятий.\n\n📱 @tiuofficial',
-            'en': '📭 No scheduled events yet.\n\n📱 @tiuofficial'
+            'uz': '📭 Hozircha rejalashtirilgan tadbirlar yo\'q.',
+            'ru': '📭 Пока нет запланированных мероприятий.',
+            'en': '📭 No scheduled events yet.'
         }
         lang = db.get_user_language(user_id)
         await message.answer(
@@ -194,12 +165,6 @@ async def weekly_digest_handler(message: types.Message):
             message_id=message_id
         )
 
-        # Menyuni qayta yuborish
-        await message.answer(
-            "📱 @tiuofficial",
-            reply_markup=get_news_submenu_keyboard(user_id)
-        )
-
     except Exception as e:
         logger.error(f'Weekly digest error for user {user_id}: {e}')
 
@@ -221,12 +186,11 @@ def register_news_handlers(dp: Dispatcher):
         lambda message: message.text in ['📰 Yangiliklar', '📰 Новости', '📰 News']
     )
 
-    # 🆕 Hafta dayjesti (Weekly digest)
     dp.register_message_handler(
-        latest_news_handler,
+        weekly_digest_handler,
         lambda message: message.text in [
             '🆕 Hafta dayjesti',
-            '🆕 Еженедельный дайджест',
+            '🆕 Недельный дайджест',
             '🆕 Weekly digest'
         ]
     )
@@ -241,15 +205,6 @@ def register_news_handlers(dp: Dispatcher):
         ]
     )
 
-    # 🗓 Tadbirlar taqvimi (Events calendar)
-    dp.register_message_handler(
-        weekly_digest_handler,
-        lambda message: message.text in [
-            '📰 Hafta dayjesti',
-            '📰 Недельный дайджест',
-            '📰 Weekly digest'
-        ]
-    )
     dp.register_message_handler(
         events_calendar_handler,
         lambda message: message.text in [

@@ -8,15 +8,10 @@ BOT_TOKEN = os.getenv('BOT_TOKEN', '8349358796:AAGh9cZHo31Ao1XTsh4TSgWlZRrPAAbgm
 ADMIN_IDS = [1920079641]  # O'z telegram ID laringizni kiriting
 
 # Channel settings
-DIGEST_CHANNEL_ID = os.getenv('DIGEST_CHANNEL_ID', '-1002319736714')  # Hafta dayjesti kanali ID
+DIGEST_CHANNEL_ID = os.getenv('DIGEST_CHANNEL_ID', '-1003285608799')  # Hafta dayjesti kanali ID
 
 # Database settings
 DATABASE_NAME = 'tiu_bot.db'
-
-# Contact info
-PHONE_NUMBER = '+998 71 200 09 09'
-EMAIL = 'info@tiu.uz'
-ADMISSION_EMAIL = 'admission@tiu.uz'
 
 # Faculties
 FACULTIES = {
