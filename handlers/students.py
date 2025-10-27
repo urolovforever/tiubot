@@ -3,7 +3,7 @@ from aiogram import types, Dispatcher
 from aiogram.dispatcher import FSMContext
 from keyboards.reply import get_faculty_keyboard, get_direction_keyboard, get_course_keyboard, get_group_keyboard, get_main_keyboard
 from database.db import Database
-from states.forms import ScheduleStates
+from states.forms import ScheduleStates, LibraryStates
 from utils.helpers import t
 from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton, InputFile, InputMediaPhoto
 import os
@@ -203,48 +203,23 @@ async def process_group(message: types.Message, state: FSMContext):
     )
 
 
-async def library_resources_info(message: types.Message):
+async def library_resources_info(message: types.Message, state: FSMContext):
+    """Redirect to new library system with categories"""
     user_id = message.from_user.id
     lang = db.get_user_language(user_id)
 
-    texts = {
-        'uz': '''📚 Kutubxona
+    # Clear any previous state
+    await state.finish()
+    await LibraryStates.choosing_category.set()
 
-📖 50,000+ kitob
-💻 100,000+ elektron kitob
-🌐 Xalqaro bazalar
+    # Import here to avoid circular dependency
+    from handlers.library import get_library_categories_keyboard
 
-🌐 library.tiu.uz
-
-Ish vaqti:
-🕐 Dush-Juma: 8:00-20:00''',
-
-        'ru': '''📚 Библиотека
-
-📖 50,000+ книг
-💻 100,000+ электронных книг
-🌐 Международные базы
-
-🌐 library.tiu.uz
-
-Время работы:
-🕐 Пн-Пт: 8:00-20:00''',
-
-        'en': '''📚 Library
-
-📖 50,000+ books
-💻 100,000+ e-books
-🌐 International databases
-
-🌐 library.tiu.uz
-
-Working hours:
-🕐 Mon-Fri: 8:00-20:00'''
-    }
+    keyboard = get_library_categories_keyboard(lang)
 
     await message.answer(
-        texts.get(lang, texts['uz']),
-        reply_markup=get_students_submenu_keyboard(user_id)
+        t(user_id, 'library_title'),
+        reply_markup=keyboard
     )
 
 
@@ -709,14 +684,15 @@ def register_students_handlers(dp: Dispatcher):
     dp.register_message_handler(process_course, state=ScheduleStates.waiting_for_course)
     dp.register_message_handler(process_group, state=ScheduleStates.waiting_for_group)
 
-    # Kutubxona
+    # Kutubxona - redirect to new library system
     dp.register_message_handler(
         library_resources_info,
         lambda message: message.text in [
             '📚 Kutubxona / resurslar',
             '📚 Библиотека / ресурсы',
             '📚 Library / resources'
-        ]
+        ],
+        state='*'
     )
 
     # Talabalar hayoti - message handler
