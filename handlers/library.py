@@ -471,12 +471,8 @@ async def back_to_category(callback: CallbackQuery, state: FSMContext):
 def register_library_handlers(dp: Dispatcher):
     """Register all library-related handlers"""
 
-    # Main library menu
-    dp.register_message_handler(
-        library_menu,
-        Text(equals=['📚 Kutubxona', '📚 Библиотека', '📚 Library']),
-        state='*'
-    )
+    # NOTE: Main library menu is now accessed through Students menu
+    # No direct handler from main menu needed
 
     # Category selection
     dp.register_callback_query_handler(

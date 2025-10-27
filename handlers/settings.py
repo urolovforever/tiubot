@@ -33,9 +33,18 @@ async def language_selected_handler(message: types.Message):
 
     new_lang = language_map.get(text)
     if new_lang:
+        # Update language in database
         db.update_user_language(user_id, new_lang)
+
+        # Get confirmation message in NEW language
+        confirmation_messages = {
+            'uz': '✅ Til o\'zbekchaga o\'zgartirildi',
+            'ru': '✅ Язык изменен на русский',
+            'en': '✅ Language changed to English'
+        }
+
         await message.answer(
-            t(user_id, 'language_changed'),
+            confirmation_messages.get(new_lang, confirmation_messages['uz']),
             reply_markup=get_main_keyboard(user_id)
         )
 
