@@ -67,8 +67,16 @@ async def event_callback_handler(callback: CallbackQuery):
     registration_link = event[6]
     image_id = event[7]
 
-    # Description'ni to'g'ridan-to'g'ri ko'rsatamiz (admin yuklagan caption)
-    text = description if description else f"<b>{title}</b>"
+    # Description bilan birga sanani ham ko'rsatamiz
+    # Sana yuqorida, keyin description
+    date_header = f"📅 <b>{date}</b>"
+    if time:
+        date_header += f" | 🕐 {time}"
+
+    if description:
+        text = f"{date_header}\n\n{description}"
+    else:
+        text = f"{date_header}\n\n<b>{title}</b>"
 
     # Send event details
     if image_id:
