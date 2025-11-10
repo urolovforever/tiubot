@@ -379,43 +379,51 @@ async def campus_photos_callback(callback: types.CallbackQuery):
     back_text = "🔙 Orqaga" if lang == 'uz' else "🔙 Назад" if lang == 'ru' else "🔙 Back"
     keyboard.add(InlineKeyboardButton(back_text, callback_data="back_to_student_life"))
 
-    # Fotosuratlar ro'yxati
-    photo_filenames = ["campus1.png", "campus2.png", "campus3.png", "campus4.png"]
-    photo_path = None
-
-    # Birinchi mavjud faylni topish
-    for filename in photo_filenames:
-        path = get_media_path(filename)
-        if path:
-            photo_path = path
-            break
+    # Mavjud fayllarni topish - 6 ta rasm (jpg yoki png)
+    available_photos = []
+    for i in range(1, 7):  # 1 dan 6 gacha
+        # Avval .jpg ni tekshiramiz, keyin .png ni
+        for ext in ['.jpg', '.png']:
+            filename = f"campus{i}{ext}"
+            path = get_media_path(filename)
+            if path and os.path.exists(path):
+                available_photos.append(path)
+                break  # Bitta format topilsa, boshqasini tekshirmaymiz
 
     try:
-        if photo_path and os.path.exists(photo_path):
-            # Agar foto mavjud bo'lsa - xabarni rasm bilan o'zgartirish
-            from aiogram.types import InputMediaPhoto
+        # Eski xabarni o'chirish
+        try:
+            await callback.message.delete()
+        except:
+            pass
 
-            media = InputMediaPhoto(
-                media=InputFile(photo_path),
-                caption=captions.get(lang, captions['uz']),
-                parse_mode="HTML"
+        if available_photos:
+            # Agar fotolar mavjud bo'lsa - media group (albom) yuborish
+            media_group = []
+            for i, photo_path in enumerate(available_photos):
+                # Birinchi rasmga caption qo'shamiz
+                if i == 0:
+                    media_group.append(
+                        InputMediaPhoto(
+                            media=InputFile(photo_path),
+                            caption=captions.get(lang, captions['uz']),
+                            parse_mode="HTML"
+                        )
+                    )
+                else:
+                    media_group.append(InputMediaPhoto(media=InputFile(photo_path)))
+
+            # Media group yuborish
+            await callback.message.answer_media_group(media=media_group)
+
+            # Tugma bilan alohida xabar yuborish
+            await callback.message.answer(
+                "⬇️",
+                reply_markup=keyboard
             )
-
-            try:
-                # Avval xabarni edit qilishga harakat qilamiz
-                await callback.message.edit_media(media=media, reply_markup=keyboard)
-            except Exception:
-                # Agar edit ishlamasa (masalan, xabar text bo'lsa), yangi xabar yuboramiz
-                await callback.message.delete()
-                await callback.message.answer_photo(
-                    photo=InputFile(photo_path),
-                    caption=captions.get(lang, captions['uz']),
-                    parse_mode="HTML",
-                    reply_markup=keyboard
-                )
         else:
             # Agar fotolar mavjud bo'lmasa
-            await callback.message.edit_text(
+            await callback.message.answer(
                 f"{captions.get(lang, captions['uz'])}\n\n📷 Fotosuratlar hozircha mavjud emas.",
                 parse_mode="HTML",
                 reply_markup=keyboard
@@ -423,18 +431,11 @@ async def campus_photos_callback(callback: types.CallbackQuery):
 
     except Exception as e:
         # Har qanday xatolik yuz bersa
-        try:
-            await callback.message.edit_text(
-                f"{captions.get(lang, captions['uz'])}\n\n📷 Fotosuratlar yuklanmoqda...",
-                parse_mode="HTML",
-                reply_markup=keyboard
-            )
-        except:
-            await callback.message.answer(
-                f"{captions.get(lang, captions['uz'])}\n\n📷 Fotosuratlar yuklanmoqda...",
-                parse_mode="HTML",
-                reply_markup=keyboard
-            )
+        await callback.message.answer(
+            f"{captions.get(lang, captions['uz'])}\n\n📷 Fotosuratlar yuklanmoqda...",
+            parse_mode="HTML",
+            reply_markup=keyboard
+        )
 
     await callback.answer()
 
@@ -581,32 +582,51 @@ During this trip, they are not only increasing their knowledge and experience, b
     back_text = "🔙 Orqaga" if lang == 'uz' else "🔙 Назад" if lang == 'ru' else "🔙 Back"
     keyboard.add(InlineKeyboardButton(back_text, callback_data="back_to_student_life"))
 
-    photo_path = get_media_path("career_center.jpg")
+    # Mavjud fayllarni topish - 6 ta rasm (jpg yoki png)
+    available_photos = []
+    for i in range(1, 7):  # 1 dan 6 gacha
+        # Avval .jpg ni tekshiramiz, keyin .png ni
+        for ext in ['.jpg', '.png']:
+            filename = f"career{i}{ext}"
+            path = get_media_path(filename)
+            if path and os.path.exists(path):
+                available_photos.append(path)
+                break  # Bitta format topilsa, boshqasini tekshirmaymiz
 
     try:
-        if photo_path and os.path.exists(photo_path):
-            # Agar foto mavjud bo'lsa - xabarni rasm bilan o'zgartirish
-            media = InputMediaPhoto(
-                media=InputFile(photo_path),
-                caption=texts.get(lang, texts['uz']),
-                parse_mode="HTML"
-            )
+        # Eski xabarni o'chirish
+        try:
+            await callback.message.delete()
+        except:
+            pass
 
-            try:
-                # Avval xabarni edit qilishga harakat qilamiz
-                await callback.message.edit_media(media=media, reply_markup=keyboard)
-            except Exception:
-                # Agar edit ishlamasa, yangi xabar yuboramiz
-                await callback.message.delete()
-                await callback.message.answer_photo(
-                    photo=InputFile(photo_path),
-                    caption=texts.get(lang, texts['uz']),
-                    parse_mode="HTML",
-                    reply_markup=keyboard
-                )
+        if available_photos:
+            # Agar fotolar mavjud bo'lsa - media group (albom) yuborish
+            media_group = []
+            for i, photo_path in enumerate(available_photos):
+                # Birinchi rasmga caption qo'shamiz
+                if i == 0:
+                    media_group.append(
+                        InputMediaPhoto(
+                            media=InputFile(photo_path),
+                            caption=texts.get(lang, texts['uz']),
+                            parse_mode="HTML"
+                        )
+                    )
+                else:
+                    media_group.append(InputMediaPhoto(media=InputFile(photo_path)))
+
+            # Media group yuborish
+            await callback.message.answer_media_group(media=media_group)
+
+            # Tugma bilan alohida xabar yuborish
+            await callback.message.answer(
+                "⬇️",
+                reply_markup=keyboard
+            )
         else:
-            # Agar foto mavjud bo'lmasa - faqat matn yuborish
-            await callback.message.edit_text(
+            # Agar fotolar mavjud bo'lmasa - faqat matn yuborish
+            await callback.message.answer(
                 texts.get(lang, texts['uz']),
                 parse_mode="HTML",
                 reply_markup=keyboard,
@@ -614,19 +634,12 @@ During this trip, they are not only increasing their knowledge and experience, b
             )
     except Exception as e:
         # Har qanday xatolik - faqat matn
-        try:
-            await callback.message.edit_text(
-                texts.get(lang, texts['uz']),
-                parse_mode="HTML",
-                reply_markup=keyboard,
-                disable_web_page_preview=True
-            )
-        except:
-            await callback.message.answer(
-                texts.get(lang, texts['uz']),
-                parse_mode="HTML",
-                reply_markup=keyboard
-            )
+        await callback.message.answer(
+            texts.get(lang, texts['uz']),
+            parse_mode="HTML",
+            reply_markup=keyboard,
+            disable_web_page_preview=True
+        )
 
     await callback.answer()
 
