@@ -491,6 +491,18 @@ async def career_center_callback(callback: types.CallbackQuery):
     texts = {
         'uz': '''💼 <b>AMALIYOT VA CAREER CENTER</b>
 
+🇰🇷 <b>TIU talabalari Koreyada!</b>
+
+40 kunlik amaliyot davomida TIU talabalari Seul shahrining mashhur diqqatga sazovor joylariga, jumladan tarixiy Gyeongbokgung saroyiga tashrif buyurishdi. 🏯✨
+
+📍 Bugun esa ular Koreyaning nufuzli kompaniyalaridan biri — Hyundai Heavy Industries – Engine & Machinery Division ga tashrif buyurib, muhandislik jarayonlari haqida qiziqarli ma'lumotlarga ega bo'lishdi.
+
+Shuningdek, talabalar Koreyaning dengiz bo'yidagi go'zal shahri Busan ga yo'l olishmoqda. 🌊🚆
+
+Bu safar davomida ular nafaqat bilim va tajriba orttirmoqda, balki Koreya madaniyati va sanoati bilan yaqindan tanishishmoqda. 🇺🇿🤝🇰🇷
+
+━━━━━━━━━━━━━━━━━━
+
 🎯 <b>Bizning imkoniyatlarimiz:</b>
 
 ✅ Kompaniyalarda amaliyot
@@ -508,6 +520,18 @@ async def career_center_callback(callback: types.CallbackQuery):
 
         'ru': '''💼 <b>ПРАКТИКА И CAREER CENTER</b>
 
+🇰🇷 <b>Студенты TIU в Корее!</b>
+
+В течение 40-дневной стажировки студенты TIU посетили знаменитые достопримечательности Сеула, включая исторический дворец Кёнбоккун. 🏯✨
+
+📍 Сегодня они также посетили одну из престижных компаний Кореи — Hyundai Heavy Industries – Engine & Machinery Division и получили интересную информацию об инженерных процессах.
+
+Кроме того, студенты направляются в прекрасный прибрежный город Корея - Пусан. 🌊🚆
+
+Во время этой поездки они не только увеличивают знания и опыт, но и знакомятся с культурой и промышленностью Кореи. 🇺🇿🤝🇰🇷
+
+━━━━━━━━━━━━━━━━━━
+
 🎯 <b>Наши возможности:</b>
 
 ✅ Стажировки в компаниях
@@ -524,6 +548,18 @@ async def career_center_callback(callback: types.CallbackQuery):
 🌐 Подробнее: career.tiu.uz''',
 
         'en': '''💼 <b>INTERNSHIP & CAREER CENTER</b>
+
+🇰🇷 <b>TIU Students in Korea!</b>
+
+During a 40-day internship, TIU students visited Seoul's famous attractions, including the historic Gyeongbokgung Palace. 🏯✨
+
+📍 Today they also visited one of Korea's prestigious companies — Hyundai Heavy Industries – Engine & Machinery Division and gained interesting insights into engineering processes.
+
+Additionally, students are heading to Korea's beautiful coastal city - Busan. 🌊🚆
+
+During this trip, they are not only increasing their knowledge and experience, but also getting closely acquainted with Korean culture and industry. 🇺🇿🤝🇰🇷
+
+━━━━━━━━━━━━━━━━━━
 
 🎯 <b>Our opportunities:</b>
 
