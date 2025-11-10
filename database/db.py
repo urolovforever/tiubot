@@ -407,23 +407,51 @@ class Database:
         conn = self.get_connection()
         c = conn.cursor()
         try:
+            # Barcha tadbirlarni olish
+            c.execute("SELECT * FROM events")
+            all_events = c.fetchall()
+
+            # Agar faqat kelajakdagi tadbirlar kerak bo'lsa, Python'da filter qilamiz
             if upcoming_only:
-                # Only get future events
-                # Convert DD.MM.YYYY to YYYY-MM-DD for comparison
-                c.execute("""SELECT * FROM events
-                            WHERE substr(date, 7, 4) || '-' || substr(date, 4, 2) || '-' || substr(date, 1, 2) >= date('now')
-                            ORDER BY substr(date, 7, 4) || substr(date, 4, 2) || substr(date, 1, 2) ASC, time ASC""")
+                from datetime import datetime
+                today = datetime.now().date()
+
+                filtered_events = []
+                for event in all_events:
+                    # event[3] = date (DD.MM.YYYY formatida)
+                    event_date_str = event[3]
+                    try:
+                        # DD.MM.YYYY formatidan datetime.date ga o'tkazish
+                        event_date = datetime.strptime(event_date_str, '%d.%m.%Y').date()
+                        # Bugungi yoki kelajakdagi tadbirlar
+                        if event_date >= today:
+                            filtered_events.append(event)
+                    except:
+                        # Agar sana parse bo'lmasa, o'sha tadbirni ham qo'shamiz (xatolikni oldini olish)
+                        filtered_events.append(event)
+
+                # Sana bo'yicha tartiblash (yaqindan uzoqqa)
+                filtered_events.sort(key=lambda e: self._parse_event_date(e[3]))
+                return filtered_events
             else:
-                # Get all events, sorted by date ascending (nearest first)
-                # Convert DD.MM.YYYY to YYYY-MM-DD for sorting
-                c.execute("""SELECT * FROM events
-                            ORDER BY substr(date, 7, 4) || substr(date, 4, 2) || substr(date, 1, 2) ASC, time ASC""")
-            return c.fetchall()
+                # Barcha tadbirlarni sana bo'yicha tartiblash
+                all_events_sorted = sorted(all_events, key=lambda e: self._parse_event_date(e[3]))
+                return all_events_sorted
+
         except Exception as e:
             logger.error(f"Error getting events: {e}")
             return []
         finally:
             conn.close()
+
+    def _parse_event_date(self, date_str: str):
+        """Helper function to parse event date for sorting"""
+        from datetime import datetime
+        try:
+            return datetime.strptime(date_str, '%d.%m.%Y')
+        except:
+            # Agar parse qilib bo'lmasa, katta sana qaytaramiz (oxirga qo'yish uchun)
+            return datetime(9999, 12, 31)
 
     def get_event(self, event_id: int) -> Optional[Tuple]:
         conn = self.get_connection()
