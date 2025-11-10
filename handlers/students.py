@@ -489,8 +489,7 @@ async def career_center_callback(callback: types.CallbackQuery):
     lang = db.get_user_language(callback.from_user.id)
 
     texts = {
-        'uz': '''💼 <b>AMALIYOT VA CAREER CENTER</b>
-
+        'uz': '''
 🇰🇷 <b>TIU talabalari Koreyada!</b>
 
 40 kunlik amaliyot davomida TIU talabalari Seul shahrining mashhur diqqatga sazovor joylariga, jumladan tarixiy Gyeongbokgung saroyiga tashrif buyurishdi. 🏯✨
@@ -500,26 +499,9 @@ async def career_center_callback(callback: types.CallbackQuery):
 Shuningdek, talabalar Koreyaning dengiz bo'yidagi go'zal shahri Busan ga yo'l olishmoqda. 🌊🚆
 
 Bu safar davomida ular nafaqat bilim va tajriba orttirmoqda, balki Koreya madaniyati va sanoati bilan yaqindan tanishishmoqda. 🇺🇿🤝🇰🇷
+''',
 
-━━━━━━━━━━━━━━━━━━
-
-🎯 <b>Bizning imkoniyatlarimiz:</b>
-
-✅ Kompaniyalarda amaliyot
-✅ Karyera maslahat xizmatlari
-✅ Rezyume tayyorlash
-✅ Suhbatlarga tayyorgarlik
-✅ Ish o'rinlari bilan tanishish
-✅ Networking tadbirlari
-
-📞 <b>Bog'lanish:</b>
-👤 Career Center: @career_mentor
-📱 Telegram: @tiu_career
-
-🌐 Ko'proq ma'lumot: career.tiu.uz''',
-
-        'ru': '''💼 <b>ПРАКТИКА И CAREER CENTER</b>
-
+        'ru': '''
 🇰🇷 <b>Студенты TIU в Корее!</b>
 
 В течение 40-дневной стажировки студенты TIU посетили знаменитые достопримечательности Сеула, включая исторический дворец Кёнбоккун. 🏯✨
@@ -529,26 +511,9 @@ Bu safar davomida ular nafaqat bilim va tajriba orttirmoqda, balki Koreya madani
 Кроме того, студенты направляются в прекрасный прибрежный город Корея - Пусан. 🌊🚆
 
 Во время этой поездки они не только увеличивают знания и опыт, но и знакомятся с культурой и промышленностью Кореи. 🇺🇿🤝🇰🇷
+''',
 
-━━━━━━━━━━━━━━━━━━
-
-🎯 <b>Наши возможности:</b>
-
-✅ Стажировки в компаниях
-✅ Карьерные консультации
-✅ Подготовка резюме
-✅ Подготовка к собеседованиям
-✅ Знакомство с вакансиями
-✅ Networking мероприятия
-
-📞 <b>Контакты:</b>
-👤 Career Center: @career_mentor
-📱 Telegram: @tiu_career
-
-🌐 Подробнее: career.tiu.uz''',
-
-        'en': '''💼 <b>INTERNSHIP & CAREER CENTER</b>
-
+        'en': '''
 🇰🇷 <b>TIU Students in Korea!</b>
 
 During a 40-day internship, TIU students visited Seoul's famous attractions, including the historic Gyeongbokgung Palace. 🏯✨
@@ -559,22 +524,7 @@ Additionally, students are heading to Korea's beautiful coastal city - Busan. �
 
 During this trip, they are not only increasing their knowledge and experience, but also getting closely acquainted with Korean culture and industry. 🇺🇿🤝🇰🇷
 
-━━━━━━━━━━━━━━━━━━
-
-🎯 <b>Our opportunities:</b>
-
-✅ Company internships
-✅ Career counseling services
-✅ Resume preparation
-✅ Interview preparation
-✅ Job vacancy introductions
-✅ Networking events
-
-📞 <b>Contact:</b>
-👤 Career Center: @career_mentor
-📱 Telegram: @tiu_career
-
-🌐 More info: career.tiu.uz'''
+'''
     }
 
     keyboard = InlineKeyboardMarkup(row_width=1)
