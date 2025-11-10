@@ -417,7 +417,7 @@ class Database:
             conn.close()
 
     def get_all_events(self, upcoming_only: bool = False) -> List[Tuple]:
-        """Get all events, optionally filter upcoming events only, sorted by date (nearest first)"""
+        """Get all events, optionally filter upcoming events only, sorted by creation time (newest first)"""
         conn = self.get_connection()
         c = conn.cursor()
         try:
@@ -444,12 +444,13 @@ class Database:
                         # Agar sana parse bo'lmasa, xatolik log qilamiz va tadbir qo'shilmaydi
                         logger.warning(f"Event #{event[0]}: Could not parse date '{event_date_str}': {e}")
 
-                # Sana bo'yicha tartiblash (yaqindan uzoqqa)
-                filtered_events.sort(key=lambda e: self._parse_event_date(e[3]))
+                # Created_at bo'yicha tartiblash (eng yangi birinchi)
+                # event[8] = created_at
+                filtered_events.sort(key=lambda e: e[8], reverse=True)
                 return filtered_events
             else:
-                # Barcha tadbirlarni sana bo'yicha tartiblash
-                all_events_sorted = sorted(all_events, key=lambda e: self._parse_event_date(e[3]))
+                # Barcha tadbirlarni created_at bo'yicha tartiblash (eng yangi birinchi)
+                all_events_sorted = sorted(all_events, key=lambda e: e[8], reverse=True)
                 return all_events_sorted
 
         except Exception as e:
