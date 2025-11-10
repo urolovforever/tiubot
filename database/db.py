@@ -72,6 +72,12 @@ class Database:
         except:
             pass
 
+        # Migration: Add group_message_id column for tracking messages in admin group
+        try:
+            c.execute("ALTER TABLE applications ADD COLUMN group_message_id INTEGER")
+        except:
+            pass
+
         # Events table
         c.execute('''CREATE TABLE IF NOT EXISTS events
                      (id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -342,6 +348,34 @@ class Database:
             conn.commit()
         except Exception as e:
             logger.error(f"Error updating application: {e}")
+        finally:
+            conn.close()
+
+    def save_application_message_id(self, app_id: int, message_id: int):
+        """Guruhda yuborilgan murojaat message ID sini saqlash"""
+        conn = self.get_connection()
+        c = conn.cursor()
+        try:
+            c.execute(
+                "UPDATE applications SET group_message_id=? WHERE id=?",
+                (message_id, app_id)
+            )
+            conn.commit()
+        except Exception as e:
+            logger.error(f"Error saving message ID: {e}")
+        finally:
+            conn.close()
+
+    def get_application_by_message_id(self, message_id: int) -> Optional[Tuple]:
+        """Guruh message ID bo'yicha murojaatni topish"""
+        conn = self.get_connection()
+        c = conn.cursor()
+        try:
+            c.execute("SELECT * FROM applications WHERE group_message_id=?", (message_id,))
+            return c.fetchone()
+        except Exception as e:
+            logger.error(f"Error getting application by message ID: {e}")
+            return None
         finally:
             conn.close()
 

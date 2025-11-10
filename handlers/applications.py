@@ -5,7 +5,7 @@ from database.db import Database
 from states.forms import ApplicationForm
 from keyboards.reply import get_cancel_keyboard, get_phone_keyboard, get_main_keyboard
 from utils.helpers import t
-from config import ADMIN_IDS
+from config import ADMIN_IDS, ADMIN_GROUP_ID
 import logging
 
 db = Database()
@@ -512,16 +512,123 @@ async def save_and_send_application(message: types.Message, state: FSMContext):
 
 📌 Javob: /reply_{app_id}'''
 
-    for admin_id in ADMIN_IDS:
+    # Adminlar guruhiga yuborish
+    if ADMIN_GROUP_ID:
         try:
             if data.get('file_id'):
-                await message.bot.send_photo(admin_id, data['file_id'], caption=admin_text)
+                sent_msg = await message.bot.send_photo(
+                    ADMIN_GROUP_ID,
+                    data['file_id'],
+                    caption=admin_text
+                )
             else:
-                await message.bot.send_message(admin_id, admin_text)
+                sent_msg = await message.bot.send_message(
+                    ADMIN_GROUP_ID,
+                    admin_text
+                )
+
+            # Message ID ni saqlash (keyin javob berish uchun)
+            db.save_application_message_id(app_id, sent_msg.message_id)
+
         except Exception as e:
-            logger.error(f'Error notifying admin {admin_id}: {e}')
+            logger.error(f'Error sending to admin group: {e}')
+            # Agar guruhga yuborib bo'lmasa, adminlarga bitta-bitta yuborish
+            for admin_id in ADMIN_IDS:
+                try:
+                    if data.get('file_id'):
+                        await message.bot.send_photo(admin_id, data['file_id'], caption=admin_text)
+                    else:
+                        await message.bot.send_message(admin_id, admin_text)
+                except Exception as e2:
+                    logger.error(f'Error notifying admin {admin_id}: {e2}')
+    else:
+        # ADMIN_GROUP_ID bo'lmasa, eski usul - adminlarga bitta-bitta yuborish
+        for admin_id in ADMIN_IDS:
+            try:
+                if data.get('file_id'):
+                    await message.bot.send_photo(admin_id, data['file_id'], caption=admin_text)
+                else:
+                    await message.bot.send_message(admin_id, admin_text)
+            except Exception as e:
+                logger.error(f'Error notifying admin {admin_id}: {e}')
 
     await state.finish()
+
+
+async def group_reply_handler(message: types.Message):
+    """
+    Adminlar guruhida reply orqali javob berish handler'i
+    Admin murojaat xabariga reply qilganda ishga tushadi
+    """
+    # Faqat guruhda va reply bo'lsa ishlaydi
+    if not message.reply_to_message or message.chat.type not in ['group', 'supergroup']:
+        return
+
+    # Faqat adminlar javob berishi mumkin
+    if message.from_user.id not in ADMIN_IDS:
+        return
+
+    # Reply qilingan xabar ID bo'yicha murojaatni topish
+    replied_msg_id = message.reply_to_message.message_id
+    app = db.get_application_by_message_id(replied_msg_id)
+
+    if not app:
+        await message.reply("❌ Murojaat topilmadi yoki allaqachon javob berilgan.")
+        return
+
+    app_id = app[0]
+    user_id = app[1]
+    status = app[7]
+
+    if status == 'answered':
+        await message.reply("ℹ️ Bu murojaatga allaqachon javob berilgan.")
+        return
+
+    # Javobni saqlash
+    response_text = message.text
+    db.update_application_response(app_id, response_text)
+
+    # Foydalanuvchiga javobni yuborish
+    try:
+        user_text = f'''✅ Sizning murojaatingizga javob berildi!
+
+📬 Murojaat #{app_id}
+
+💬 Javob:
+{response_text}
+
+Agar qo'shimcha savollaringiz bo'lsa, yana murojaat yuborishingiz mumkin.'''
+
+        await message.bot.send_message(user_id, user_text)
+
+        # Guruhda tasdiqlash xabari
+        await message.reply(
+            f"✅ Javob yuborildi!\n\n"
+            f"Murojaat #{app_id}\n"
+            f"Foydalanuvchi: {user_id}"
+        )
+
+        # Asl xabarni edit qilib, "Javob berilgan" statusini qo'shish
+        try:
+            original_text = message.reply_to_message.text or message.reply_to_message.caption
+            updated_text = f"{original_text}\n\n✅ <b>JAVOB BERILGAN</b>"
+
+            if message.reply_to_message.photo:
+                await message.reply_to_message.edit_caption(
+                    caption=updated_text,
+                    parse_mode='HTML'
+                )
+            else:
+                await message.reply_to_message.edit_text(
+                    updated_text,
+                    parse_mode='HTML'
+                )
+        except Exception as e:
+            logger.error(f"Error updating message status: {e}")
+
+    except Exception as e:
+        logger.error(f'Error sending response to user {user_id}: {e}')
+        await message.reply(f"❌ Xatolik: Foydalanuvchiga javob yuborib bo'lmadi.\n{e}")
 
 
 async def my_applications_handler(message: types.Message):
@@ -596,3 +703,14 @@ def register_applications_handlers(dp: Dispatcher):
     dp.register_message_handler(process_file, content_types=['text', 'photo', 'document'],
                                 state=ApplicationForm.waiting_for_file)
     dp.register_message_handler(process_confirmation, state=ApplicationForm.waiting_for_confirmation)
+
+    # Guruhda reply orqali javob berish (oxirida bo'lishi kerak)
+    dp.register_message_handler(
+        group_reply_handler,
+        lambda message: (
+            message.chat.type in ['group', 'supergroup'] and
+            message.reply_to_message is not None and
+            message.from_user.id in ADMIN_IDS
+        ),
+        content_types=['text']
+    )

@@ -7,6 +7,10 @@ load_dotenv()
 BOT_TOKEN = os.getenv('BOT_TOKEN', '8349358796:AAGh9cZHo31Ao1XTsh4TSgWlZRrPAAbgmS0')
 ADMIN_IDS = [1920079641]  # O'z telegram ID laringizni kiriting
 
+# Admin group for applications
+# Murojaatlar adminlar guruhiga yuboriladi
+ADMIN_GROUP_ID = os.getenv('ADMIN_GROUP_ID', None)  # Adminlar guruhi ID sini kiriting
+
 # Channel settings
 DIGEST_CHANNEL_ID = os.getenv('DIGEST_CHANNEL_ID', '-1003285608799')  # Hafta dayjesti kanali ID
 
