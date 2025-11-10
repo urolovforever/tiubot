@@ -183,10 +183,12 @@ def get_admin_keyboard(user_id: int) -> ReplyKeyboardMarkup:
         ]
     }
 
-    for btn in buttons.get(lang, buttons['uz']):
-        keyboard.add(KeyboardButton(btn))
+    # 2 ta ustunda (row_width=2) chiqarish uchun insert ishlatamiz
+    lang_buttons = buttons.get(lang, buttons['uz'])
+    for btn in lang_buttons:
+        keyboard.insert(KeyboardButton(btn))
 
-    keyboard.add(KeyboardButton(t(user_id, 'back')))
+    keyboard.row(KeyboardButton(t(user_id, 'back')))
     return keyboard
 
 def get_broadcast_confirm_keyboard(user_id: int) -> ReplyKeyboardMarkup:
