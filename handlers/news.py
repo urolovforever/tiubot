@@ -111,8 +111,8 @@ async def events_calendar_handler(message: types.Message):
     """
     user_id = message.from_user.id
 
-    # Barcha tadbirlarni olish (debug uchun vaqtincha upcoming_only=False)
-    # TODO: kelajakda upcoming_only=True ga qaytarish kerak
+    # Barcha tadbirlarni ko'rsatish (o'tmish va kelajakdagi)
+    # upcoming_only=False - foydalanuvchilarga barcha tadbirlarni ko'rsatish uchun
     events = db.get_all_events(upcoming_only=False)
 
     if not events:
