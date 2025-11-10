@@ -381,32 +381,38 @@ async def campus_photos_callback(callback: types.CallbackQuery):
 
     # Fotosuratlar ro'yxati
     photo_filenames = ["campus1.png", "campus2.png", "campus3.png", "campus4.png"]
-    photo_paths = []
+    photo_path = None
 
-    # Mavjud fayllarni tekshirish
+    # Birinchi mavjud faylni topish
     for filename in photo_filenames:
         path = get_media_path(filename)
         if path:
-            photo_paths.append(path)
+            photo_path = path
+            break
 
     try:
-        if photo_paths:
-            # Agar fotolar mavjud bo'lsa
-            await callback.message.delete()
+        if photo_path and os.path.exists(photo_path):
+            # Agar foto mavjud bo'lsa - xabarni rasm bilan o'zgartirish
+            from aiogram.types import InputMediaPhoto
 
-            media_group = []
-            for i, photo_path in enumerate(photo_paths):
-                if i == 0:
-                    media_group.append(InputMediaPhoto(
-                        media=InputFile(photo_path),
-                        caption=captions.get(lang, captions['uz']),
-                        parse_mode="HTML"
-                    ))
-                else:
-                    media_group.append(InputMediaPhoto(media=InputFile(photo_path)))
+            media = InputMediaPhoto(
+                media=InputFile(photo_path),
+                caption=captions.get(lang, captions['uz']),
+                parse_mode="HTML"
+            )
 
-            await callback.message.answer_media_group(media_group)
-            await callback.message.answer("⬆️", reply_markup=keyboard)
+            try:
+                # Avval xabarni edit qilishga harakat qilamiz
+                await callback.message.edit_media(media=media, reply_markup=keyboard)
+            except Exception:
+                # Agar edit ishlamasa (masalan, xabar text bo'lsa), yangi xabar yuboramiz
+                await callback.message.delete()
+                await callback.message.answer_photo(
+                    photo=InputFile(photo_path),
+                    caption=captions.get(lang, captions['uz']),
+                    parse_mode="HTML",
+                    reply_markup=keyboard
+                )
         else:
             # Agar fotolar mavjud bo'lmasa
             await callback.message.edit_text(
@@ -543,14 +549,25 @@ async def career_center_callback(callback: types.CallbackQuery):
 
     try:
         if photo_path and os.path.exists(photo_path):
-            # Agar foto mavjud bo'lsa
-            await callback.message.delete()
-            await callback.message.answer_photo(
-                photo=InputFile(photo_path),
+            # Agar foto mavjud bo'lsa - xabarni rasm bilan o'zgartirish
+            media = InputMediaPhoto(
+                media=InputFile(photo_path),
                 caption=texts.get(lang, texts['uz']),
-                parse_mode="HTML",
-                reply_markup=keyboard
+                parse_mode="HTML"
             )
+
+            try:
+                # Avval xabarni edit qilishga harakat qilamiz
+                await callback.message.edit_media(media=media, reply_markup=keyboard)
+            except Exception:
+                # Agar edit ishlamasa, yangi xabar yuboramiz
+                await callback.message.delete()
+                await callback.message.answer_photo(
+                    photo=InputFile(photo_path),
+                    caption=texts.get(lang, texts['uz']),
+                    parse_mode="HTML",
+                    reply_markup=keyboard
+                )
         else:
             # Agar foto mavjud bo'lmasa - faqat matn yuborish
             await callback.message.edit_text(
@@ -629,6 +646,12 @@ Choose a section ↓'''
             reply_markup=keyboard
         )
     except:
+        # Agar edit_text ishlamasa (masalan, xabar rasm bo'lsa),
+        # eski xabarni o'chirib, yangi xabar yuboramiz
+        try:
+            await callback.message.delete()
+        except:
+            pass
         await callback.message.answer(
             texts.get(lang, texts['uz']),
             parse_mode="HTML",
