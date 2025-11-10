@@ -552,17 +552,68 @@ class Database:
             conn.close()
 
     def get_events_needing_reminders(self, hours_before: int) -> List[Tuple]:
-        """Get events that need reminders (1 day or 1 hour before)"""
+        """
+        Get events that need reminders (24 hours or 1 hour before)
+        Uses Tashkent timezone for comparison
+        """
         conn = self.get_connection()
         c = conn.cursor()
         try:
-            c.execute(f"""
-                SELECT * FROM events
-                WHERE datetime(date || ' ' || COALESCE(time, '00:00'))
-                      BETWEEN datetime('now')
-                      AND datetime('now', '+{hours_before} hours', '+30 minutes')
-            """)
-            return c.fetchall()
+            # Barcha tadbirlarni olish
+            c.execute("SELECT * FROM events")
+            all_events = c.fetchall()
+
+            # Tashkent vaqti bo'yicha hozirgi vaqt
+            now = get_tashkent_now()
+
+            # hours_before soatdan keyin bo'ladigan tadbirlarni topish
+            if hours_before == 24:
+                # 1 kun oldin: 23-25 soat orasida
+                min_time = now + timedelta(hours=23)
+                max_time = now + timedelta(hours=25)
+            elif hours_before == 1:
+                # 1 soat oldin: 55 daqiqa - 65 daqiqa orasida
+                min_time = now + timedelta(minutes=55)
+                max_time = now + timedelta(minutes=65)
+            else:
+                min_time = now + timedelta(hours=hours_before - 0.5)
+                max_time = now + timedelta(hours=hours_before + 0.5)
+
+            events_needing_reminder = []
+            for event in all_events:
+                # event[3] = date (DD.MM.YYYY), event[4] = time (HH:MM)
+                date_str = event[3]
+                time_str = event[4] if event[4] else "00:00"
+
+                try:
+                    # DD.MM.YYYY HH:MM formatidan datetime ga o'tkazish
+                    day, month, year = date_str.split('.')
+
+                    # Vaqtni parse qilish
+                    if ':' in time_str:
+                        # Agar vaqt range bo'lsa (10:00-12:00), birinchisini olish
+                        if '-' in time_str:
+                            time_str = time_str.split('-')[0].strip()
+                        hour, minute = time_str.split(':')[:2]
+                    else:
+                        hour, minute = 0, 0
+
+                    # Tashkent timezone bilan datetime yaratish
+                    event_datetime = datetime(
+                        int(year), int(month), int(day),
+                        int(hour), int(minute),
+                        tzinfo=TASHKENT_TZ
+                    )
+
+                    # Agar tadbir kerakli vaqt oralig'ida bo'lsa
+                    if min_time <= event_datetime <= max_time:
+                        events_needing_reminder.append(event)
+
+                except Exception as e:
+                    logger.warning(f"Event #{event[0]}: Could not parse datetime '{date_str} {time_str}': {e}")
+
+            return events_needing_reminder
+
         except Exception as e:
             logger.error(f"Error getting events for reminders: {e}")
             return []
