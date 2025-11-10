@@ -82,6 +82,13 @@ async def on_startup(dp: Dispatcher):
     logger.info(f'Bot name: {(await dp.bot.get_me()).full_name}')
     register_all_handlers(dp)
 
+    # Cleanup old answered applications (older than 7 days)
+    from database.db import Database
+    db = Database()
+    cleaned_count = db.cleanup_old_answered_applications(days=7)
+    if cleaned_count > 0:
+        logger.info(f'🧹 Cleaned up {cleaned_count} old answered applications')
+
     # Start event reminder scheduler in background
     asyncio.create_task(start_reminder_scheduler(dp.bot, interval_minutes=30))
     logger.info('📅 Event reminder scheduler started')
