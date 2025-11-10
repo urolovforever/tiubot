@@ -1,9 +1,23 @@
 import sqlite3
-from datetime import datetime
+from datetime import datetime, timedelta
 from typing import Optional, List, Tuple
 import logging
 
 logger = logging.getLogger(__name__)
+
+# Tashkent timezone (UTC+5)
+try:
+    from zoneinfo import ZoneInfo
+    TASHKENT_TZ = ZoneInfo("Asia/Tashkent")
+except ImportError:
+    # Fallback for Python < 3.9
+    from datetime import timezone
+    TASHKENT_TZ = timezone(timedelta(hours=5))
+
+
+def get_tashkent_now():
+    """Tashkent vaqti bo'yicha hozirgi vaqtni qaytaradi"""
+    return datetime.now(TASHKENT_TZ)
 
 
 class Database:
@@ -413,8 +427,8 @@ class Database:
 
             # Agar faqat kelajakdagi tadbirlar kerak bo'lsa, Python'da filter qilamiz
             if upcoming_only:
-                from datetime import datetime
-                today = datetime.now().date()
+                # Tashkent vaqti bo'yicha bugungi sana
+                today = datetime.now(TASHKENT_TZ).date()
 
                 filtered_events = []
                 for event in all_events:
@@ -427,9 +441,8 @@ class Database:
                         if event_date >= today:
                             filtered_events.append(event)
                     except Exception as e:
-                        # Agar sana parse bo'lmasa, o'sha tadbirni ham qo'shamiz (xatolikni oldini olish)
+                        # Agar sana parse bo'lmasa, xatolik log qilamiz va tadbir qo'shilmaydi
                         logger.warning(f"Event #{event[0]}: Could not parse date '{event_date_str}': {e}")
-                        filtered_events.append(event)
 
                 # Sana bo'yicha tartiblash (yaqindan uzoqqa)
                 filtered_events.sort(key=lambda e: self._parse_event_date(e[3]))
