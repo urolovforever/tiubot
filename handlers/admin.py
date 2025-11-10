@@ -105,14 +105,15 @@ async def view_answered_applications_handler(message: types.Message):
     if not is_admin(user_id):
         return
 
-    applications = db.get_answered_applications()
+    # Oxirgi 7 kunlik murojaatlarni olish
+    applications = db.get_answered_applications(days=7)
 
     if not applications:
         lang = db.get_user_language(user_id)
         texts = {
-            'uz': '📭 Javob berilgan murojaatlar yo\'q',
-            'ru': '📭 Нет отвеченных обращений',
-            'en': '📭 No answered applications'
+            'uz': '📭 Oxirgi 7 kunda javob berilgan murojaatlar yo\'q',
+            'ru': '📭 Нет отвеченных обращений за последние 7 дней',
+            'en': '📭 No answered applications in the last 7 days'
         }
         await message.answer(
             texts.get(lang, texts['uz']),
@@ -120,7 +121,7 @@ async def view_answered_applications_handler(message: types.Message):
         )
         return
 
-    await message.answer(f'✅ Javob berilgan murojaatlar: {len(applications)} ta\n\n')
+    await message.answer(f'✅ Javob berilgan murojaatlar (oxirgi 7 kun): {len(applications)} ta\n\n')
 
     for app in applications[:20]:  # Oxirgi 20 ta
         text = f'''📬 Murojaat #{app[0]}

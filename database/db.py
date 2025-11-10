@@ -275,13 +275,23 @@ class Database:
         finally:
             conn.close()
 
-    def get_answered_applications(self) -> List[Tuple]:
-        """Javob berilgan murojaatlar"""
+    def get_answered_applications(self, days: int = 7) -> List[Tuple]:
+        """
+        Javob berilgan murojaatlar (faqat oxirgi N kun)
+        Default: 7 kun
+        """
         conn = self.get_connection()
         c = conn.cursor()
         try:
+            # Tashkent vaqti bo'yicha N kun oldingi sana
+            cutoff_date = (get_tashkent_now() - timedelta(days=days)).strftime("%Y-%m-%d %H:%M:%S")
+
             c.execute(
-                "SELECT * FROM applications WHERE status='answered' ORDER BY created_at DESC"
+                """SELECT * FROM applications
+                   WHERE status='answered'
+                   AND created_at >= ?
+                   ORDER BY created_at DESC""",
+                (cutoff_date,)
             )
             return c.fetchall()
         except Exception as e:
@@ -332,6 +342,45 @@ class Database:
             conn.commit()
         except Exception as e:
             logger.error(f"Error updating application: {e}")
+        finally:
+            conn.close()
+
+    def cleanup_old_answered_applications(self, days: int = 7) -> int:
+        """
+        N kundan eski javob berilgan murojaatlarni o'chirish
+        Default: 7 kun
+        Returns: O'chirilgan murojaatlar soni
+        """
+        conn = self.get_connection()
+        c = conn.cursor()
+        try:
+            # Tashkent vaqti bo'yicha N kun oldingi sana
+            cutoff_date = (get_tashkent_now() - timedelta(days=days)).strftime("%Y-%m-%d %H:%M:%S")
+
+            # Avval nechta o'chirilishini sanash
+            c.execute(
+                """SELECT COUNT(*) FROM applications
+                   WHERE status='answered'
+                   AND created_at < ?""",
+                (cutoff_date,)
+            )
+            count = c.fetchone()[0]
+
+            # O'chirish
+            if count > 0:
+                c.execute(
+                    """DELETE FROM applications
+                       WHERE status='answered'
+                       AND created_at < ?""",
+                    (cutoff_date,)
+                )
+                conn.commit()
+                logger.info(f"Cleaned up {count} old answered applications (older than {days} days)")
+
+            return count
+        except Exception as e:
+            logger.error(f"Error cleaning up old applications: {e}")
+            return 0
         finally:
             conn.close()
 
