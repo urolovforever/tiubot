@@ -111,9 +111,8 @@ async def events_calendar_handler(message: types.Message):
     """
     user_id = message.from_user.id
 
-    # Barcha tadbirlarni olish (debug uchun vaqtincha upcoming_only=False)
-    # TODO: kelajakda upcoming_only=True ga qaytarish kerak
-    events = db.get_all_events(upcoming_only=False)
+    # Faqat kelajakdagi tadbirlarni ko'rsatish (Tashkent time zone bo'yicha)
+    events = db.get_all_events(upcoming_only=True)
 
     if not events:
         texts = {

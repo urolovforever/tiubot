@@ -1,9 +1,23 @@
 import sqlite3
-from datetime import datetime
+from datetime import datetime, timedelta
 from typing import Optional, List, Tuple
 import logging
 
 logger = logging.getLogger(__name__)
+
+# Tashkent timezone (UTC+5)
+try:
+    from zoneinfo import ZoneInfo
+    TASHKENT_TZ = ZoneInfo("Asia/Tashkent")
+except ImportError:
+    # Fallback for Python < 3.9
+    from datetime import timezone
+    TASHKENT_TZ = timezone(timedelta(hours=5))
+
+
+def get_tashkent_now():
+    """Tashkent vaqti bo'yicha hozirgi vaqtni qaytaradi"""
+    return datetime.now(TASHKENT_TZ)
 
 
 class Database:
@@ -411,42 +425,31 @@ class Database:
             c.execute("SELECT * FROM events")
             all_events = c.fetchall()
 
-            logger.info(f"Database'dan {len(all_events)} ta tadbir topildi")
-
             # Agar faqat kelajakdagi tadbirlar kerak bo'lsa, Python'da filter qilamiz
             if upcoming_only:
-                from datetime import datetime
-                today = datetime.now().date()
-                logger.info(f"Bugungi sana: {today}")
+                # Tashkent vaqti bo'yicha bugungi sana
+                today = datetime.now(TASHKENT_TZ).date()
 
                 filtered_events = []
                 for event in all_events:
                     # event[3] = date (DD.MM.YYYY formatida)
                     event_date_str = event[3]
-                    logger.info(f"Tadbir #{event[0]}: sana={event_date_str}")
                     try:
                         # DD.MM.YYYY formatidan datetime.date ga o'tkazish
                         event_date = datetime.strptime(event_date_str, '%d.%m.%Y').date()
-                        logger.info(f"  Parse qilingan sana: {event_date}, bugun >= taqqoslash: {event_date >= today}")
                         # Bugungi yoki kelajakdagi tadbirlar
                         if event_date >= today:
                             filtered_events.append(event)
-                            logger.info(f"  ✅ Tadbir qo'shildi")
-                        else:
-                            logger.info(f"  ❌ Tadbir o'tmishda, qo'shilmadi")
                     except Exception as e:
-                        # Agar sana parse bo'lmasa, o'sha tadbirni ham qo'shamiz (xatolikni oldini olish)
-                        logger.warning(f"  ⚠️ Sana parse qilib bo'lmadi: {e}, lekin tadbir qo'shiladi")
-                        filtered_events.append(event)
+                        # Agar sana parse bo'lmasa, xatolik log qilamiz va tadbir qo'shilmaydi
+                        logger.warning(f"Event #{event[0]}: Could not parse date '{event_date_str}': {e}")
 
                 # Sana bo'yicha tartiblash (yaqindan uzoqqa)
                 filtered_events.sort(key=lambda e: self._parse_event_date(e[3]))
-                logger.info(f"Jami {len(filtered_events)} ta kelajakdagi tadbir qaytarildi")
                 return filtered_events
             else:
                 # Barcha tadbirlarni sana bo'yicha tartiblash
                 all_events_sorted = sorted(all_events, key=lambda e: self._parse_event_date(e[3]))
-                logger.info(f"Jami {len(all_events_sorted)} ta tadbir (barcha) qaytarildi")
                 return all_events_sorted
 
         except Exception as e:
