@@ -390,52 +390,75 @@ async def campus_photos_callback(callback: types.CallbackQuery):
     back_text = "🔙 Orqaga" if lang == 'uz' else "🔙 Назад" if lang == 'ru' else "🔙 Back"
     keyboard.add(InlineKeyboardButton(back_text, callback_data="back_to_student_life"))
 
-    # Mavjud fayllarni topish - 6 ta rasm (jpg yoki png)
-    available_photos = []
-    for i in range(1, 7):  # 1 dan 6 gacha
-        # Avval .jpg ni tekshiramiz, keyin .png ni
-        for ext in ['.jpg', '.png']:
-            filename = f"campus{i}{ext}"
-            path = get_media_path(filename)
-            if path and os.path.exists(path):
-                available_photos.append(path)
-                break  # Bitta format topilsa, boshqasini tekshirmaymiz
-
     try:
         # Eski xabarni o'chirish (kutmasdan)
         asyncio.create_task(callback.message.delete())
 
-        if available_photos:
-            # Agar fotolar mavjud bo'lsa - media group (albom) yuborish
+        # Avval cache dan file_id larni tekshiramiz
+        cached_file_ids = db.get_cached_media_group('campus')
+
+        if cached_file_ids and len(cached_file_ids) > 0:
+            # Cache dan yuborish - juda tez!
             media_group = []
-            for i, photo_path in enumerate(available_photos):
-                # Birinchi rasmga caption qo'shamiz
+            for i, file_id in enumerate(cached_file_ids):
                 if i == 0:
                     media_group.append(
                         InputMediaPhoto(
-                            media=InputFile(photo_path),
+                            media=file_id,
                             caption=captions.get(lang, captions['uz']),
                             parse_mode="HTML"
                         )
                     )
                 else:
-                    media_group.append(InputMediaPhoto(media=InputFile(photo_path)))
+                    media_group.append(InputMediaPhoto(media=file_id))
 
-            # Media group yuborish
             await callback.message.answer_media_group(media=media_group)
-
-            # Tugma bilan alohida xabar yuborish
-            await callback.message.answer(
-                "⬇️",
-                reply_markup=keyboard
-            )
         else:
-            # Agar fotolar mavjud bo'lmasa
-            await callback.message.answer(
-                f"{captions.get(lang, captions['uz'])}\n\n📷 Fotosuratlar hozircha mavjud emas.",
-                parse_mode="HTML",
-                reply_markup=keyboard
-            )
+            # Cache yo'q - diskdan yuklash va cache ga saqlash
+            available_photos = []
+            for i in range(1, 7):
+                for ext in ['.jpg', '.png']:
+                    filename = f"campus{i}{ext}"
+                    path = get_media_path(filename)
+                    if path and os.path.exists(path):
+                        available_photos.append((i, path))
+                        break
+
+            if available_photos:
+                media_group = []
+                for i, photo_path in enumerate(available_photos):
+                    if i == 0:
+                        media_group.append(
+                            InputMediaPhoto(
+                                media=InputFile(photo_path[1]),
+                                caption=captions.get(lang, captions['uz']),
+                                parse_mode="HTML"
+                            )
+                        )
+                    else:
+                        media_group.append(InputMediaPhoto(media=InputFile(photo_path[1])))
+
+                # Media group yuborish va file_id larni saqlash
+                sent_messages = await callback.message.answer_media_group(media=media_group)
+
+                # File_id larni cache ga saqlash
+                for idx, msg in enumerate(sent_messages):
+                    if msg.photo:
+                        file_id = msg.photo[-1].file_id
+                        db.save_cached_file_id(f'campus_{idx+1}', file_id)
+            else:
+                await callback.message.answer(
+                    f"{captions.get(lang, captions['uz'])}\n\n📷 Fotosuratlar hozircha mavjud emas.",
+                    parse_mode="HTML",
+                    reply_markup=keyboard
+                )
+                return
+
+        # Tugma bilan alohida xabar yuborish
+        await callback.message.answer(
+            "⬇️",
+            reply_markup=keyboard
+        )
 
     except Exception as e:
         # Har qanday xatolik yuz bersa
@@ -548,53 +571,76 @@ During this trip, they are not only increasing their knowledge and experience, b
     back_text = "🔙 Orqaga" if lang == 'uz' else "🔙 Назад" if lang == 'ru' else "🔙 Back"
     keyboard.add(InlineKeyboardButton(back_text, callback_data="back_to_student_life"))
 
-    # Mavjud fayllarni topish - 6 ta rasm (jpg yoki png)
-    available_photos = []
-    for i in range(1, 7):  # 1 dan 6 gacha
-        # Avval .jpg ni tekshiramiz, keyin .png ni
-        for ext in ['.jpg', '.png']:
-            filename = f"career{i}{ext}"
-            path = get_media_path(filename)
-            if path and os.path.exists(path):
-                available_photos.append(path)
-                break  # Bitta format topilsa, boshqasini tekshirmaymiz
-
     try:
         # Eski xabarni o'chirish (kutmasdan)
         asyncio.create_task(callback.message.delete())
 
-        if available_photos:
-            # Agar fotolar mavjud bo'lsa - media group (albom) yuborish
+        # Avval cache dan file_id larni tekshiramiz
+        cached_file_ids = db.get_cached_media_group('career')
+
+        if cached_file_ids and len(cached_file_ids) > 0:
+            # Cache dan yuborish - juda tez!
             media_group = []
-            for i, photo_path in enumerate(available_photos):
-                # Birinchi rasmga caption qo'shamiz
+            for i, file_id in enumerate(cached_file_ids):
                 if i == 0:
                     media_group.append(
                         InputMediaPhoto(
-                            media=InputFile(photo_path),
+                            media=file_id,
                             caption=texts.get(lang, texts['uz']),
                             parse_mode="HTML"
                         )
                     )
                 else:
-                    media_group.append(InputMediaPhoto(media=InputFile(photo_path)))
+                    media_group.append(InputMediaPhoto(media=file_id))
 
-            # Media group yuborish
             await callback.message.answer_media_group(media=media_group)
-
-            # Tugma bilan alohida xabar yuborish
-            await callback.message.answer(
-                "⬇️",
-                reply_markup=keyboard
-            )
         else:
-            # Agar fotolar mavjud bo'lmasa - faqat matn yuborish
-            await callback.message.answer(
-                texts.get(lang, texts['uz']),
-                parse_mode="HTML",
-                reply_markup=keyboard,
-                disable_web_page_preview=True
-            )
+            # Cache yo'q - diskdan yuklash va cache ga saqlash
+            available_photos = []
+            for i in range(1, 7):
+                for ext in ['.jpg', '.png']:
+                    filename = f"career{i}{ext}"
+                    path = get_media_path(filename)
+                    if path and os.path.exists(path):
+                        available_photos.append((i, path))
+                        break
+
+            if available_photos:
+                media_group = []
+                for i, photo_path in enumerate(available_photos):
+                    if i == 0:
+                        media_group.append(
+                            InputMediaPhoto(
+                                media=InputFile(photo_path[1]),
+                                caption=texts.get(lang, texts['uz']),
+                                parse_mode="HTML"
+                            )
+                        )
+                    else:
+                        media_group.append(InputMediaPhoto(media=InputFile(photo_path[1])))
+
+                # Media group yuborish va file_id larni saqlash
+                sent_messages = await callback.message.answer_media_group(media=media_group)
+
+                # File_id larni cache ga saqlash
+                for idx, msg in enumerate(sent_messages):
+                    if msg.photo:
+                        file_id = msg.photo[-1].file_id
+                        db.save_cached_file_id(f'career_{idx+1}', file_id)
+            else:
+                await callback.message.answer(
+                    texts.get(lang, texts['uz']),
+                    parse_mode="HTML",
+                    reply_markup=keyboard,
+                    disable_web_page_preview=True
+                )
+                return
+
+        # Tugma bilan alohida xabar yuborish
+        await callback.message.answer(
+            "⬇️",
+            reply_markup=keyboard
+        )
     except Exception as e:
         # Har qanday xatolik - faqat matn
         await callback.message.answer(

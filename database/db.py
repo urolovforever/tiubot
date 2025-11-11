@@ -182,6 +182,13 @@ class Database:
                       UNIQUE(book_id, user_id),
                       FOREIGN KEY (book_id) REFERENCES library_books (id))''')
 
+        # Media cache table - to store file_ids for faster loading
+        c.execute('''CREATE TABLE IF NOT EXISTS media_cache
+                     (id INTEGER PRIMARY KEY AUTOINCREMENT,
+                      media_key TEXT UNIQUE,
+                      file_id TEXT,
+                      cached_at TEXT)''')
+
         conn.commit()
         conn.close()
         logger.info("Database initialized successfully")
@@ -1120,5 +1127,51 @@ class Database:
         except Exception as e:
             logger.error(f"Error getting library statistics: {e}")
             return {}
+
+    # ==================== MEDIA CACHE ====================
+
+    def get_cached_file_id(self, media_key: str) -> Optional[str]:
+        """Get cached file_id by media key"""
+        conn = self.get_connection()
+        c = conn.cursor()
+        try:
+            c.execute("SELECT file_id FROM media_cache WHERE media_key=?", (media_key,))
+            result = c.fetchone()
+            return result[0] if result else None
+        except Exception as e:
+            logger.error(f"Error getting cached file_id: {e}")
+            return None
+        finally:
+            conn.close()
+
+    def save_cached_file_id(self, media_key: str, file_id: str):
+        """Save file_id to cache"""
+        conn = self.get_connection()
+        c = conn.cursor()
+        try:
+            c.execute(
+                "INSERT OR REPLACE INTO media_cache (media_key, file_id, cached_at) VALUES (?, ?, ?)",
+                (media_key, file_id, datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
+            )
+            conn.commit()
+        except Exception as e:
+            logger.error(f"Error saving cached file_id: {e}")
+        finally:
+            conn.close()
+
+    def get_cached_media_group(self, group_key: str) -> Optional[List[str]]:
+        """Get all file_ids for a media group (e.g., 'campus' or 'career')"""
+        conn = self.get_connection()
+        c = conn.cursor()
+        try:
+            c.execute(
+                "SELECT file_id FROM media_cache WHERE media_key LIKE ? ORDER BY media_key",
+                (f"{group_key}_%",)
+            )
+            results = c.fetchall()
+            return [r[0] for r in results] if results else None
+        except Exception as e:
+            logger.error(f"Error getting cached media group: {e}")
+            return None
         finally:
             conn.close()
