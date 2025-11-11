@@ -493,7 +493,7 @@ async def save_and_send_application(message: types.Message, state: FSMContext):
     anonymity_status = '🕶 ANONIM (foydalanuvchi uchun)' if is_anonymous else '📱 OCHIQ'
     phone_display = f"  • Telefon: {phone}" if phone else "  • Telefon: -"
 
-    admin_text = f'''🆕 Yangi murojaat #{app_id}
+    admin_text = f'''🆕 Yangi murojaat
 
 👤 Foydalanuvchi:
   • Ism: {full_name}
@@ -508,9 +508,7 @@ async def save_and_send_application(message: types.Message, state: FSMContext):
   • Holat: {anonymity_status}
 
 💬 Matn:
-{data['message']}
-
-📌 Javob: /reply_{app_id}'''
+{data['message']}'''
 
     # Adminlar guruhiga yuborish
     if ADMIN_GROUP_ID:
