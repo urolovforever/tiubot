@@ -602,13 +602,13 @@ async def back_to_student_life_callback(callback: types.CallbackQuery):
     texts = {
         'uz': '''🎉 <b>Talabalar hayoti</b>
 
-Quyidagi bo'limlardan birini tanlang ↓''',
+Quyidagi bo'limlardan birini tanlang:''',
         'ru': '''🎉 <b>Студенческая жизнь</b>
 
-Выберите раздел ↓''',
+Выберите раздел:''',
         'en': '''🎉 <b>Student Life</b>
 
-Choose a section ↓'''
+Choose a section:'''
     }
 
     keyboard = InlineKeyboardMarkup(row_width=1)
