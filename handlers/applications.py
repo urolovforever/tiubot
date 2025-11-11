@@ -1,7 +1,7 @@
 from aiogram import types, Dispatcher
 from aiogram.dispatcher import FSMContext
 from aiogram.types import ReplyKeyboardMarkup, KeyboardButton
-from database.db import Database
+from database.db import Database, get_tashkent_now
 from states.forms import ApplicationForm
 from keyboards.reply import get_cancel_keyboard, get_phone_keyboard, get_main_keyboard
 from utils.helpers import t
