@@ -79,9 +79,7 @@ async def view_new_applications_handler(message: types.Message):
 💬 Murojaat:
 {app[5]}
 
-📅 Sana: {app[8]}
-
-📌 Javob berish: /reply_{app[0]}'''
+📅 Sana: {app[8]}'''
 
         if app[6]:  # file_id
             try:
