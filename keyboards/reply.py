@@ -80,24 +80,26 @@ def get_faculty_keyboard(user_id: int) -> ReplyKeyboardMarkup:
     return keyboard
 
 
-def get_direction_keyboard(user_id: int, faculty: str) -> ReplyKeyboardMarkup:
+def get_course_keyboard(user_id: int, faculty: str) -> ReplyKeyboardMarkup:
+    """Get keyboard with courses for selected faculty"""
     from config import FACULTIES
     from database.db import Database
 
     lang = db.get_user_language(user_id)
 
-    keyboard = ReplyKeyboardMarkup(resize_keyboard=True, row_width=2)
+    keyboard = ReplyKeyboardMarkup(resize_keyboard=True, row_width=3)
     faculties_lang = FACULTIES.get(lang, FACULTIES['uz'])
 
     if faculty in faculties_lang:
-        for direction in faculties_lang[faculty]:
-            keyboard.insert(KeyboardButton(direction))
+        for course in faculties_lang[faculty]:
+            keyboard.insert(KeyboardButton(course))
 
     keyboard.add(KeyboardButton(t(user_id, 'back')))
     return keyboard
 
 
-def get_course_keyboard(user_id: int, faculty: str, direction: str) -> ReplyKeyboardMarkup:
+def get_direction_keyboard(user_id: int, faculty: str, course: str) -> ReplyKeyboardMarkup:
+    """Get keyboard with directions for selected faculty and course"""
     from config import FACULTIES
     from database.db import Database
     from utils.helpers import t
@@ -107,9 +109,19 @@ def get_course_keyboard(user_id: int, faculty: str, direction: str) -> ReplyKeyb
     keyboard = ReplyKeyboardMarkup(resize_keyboard=True, row_width=2)
     faculties_lang = FACULTIES.get(lang, FACULTIES['uz'])
 
-    if faculty in faculties_lang and direction in faculties_lang[faculty]:
-        for course in faculties_lang[faculty][direction]:
-            keyboard.insert(KeyboardButton(course))
+    if faculty in faculties_lang and course in faculties_lang[faculty]:
+        course_data = faculties_lang[faculty][course]
+
+        # Check if it's a list (for Yurisprudensiya - no directions, just groups)
+        if isinstance(course_data, list):
+            # This is Yurisprudensiya - groups are directly under course
+            # Return groups as buttons
+            for group in course_data:
+                keyboard.insert(KeyboardButton(group))
+        else:
+            # This is Biznes faculty - has directions
+            for direction in course_data:
+                keyboard.insert(KeyboardButton(direction))
 
     keyboard.add(KeyboardButton(t(user_id, 'back')))
     return keyboard

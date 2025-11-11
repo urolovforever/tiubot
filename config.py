@@ -30,230 +30,179 @@ LIBRARY_CHANNELS = {
 # Database settings
 DATABASE_NAME = 'tiu_bot.db'
 
-# Faculties
+# Faculties - NEW STRUCTURE: Faculty → Course → Direction → Groups
 FACULTIES = {
     'uz': {
-        'Yurisprudensiya': {
-            'Yurisprudensiya': {
-                '1-kurs': ['xq-1-1', 'xq-1-2'],
-                '2-kurs': ['xq-2-1', 'xq-2-2']
+        'Biznes va innovatsion ta\'lim': {
+            '1-kurs': {
+                'Psixologiya': ['PS-1-25'],
+                'Moliya va moliyaviy texnologiyalar': ['ML-1-25'],
+                'Dasturiy injiniring': ['DI-1-25'],
+                'Iqtisodiyot': ['EK-1-25', 'EK-2-25', 'EK-3-25', 'EK-4-25', 'EK-1-25r', 'EK-2-25r', 'EK-3-25r'],
+                'Jahon iqtisodiyoti va xalqaro iqtisodiy munosabatlar (mintaqalar va faoliyat turlari bo\'yicha)': ['XIM-1-25', 'XIM-2-25', 'XIM-3-25', 'XIM-4-25', 'XIM-1-25r', 'XIM-2-25r', 'XIM-3-25r'],
+                'Bank ishi': ['BK-1-25'],
+                'Menejment': ['MN-1-25', 'MN-2-25'],
+                'Buxgalteriya hisobi': ['BH-1-25'],
+                'Boshlang\'ich ta\'lim': ['BT-1-25'],
+                'Xorijiy til va adabiyoti (ingliz tili)': ['XT-1-25', 'XT-2-25', 'XT-1-25r'],
+                'Filologiya va tillarni o\'qitish (korayes tili)': ['KR-1-25'],
+                'Kiberxavfsizlik injiniringi': ['CS-1-25', 'CS-2-25', 'CS-3-25', 'CS-1-25r', 'CS-2-25r']
+            },
+            '2-kurs': {
+                'Xorijiy til va adabiyoti (ingliz tili)': ['XT-1-24', 'XT-2-24', 'XT-3-24', 'XT-1-24r'],
+                'Axborot tizimlari va texnologiyalari (tarmoqlar va sohalar bo\'yicha)': ['AT-1-24'],
+                'Iqtisodiyot': ['EK-1-24', 'EK-2-24', 'MEK-1-24', 'EK-1-24r', 'EK-2-24r'],
+                'Bank ishi': ['BK-1-24'],
+                'Kiberxavfsizlik injiniringi': ['CS-1-24', 'CS-1-24r'],
+                'Dasturiy injiniring': ['DI-1-24'],
+                'Filologiya va tillarni o\'qitish (korayes tili)': ['KR-1-24'],
+                'Boshlang\'ich ta\'lim': ['BT-1-24'],
+                'Psixologiya': ['PS-1-24'],
+                'Jahon iqtisodiyoti va xalqaro iqtisodiy munosabatlar (mintaqalar va faoliyat turlari bo\'yicha)': ['XIM-1-24', 'XIM-2-24', 'XIM-1-24r', 'XIM-2-24r'],
+                'Menejment': ['MN-1-24']
+            },
+            '3-kurs': {
+                'Xorijiy til va adabiyoti (ingliz tili)': ['XT-1-23'],
+                'Iqtisodiyot': ['EK-1-23'],
+                'Kiberxavfsizlik injiniringi': ['CS-1-23']
             }
         },
-        'Biznes va innovatsion ta\'lim': {
-            'Bank ishi': {
-                '1-kurs': ['b-1-1'],
-                '2-kurs': []
-            },
-            'Buxgalteriya hisobi': {
-                '1-kurs': ['bh-1-5'],
-                '2-kurs': []
-            },
-            'Iqtisodiyot': {
-                '1-kurs': ['i-1-9'],
-                '2-kurs': []
-            },
-            'Marketing': {
-                '1-kurs': [],
-                '2-kurs': []
-            },
-            'Menejment': {
-                '1-kurs': [],
-                '2-kurs': []
-            },
-            'Moliya va moliyaviy texnologiyalar': {
-                '1-kurs': [],
-                '2-kurs': []
-            },
-            'Jahon iqtisodiyoti va xalqaro iqtisodiy munosabatlar': {
-                '1-kurs': [],
-                '2-kurs': []
-            },
-            'Axborot tizimlari va texnologiyalari': {
-                '1-kurs': [],
-                '2-kurs': []
-            },
-            'Kiberxavfsizlik injiniringi': {
-                '1-kurs': [],
-                '2-kurs': []
-            },
-            'Kompyuter injiniringi': {
-                '1-kurs': [],
-                '2-kurs': []
-            },
-            'Dasturiy injiniring': {
-                '1-kurs': [],
-                '2-kurs': []
-            },
-            'Maktabgacha ta\'lim': {
-                '1-kurs': [],
-                '2-kurs': []
-            },
-            'Boshlang\'ich ta\'lim': {
-                '1-kurs': [],
-                '2-kurs': []
-            },
-            'Psixologiya': {
-                '1-kurs': [],
-                '2-kurs': []
-            },
-            'Xorijiy tili va adabiyoti: ingliz tili': {
-                '1-kurs': [],
-                '2-kurs': []
-            },
-            'Filologiya va tillarni o\'qitish (koreys tili)': {
-                '1-kurs': [],
-                '2-kurs': []
-            }
+        'Yurisprudensiya': {
+            '1-kurs': [
+                'HQ-1-25', 'HQ-2-25', 'HQ-3-25', 'HQ-4-25', 'HQ-5-25', 'HQ-6-25',
+                'HQ-7-25', 'HQ-8-25', 'HQ-9-25', 'HQ-10-25', 'HQ-11-25', 'HQ-12-25',
+                'HQ-13-25', 'HQ-14-25', 'HQ-15-25', 'HQ-16-25', 'HQ-17-25', 'HQ-18-25',
+                'HQ-19-25', 'HQ-20-25', 'HQ-21-25', 'HQ-22-25', 'HQ-23-25', 'HQ-24-25',
+                'HQ-25-25', 'HQ-26-25', 'HQ-27-25', 'HQ-28-25', 'HQ-29-25', 'HQ-30-25',
+                'HQ-1-25r', 'HQ-2-25r', 'HQ-3-25r', 'HQ-4-25r', 'HQ-5-25r', 'HQ-6-25r',
+                'HQ-7-25r', 'HQ-8-25r', 'HQ-9-25r'
+            ],
+            '2-kurs': [
+                'HQ-1-24', 'HQ-2-24', 'HQ-3-24', 'HQ-4-24', 'HQ-5-24', 'HQ-6-24',
+                'HQ-7-24', 'HQ-8-24', 'HQ-9-24', 'HQ-10-24', 'HQ-11-24', 'HQ-12-24',
+                'HQ-13-24', 'HQ-14-24', 'HQ-15-24', 'HQ-16-24', 'HQ-17-24', 'HQ-18-24',
+                'HQ-19-24', 'HQ-20-24', 'HQ-21-24', 'HQ-22-24',
+                'HQ-1-24r', 'HQ-2-24r', 'HQ-3-24r', 'HQ-4-24r', 'HQ-5-24r', 'HQ-6-24r'
+            ],
+            '3-kurs': [
+                'HQ-1-23', 'HQ-2-23', 'HQ-3-23', 'HQ-4-23', 'HQ-5-23', 'HQ-6-23'
+            ]
         }
     },
 
     'ru': {
-        'Юриспруденция': {
-            'Юриспруденция': {
-                '1-курс': ['xq-1-1', 'xq-1-2'],
-                '2-курс': ['xq-2-1', 'xq-2-2']
+        'Бизнес и инновационное образование': {
+            '1-курс': {
+                'Психология': ['PS-1-25'],
+                'Финансы и финансовые технологии': ['ML-1-25'],
+                'Программный инжиниринг': ['DI-1-25'],
+                'Экономика': ['EK-1-25', 'EK-2-25', 'EK-3-25', 'EK-4-25', 'EK-1-25r', 'EK-2-25r', 'EK-3-25r'],
+                'Мировая экономика и международные экономические отношения (по регионам и видам деятельности)': ['XIM-1-25', 'XIM-2-25', 'XIM-3-25', 'XIM-4-25', 'XIM-1-25r', 'XIM-2-25r', 'XIM-3-25r'],
+                'Банковское дело': ['BK-1-25'],
+                'Менеджмент': ['MN-1-25', 'MN-2-25'],
+                'Бухгалтерский учет': ['BH-1-25'],
+                'Начальное образование': ['BT-1-25'],
+                'Иностранный язык и литература (английский язык)': ['XT-1-25', 'XT-2-25', 'XT-1-25r'],
+                'Филология и обучение языкам (корейский язык)': ['KR-1-25'],
+                'Инжиниринг кибербезопасности': ['CS-1-25', 'CS-2-25', 'CS-3-25', 'CS-1-25r', 'CS-2-25r']
+            },
+            '2-курс': {
+                'Иностранный язык и литература (английский язык)': ['XT-1-24', 'XT-2-24', 'XT-3-24', 'XT-1-24r'],
+                'Информационные системы и технологии (по отраслям и областям)': ['AT-1-24'],
+                'Экономика': ['EK-1-24', 'EK-2-24', 'MEK-1-24', 'EK-1-24r', 'EK-2-24r'],
+                'Банковское дело': ['BK-1-24'],
+                'Инжиниринг кибербезопасности': ['CS-1-24', 'CS-1-24r'],
+                'Программный инжиниринг': ['DI-1-24'],
+                'Филология и обучение языкам (корейский язык)': ['KR-1-24'],
+                'Начальное образование': ['BT-1-24'],
+                'Психология': ['PS-1-24'],
+                'Мировая экономика и международные экономические отношения (по регионам и видам деятельности)': ['XIM-1-24', 'XIM-2-24', 'XIM-1-24r', 'XIM-2-24r'],
+                'Менеджмент': ['MN-1-24']
+            },
+            '3-курс': {
+                'Иностранный язык и литература (английский язык)': ['XT-1-23'],
+                'Экономика': ['EK-1-23'],
+                'Инжиниринг кибербезопасности': ['CS-1-23']
             }
         },
-        'Бизнес и инновационное образование': {
-            'Банковское дело': {
-                '1-курс': ['b-1-1'],
-                '2-курс': []
-            },
-            'Бухгалтерский учет': {
-                '1-курс': ['bh-1-5'],
-                '2-курс': []
-            },
-            'Экономика': {
-                '1-курс': ['i-1-9'],
-                '2-курс': []
-            },
-            'Маркетинг': {
-                '1-курс': [],
-                '2-курс': []
-            },
-            'Менеджмент': {
-                '1-курс': [],
-                '2-курс': []
-            },
-            'Финансы и финансовые технологии': {
-                '1-курс': [],
-                '2-курс': []
-            },
-            'Мировая экономика и международные экономические отношения': {
-                '1-курс': [],
-                '2-курс': []
-            },
-            'Информационные системы и технологии': {
-                '1-курс': [],
-                '2-курс': []
-            },
-            'Инжиниринг кибербезопасности': {
-                '1-курс': [],
-                '2-курс': []
-            },
-            'Компьютерный инжиниринг': {
-                '1-курс': [],
-                '2-курс': []
-            },
-            'Программный инжиниринг': {
-                '1-курс': [],
-                '2-курс': []
-            },
-            'Дошкольное образование': {
-                '1-курс': [],
-                '2-курс': []
-            },
-            'Начальное образование': {
-                '1-курс': [],
-                '2-курс': []
-            },
-            'Психология': {
-                '1-курс': [],
-                '2-курс': []
-            },
-            'Иностранный язык и литература: английский язык': {
-                '1-курс': [],
-                '2-курс': []
-            },
-            'Филология и обучение языкам (корейский язык)': {
-                '1-курс': [],
-                '2-курс': []
-            }
+        'Юриспруденция': {
+            '1-курс': [
+                'HQ-1-25', 'HQ-2-25', 'HQ-3-25', 'HQ-4-25', 'HQ-5-25', 'HQ-6-25',
+                'HQ-7-25', 'HQ-8-25', 'HQ-9-25', 'HQ-10-25', 'HQ-11-25', 'HQ-12-25',
+                'HQ-13-25', 'HQ-14-25', 'HQ-15-25', 'HQ-16-25', 'HQ-17-25', 'HQ-18-25',
+                'HQ-19-25', 'HQ-20-25', 'HQ-21-25', 'HQ-22-25', 'HQ-23-25', 'HQ-24-25',
+                'HQ-25-25', 'HQ-26-25', 'HQ-27-25', 'HQ-28-25', 'HQ-29-25', 'HQ-30-25',
+                'HQ-1-25r', 'HQ-2-25r', 'HQ-3-25r', 'HQ-4-25r', 'HQ-5-25r', 'HQ-6-25r',
+                'HQ-7-25r', 'HQ-8-25r', 'HQ-9-25r'
+            ],
+            '2-курс': [
+                'HQ-1-24', 'HQ-2-24', 'HQ-3-24', 'HQ-4-24', 'HQ-5-24', 'HQ-6-24',
+                'HQ-7-24', 'HQ-8-24', 'HQ-9-24', 'HQ-10-24', 'HQ-11-24', 'HQ-12-24',
+                'HQ-13-24', 'HQ-14-24', 'HQ-15-24', 'HQ-16-24', 'HQ-17-24', 'HQ-18-24',
+                'HQ-19-24', 'HQ-20-24', 'HQ-21-24', 'HQ-22-24',
+                'HQ-1-24r', 'HQ-2-24r', 'HQ-3-24r', 'HQ-4-24r', 'HQ-5-24r', 'HQ-6-24r'
+            ],
+            '3-курс': [
+                'HQ-1-23', 'HQ-2-23', 'HQ-3-23', 'HQ-4-23', 'HQ-5-23', 'HQ-6-23'
+            ]
         }
     },
 
     'en': {
-        'Law': {
-            'Law': {
-                '1st year': ['xq-1-1', 'xq-1-2'],
-                '2nd year': ['xq-2-1', 'xq-2-2']
+        'Business and Innovative Education': {
+            '1st year': {
+                'Psychology': ['PS-1-25'],
+                'Finance and Financial Technologies': ['ML-1-25'],
+                'Software Engineering': ['DI-1-25'],
+                'Economics': ['EK-1-25', 'EK-2-25', 'EK-3-25', 'EK-4-25', 'EK-1-25r', 'EK-2-25r', 'EK-3-25r'],
+                'World Economy and International Economic Relations (by regions and types of activities)': ['XIM-1-25', 'XIM-2-25', 'XIM-3-25', 'XIM-4-25', 'XIM-1-25r', 'XIM-2-25r', 'XIM-3-25r'],
+                'Banking': ['BK-1-25'],
+                'Management': ['MN-1-25', 'MN-2-25'],
+                'Accounting': ['BH-1-25'],
+                'Primary Education': ['BT-1-25'],
+                'Foreign Language and Literature (English)': ['XT-1-25', 'XT-2-25', 'XT-1-25r'],
+                'Philology and Language Teaching (Korean)': ['KR-1-25'],
+                'Cybersecurity Engineering': ['CS-1-25', 'CS-2-25', 'CS-3-25', 'CS-1-25r', 'CS-2-25r']
+            },
+            '2nd year': {
+                'Foreign Language and Literature (English)': ['XT-1-24', 'XT-2-24', 'XT-3-24', 'XT-1-24r'],
+                'Information Systems and Technologies (by networks and fields)': ['AT-1-24'],
+                'Economics': ['EK-1-24', 'EK-2-24', 'MEK-1-24', 'EK-1-24r', 'EK-2-24r'],
+                'Banking': ['BK-1-24'],
+                'Cybersecurity Engineering': ['CS-1-24', 'CS-1-24r'],
+                'Software Engineering': ['DI-1-24'],
+                'Philology and Language Teaching (Korean)': ['KR-1-24'],
+                'Primary Education': ['BT-1-24'],
+                'Psychology': ['PS-1-24'],
+                'World Economy and International Economic Relations (by regions and types of activities)': ['XIM-1-24', 'XIM-2-24', 'XIM-1-24r', 'XIM-2-24r'],
+                'Management': ['MN-1-24']
+            },
+            '3rd year': {
+                'Foreign Language and Literature (English)': ['XT-1-23'],
+                'Economics': ['EK-1-23'],
+                'Cybersecurity Engineering': ['CS-1-23']
             }
         },
-        'Business and Innovative Education': {
-            'Banking': {
-                '1st year': ['b-1-1'],
-                '2nd year': []
-            },
-            'Accounting': {
-                '1st year': ['bh-1-5'],
-                '2nd year': []
-            },
-            'Economics': {
-                '1st year': ['i-1-9'],
-                '2nd year': []
-            },
-            'Marketing': {
-                '1st year': [],
-                '2nd year': []
-            },
-            'Management': {
-                '1st year': [],
-                '2nd year': []
-            },
-            'Finance and Financial Technologies': {
-                '1st year': [],
-                '2nd year': []
-            },
-            'World Economy and International Economic Relations': {
-                '1st year': [],
-                '2nd year': []
-            },
-            'Information Systems and Technologies': {
-                '1st year': [],
-                '2nd year': []
-            },
-            'Cybersecurity Engineering': {
-                '1st year': [],
-                '2nd year': []
-            },
-            'Computer Engineering': {
-                '1st year': [],
-                '2nd year': []
-            },
-            'Software Engineering': {
-                '1st year': [],
-                '2nd year': []
-            },
-            'Preschool Education': {
-                '1st year': [],
-                '2nd year': []
-            },
-            'Primary Education': {
-                '1st year': [],
-                '2nd year': []
-            },
-            'Psychology': {
-                '1st year': [],
-                '2nd year': []
-            },
-            'Foreign Language and Literature: English': {
-                '1st year': [],
-                '2nd year': []
-            },
-            'Philology and Language Teaching (Korean)': {
-                '1st year': [],
-                '2nd year': []
-            }
+        'Law': {
+            '1st year': [
+                'HQ-1-25', 'HQ-2-25', 'HQ-3-25', 'HQ-4-25', 'HQ-5-25', 'HQ-6-25',
+                'HQ-7-25', 'HQ-8-25', 'HQ-9-25', 'HQ-10-25', 'HQ-11-25', 'HQ-12-25',
+                'HQ-13-25', 'HQ-14-25', 'HQ-15-25', 'HQ-16-25', 'HQ-17-25', 'HQ-18-25',
+                'HQ-19-25', 'HQ-20-25', 'HQ-21-25', 'HQ-22-25', 'HQ-23-25', 'HQ-24-25',
+                'HQ-25-25', 'HQ-26-25', 'HQ-27-25', 'HQ-28-25', 'HQ-29-25', 'HQ-30-25',
+                'HQ-1-25r', 'HQ-2-25r', 'HQ-3-25r', 'HQ-4-25r', 'HQ-5-25r', 'HQ-6-25r',
+                'HQ-7-25r', 'HQ-8-25r', 'HQ-9-25r'
+            ],
+            '2nd year': [
+                'HQ-1-24', 'HQ-2-24', 'HQ-3-24', 'HQ-4-24', 'HQ-5-24', 'HQ-6-24',
+                'HQ-7-24', 'HQ-8-24', 'HQ-9-24', 'HQ-10-24', 'HQ-11-24', 'HQ-12-24',
+                'HQ-13-24', 'HQ-14-24', 'HQ-15-24', 'HQ-16-24', 'HQ-17-24', 'HQ-18-24',
+                'HQ-19-24', 'HQ-20-24', 'HQ-21-24', 'HQ-22-24',
+                'HQ-1-24r', 'HQ-2-24r', 'HQ-3-24r', 'HQ-4-24r', 'HQ-5-24r', 'HQ-6-24r'
+            ],
+            '3rd year': [
+                'HQ-1-23', 'HQ-2-23', 'HQ-3-23', 'HQ-4-23', 'HQ-5-23', 'HQ-6-23'
+            ]
         }
     }
 }
