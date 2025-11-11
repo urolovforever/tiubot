@@ -635,7 +635,11 @@ async def my_applications_handler(message: types.Message):
     user_id = message.from_user.id
     lang = db.get_user_language(user_id)
 
-    apps = db.get_user_applications(user_id, 20)
+    # Avval eski murojaatlarni tozalash (faqat oxirgi 5 ta saqlanadi)
+    db.cleanup_old_user_applications(user_id, keep_last=5)
+
+    # Oxirgi 5 ta murojaatni olish
+    apps = db.get_user_applications(user_id, limit=5)
 
     if not apps:
         texts = {
@@ -649,24 +653,53 @@ async def my_applications_handler(message: types.Message):
         )
         return
 
-    status_map = {
-        'new': {'uz': '🆕 Yangi', 'ru': '🆕 Новое', 'en': '🆕 New'},
-        'answered': {'uz': '✅ Javob berildi', 'ru': '✅ Отвечено', 'en': '✅ Answered'}
+    # Tarjimalar
+    status_texts = {
+        'answered': {'uz': '✅ Javob berildi', 'ru': '✅ Отвечено', 'en': '✅ Answered'},
+        'new': {'uz': '⏳ Javob kutilmoqda', 'ru': '⏳ Ожидает ответа', 'en': '⏳ Waiting for response'}
     }
 
-    texts = {
-        'uz': '📋 Sizning murojaatlaringiz:\n\n',
-        'ru': '📋 Ваши обращения:\n\n',
-        'en': '📋 Your applications:\n\n'
+    sent_date_label = {'uz': '🕓 Yuborilgan sana:', 'ru': '🕓 Дата отправки:', 'en': '🕓 Sent date:'}
+    message_label = {'uz': '💬 Murojaat:', 'ru': '💬 Обращение:', 'en': '💬 Application:'}
+    status_label = {'uz': '📊 Status:', 'ru': '📊 Статус:', 'en': '📊 Status:'}
+    answer_date_label = {'uz': '📅 Javob sanasi:', 'ru': '📅 Дата ответа:', 'en': '📅 Answer date:'}
+    answer_label = {'uz': '✉️ Javob:', 'ru': '✉️ Ответ:', 'en': '✉️ Answer:'}
+
+    header_texts = {
+        'uz': '📋 Sizning murojaatlaringiz (oxirgi 5 ta):\n\n',
+        'ru': '📋 Ваши обращения (последние 5):\n\n',
+        'en': '📋 Your applications (last 5):\n\n'
     }
 
-    text = texts.get(lang, texts['uz'])
-    for app in apps:
-        status = status_map.get(app[2], {}).get(lang, app[2])
-        text += f'#{app[0]} - {status}\n📅 {app[3]}\n\n'
+    text = header_texts.get(lang, header_texts['uz'])
+
+    # app structure: (id, message, status, created_at, admin_response)
+    for i, app in enumerate(apps):
+        app_id = app[0]
+        app_message = app[1]
+        status = app[2]
+        created_at = app[3]
+        admin_response = app[4]
+
+        text += f"<b>#{app_id}</b>\n"
+        text += f"{sent_date_label.get(lang, sent_date_label['uz'])} {created_at}\n"
+        text += f"{message_label.get(lang, message_label['uz'])} {app_message}\n"
+
+        status_text = status_texts.get(status, {}).get(lang, status)
+        text += f"{status_label.get(lang, status_label['uz'])} {status_text}\n"
+
+        # Agar javob berilgan bo'lsa
+        if status == 'answered' and admin_response:
+            # Javob sanasi (created_at dan keyingi sana deb hisoblaymiz, yoki alohida saqlash mumkin)
+            text += f"{answer_label.get(lang, answer_label['uz'])} {admin_response}\n"
+
+        # Keyingi murojaat uchun separator
+        if i < len(apps) - 1:
+            text += "\n" + "─" * 30 + "\n\n"
 
     await message.answer(
         text,
+        parse_mode='HTML',
         reply_markup=get_applications_submenu_keyboard(user_id)
     )
 
