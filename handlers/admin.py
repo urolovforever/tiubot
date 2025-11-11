@@ -2,10 +2,11 @@ from aiogram import types, Dispatcher
 from aiogram.dispatcher import FSMContext
 from keyboards.reply import (get_admin_keyboard, get_cancel_keyboard, get_events_keyboard,
                              get_main_keyboard, get_statistics_keyboard,
-                             get_skip_keyboard)
+                             get_skip_keyboard, get_faculty_keyboard, get_course_keyboard,
+                             get_direction_keyboard, get_group_keyboard)
 # get_broadcast_confirm_keyboard endi ishlatilmaydi
 from database.db import Database, get_tashkent_now
-from states.forms import AdminReplyState, EventCreateState, EventDeleteState
+from states.forms import AdminReplyState, EventCreateState, EventDeleteState, ScheduleUploadState
 # BroadcastState endi universal_broadcast.py da ishlatiladi
 from utils.helpers import t, is_admin
 from datetime import datetime
@@ -589,6 +590,296 @@ async def admin_manage_events_callback(callback: types.CallbackQuery):
     await callback.answer()
 
 
+# ==================== JADVAL YUKLASH ====================
+
+async def upload_schedule_start(message: types.Message, state: FSMContext):
+    """Step 1: Choose faculty for schedule upload"""
+    user_id = message.from_user.id
+
+    if not is_admin(user_id):
+        return
+
+    await state.finish()
+
+    lang = db.get_user_language(user_id)
+    texts = {
+        'uz': '📅 Jadval yuklash\n\nFakultetni tanlang:',
+        'ru': '📅 Загрузить расписание\n\nВыберите факультет:',
+        'en': '📅 Upload Schedule\n\nChoose faculty:'
+    }
+
+    await message.answer(
+        texts.get(lang, texts['uz']),
+        reply_markup=get_faculty_keyboard(user_id)
+    )
+    await ScheduleUploadState.waiting_for_faculty.set()
+
+
+async def process_schedule_faculty(message: types.Message, state: FSMContext):
+    """Step 2: Choose course"""
+    user_id = message.from_user.id
+
+    if message.text in ['⬅️ Orqaga', '⬅️ Назад', '⬅️ Back']:
+        await state.finish()
+        await message.answer(
+            t(user_id, 'admin_panel'),
+            reply_markup=get_admin_keyboard(user_id)
+        )
+        return
+
+    faculty = message.text
+    await state.update_data(faculty=faculty)
+
+    lang = db.get_user_language(user_id)
+    texts = {
+        'uz': f'Fakultet: {faculty}\n\nKursni tanlang:',
+        'ru': f'Факультет: {faculty}\n\nВыберите курс:',
+        'en': f'Faculty: {faculty}\n\nChoose course:'
+    }
+
+    await message.answer(
+        texts.get(lang, texts['uz']),
+        reply_markup=get_course_keyboard(user_id, faculty)
+    )
+    await ScheduleUploadState.waiting_for_course.set()
+
+
+async def process_schedule_course(message: types.Message, state: FSMContext):
+    """Step 3: Choose direction or group"""
+    user_id = message.from_user.id
+
+    if message.text in ['⬅️ Orqaga', '⬅️ Назад', '⬅️ Back']:
+        await message.answer(
+            t(user_id, 'choose_faculty'),
+            reply_markup=get_faculty_keyboard(user_id)
+        )
+        await ScheduleUploadState.waiting_for_faculty.set()
+        return
+
+    course = message.text
+    data = await state.get_data()
+    faculty = data.get('faculty')
+    await state.update_data(course=course)
+
+    # Check if this is Yurisprudensiya (groups directly) or other faculty (directions first)
+    from config import FACULTIES
+    lang = db.get_user_language(user_id)
+    faculties_lang = FACULTIES.get(lang, FACULTIES['uz'])
+
+    texts = {
+        'uz': f'Fakultet: {faculty}\nKurs: {course}\n\n',
+        'ru': f'Факультет: {faculty}\nКурс: {course}\n\n',
+        'en': f'Faculty: {faculty}\nCourse: {course}\n\n'
+    }
+
+    if faculty in faculties_lang and course in faculties_lang[faculty]:
+        course_data = faculties_lang[faculty][course]
+
+        if isinstance(course_data, list):
+            # Yurisprudensiya - show groups directly
+            texts['uz'] += 'Guruhni tanlang:'
+            texts['ru'] += 'Выберите группу:'
+            texts['en'] += 'Choose group:'
+
+            await message.answer(
+                texts.get(lang, texts['uz']),
+                reply_markup=get_direction_keyboard(user_id, faculty, course)
+            )
+            await ScheduleUploadState.waiting_for_direction.set()
+        else:
+            # Other faculty - show directions
+            texts['uz'] += 'Yo\'nalishni tanlang:'
+            texts['ru'] += 'Выберите направление:'
+            texts['en'] += 'Choose direction:'
+
+            await message.answer(
+                texts.get(lang, texts['uz']),
+                reply_markup=get_direction_keyboard(user_id, faculty, course)
+            )
+            await ScheduleUploadState.waiting_for_direction.set()
+
+
+async def process_schedule_direction(message: types.Message, state: FSMContext):
+    """Step 4: Choose group or upload image"""
+    user_id = message.from_user.id
+
+    if message.text in ['⬅️ Orqaga', '⬅️ Назад', '⬅️ Back']:
+        data = await state.get_data()
+        faculty = data.get('faculty')
+        await message.answer(
+            t(user_id, 'choose_course'),
+            reply_markup=get_course_keyboard(user_id, faculty)
+        )
+        await ScheduleUploadState.waiting_for_course.set()
+        return
+
+    direction_or_group = message.text
+    data = await state.get_data()
+    faculty = data.get('faculty')
+    course = data.get('course')
+
+    # Check if this is Yurisprudensiya or other faculty
+    from config import FACULTIES
+    lang = db.get_user_language(user_id)
+    faculties_lang = FACULTIES.get(lang, FACULTIES['uz'])
+
+    if faculty in faculties_lang and course in faculties_lang[faculty]:
+        course_data = faculties_lang[faculty][course]
+
+        if isinstance(course_data, list):
+            # Yurisprudensiya - direction_or_group is actually a group, ask for image
+            group = direction_or_group
+            await state.update_data(group=group, direction='')
+
+            texts = {
+                'uz': f'Fakultet: {faculty}\nKurs: {course}\nGuruh: {group}\n\nJadval rasmini yuboring:',
+                'ru': f'Факультет: {faculty}\nКурс: {course}\nГруппа: {group}\n\nОтправьте изображение расписания:',
+                'en': f'Faculty: {faculty}\nCourse: {course}\nGroup: {group}\n\nSend schedule image:'
+            }
+
+            await message.answer(
+                texts.get(lang, texts['uz']),
+                reply_markup=get_cancel_keyboard(user_id)
+            )
+            await ScheduleUploadState.waiting_for_image.set()
+        else:
+            # Other faculty - direction_or_group is a direction, show groups
+            direction = direction_or_group
+            await state.update_data(direction=direction)
+
+            groups = course_data.get(direction, [])
+
+            texts = {
+                'uz': f'Fakultet: {faculty}\nKurs: {course}\nYo\'nalish: {direction}\n\nGuruhni tanlang:',
+                'ru': f'Факультет: {faculty}\nКурс: {course}\nНаправление: {direction}\n\nВыберите группу:',
+                'en': f'Faculty: {faculty}\nCourse: {course}\nDirection: {direction}\n\nChoose group:'
+            }
+
+            await message.answer(
+                texts.get(lang, texts['uz']),
+                reply_markup=get_group_keyboard(user_id, groups)
+            )
+            await ScheduleUploadState.waiting_for_group.set()
+
+
+async def process_schedule_group(message: types.Message, state: FSMContext):
+    """Step 5: Request image for group"""
+    user_id = message.from_user.id
+
+    if message.text in ['⬅️ Orqaga', '⬅️ Назад', '⬅️ Back']:
+        data = await state.get_data()
+        faculty = data.get('faculty')
+        course = data.get('course')
+        await message.answer(
+            t(user_id, 'choose_direction'),
+            reply_markup=get_direction_keyboard(user_id, faculty, course)
+        )
+        await ScheduleUploadState.waiting_for_direction.set()
+        return
+
+    group = message.text
+    data = await state.get_data()
+    faculty = data.get('faculty')
+    course = data.get('course')
+    direction = data.get('direction')
+
+    await state.update_data(group=group)
+
+    lang = db.get_user_language(user_id)
+    texts = {
+        'uz': f'Fakultet: {faculty}\nKurs: {course}\nYo\'nalish: {direction}\nGuruh: {group}\n\nJadval rasmini yuboring:',
+        'ru': f'Факультет: {faculty}\nКурс: {course}\nНаправление: {direction}\nГруппа: {group}\n\nОтправьте изображение расписания:',
+        'en': f'Faculty: {faculty}\nCourse: {course}\nDirection: {direction}\nGroup: {group}\n\nSend schedule image:'
+    }
+
+    await message.answer(
+        texts.get(lang, texts['uz']),
+        reply_markup=get_cancel_keyboard(user_id)
+    )
+    await ScheduleUploadState.waiting_for_image.set()
+
+
+async def process_schedule_image(message: types.Message, state: FSMContext):
+    """Step 6: Save schedule image"""
+    user_id = message.from_user.id
+
+    if message.text and message.text in ['❌ Bekor qilish', '❌ Отмена', '❌ Cancel']:
+        await state.finish()
+        await message.answer(
+            t(user_id, 'admin_panel'),
+            reply_markup=get_admin_keyboard(user_id)
+        )
+        return
+
+    # Get image file_id
+    image_id = None
+    if message.photo:
+        image_id = message.photo[-1].file_id
+    elif message.document:
+        image_id = message.document.file_id
+    else:
+        await message.answer('❌ Iltimos, rasm yuboring!')
+        return
+
+    data = await state.get_data()
+    faculty = data.get('faculty')
+    direction = data.get('direction', '')
+    course = data.get('course')
+    group = data.get('group')
+
+    # Save to database
+    try:
+        # Use database method with direction parameter
+        # We need to insert or update schedule
+        conn = db.get_connection()
+        c = conn.cursor()
+
+        # Check if schedule exists
+        c.execute(
+            "SELECT id FROM schedules WHERE faculty=? AND direction=? AND course=? AND group_name=?",
+            (faculty, direction, course, group)
+        )
+        existing = c.fetchone()
+
+        if existing:
+            # Update
+            c.execute(
+                "UPDATE schedules SET image_id=? WHERE id=?",
+                (image_id, existing[0])
+            )
+        else:
+            # Insert
+            c.execute(
+                '''INSERT INTO schedules (faculty, direction, course, group_name, image_id, created_at)
+                   VALUES (?,?,?,?,?,?)''',
+                (faculty, direction, course, group, image_id, datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
+            )
+
+        conn.commit()
+        conn.close()
+
+        lang = db.get_user_language(user_id)
+        texts = {
+            'uz': f'✅ Jadval muvaffaqiyatli saqlandi!\n\nFakultet: {faculty}\nKurs: {course}\nYo\'nalish: {direction if direction else "Yo\'q"}\nGuruh: {group}',
+            'ru': f'✅ Расписание успешно сохранено!\n\nФакультет: {faculty}\nКурс: {course}\nНаправление: {direction if direction else "Нет"}\nГруппа: {group}',
+            'en': f'✅ Schedule saved successfully!\n\nFaculty: {faculty}\nCourse: {course}\nDirection: {direction if direction else "None"}\nGroup: {group}'
+        }
+
+        await message.answer_photo(
+            image_id,
+            caption=texts.get(lang, texts['uz']),
+            reply_markup=get_admin_keyboard(user_id)
+        )
+    except Exception as e:
+        logger.error(f'Error saving schedule: {e}')
+        await message.answer(
+            f'❌ Xatolik yuz berdi: {e}',
+            reply_markup=get_admin_keyboard(user_id)
+        )
+
+    await state.finish()
+
+
 # EDIT FUNKSIYALARI O'CHIRILDI - FAQAT DELETE QOLDIRILDI
 # async def edit_field_callback(callback: types.CallbackQuery, state: FSMContext):
 #     """Handle field edit button click"""
@@ -803,3 +1094,20 @@ def register_admin_handlers(dp: Dispatcher):
     #     content_types=['text', 'photo', 'document'],
     #     state=EventEditState.waiting_for_field_value
     # )
+
+    # Schedule upload handlers
+    dp.register_message_handler(
+        upload_schedule_start,
+        lambda message: message.text in ['📅 Jadval yuklash', '📅 Загрузить расписание', '📅 Upload Schedule'] and is_admin(
+            message.from_user.id),
+        state='*'
+    )
+    dp.register_message_handler(process_schedule_faculty, state=ScheduleUploadState.waiting_for_faculty)
+    dp.register_message_handler(process_schedule_course, state=ScheduleUploadState.waiting_for_course)
+    dp.register_message_handler(process_schedule_direction, state=ScheduleUploadState.waiting_for_direction)
+    dp.register_message_handler(process_schedule_group, state=ScheduleUploadState.waiting_for_group)
+    dp.register_message_handler(
+        process_schedule_image,
+        content_types=['photo', 'document'],
+        state=ScheduleUploadState.waiting_for_image
+    )

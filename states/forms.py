@@ -56,3 +56,11 @@ class LibraryStates(StatesGroup):
     choosing_category = State()  # Kategoriya tanlash
     browsing_books = State()  # Kitoblarni ko'rish
     searching_books = State()  # Qidirish
+
+# Schedule upload states (admin)
+class ScheduleUploadState(StatesGroup):
+    waiting_for_faculty = State()
+    waiting_for_course = State()
+    waiting_for_direction = State()
+    waiting_for_group = State()
+    waiting_for_image = State()
