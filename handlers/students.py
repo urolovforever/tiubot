@@ -361,7 +361,11 @@ async def student_clubs_callback(callback: types.CallbackQuery):
         parse_mode="HTML",
         reply_markup=keyboard
     )
-    await callback.answer()
+
+    try:
+        await callback.answer()
+    except Exception:
+        pass
 
 
 # ---- 2. Kampus fotolavhalari ----
@@ -437,7 +441,11 @@ async def campus_photos_callback(callback: types.CallbackQuery):
             reply_markup=keyboard
         )
 
-    await callback.answer()
+    # Callback query javob berish (eski querylar uchun xatolikni ignore qilish)
+    try:
+        await callback.answer()
+    except Exception:
+        pass
 
 
 # ---- 3. Talaba hayotidagi 1 kun ----
@@ -481,7 +489,11 @@ async def student_day_vlog_callback(callback: types.CallbackQuery):
         reply_markup=keyboard,
         disable_web_page_preview=True
     )
-    await callback.answer()
+
+    try:
+        await callback.answer()
+    except Exception:
+        pass
 
 
 # ---- 4. Career Center ----
@@ -591,7 +603,11 @@ During this trip, they are not only increasing their knowledge and experience, b
             disable_web_page_preview=True
         )
 
-    await callback.answer()
+    # Callback query javob berish (eski querylar uchun xatolikni ignore qilish)
+    try:
+        await callback.answer()
+    except Exception:
+        pass
 
 
 # ---- Orqaga qaytish handlarlari ----
@@ -657,7 +673,10 @@ Choose a section:'''
             reply_markup=keyboard
         )
 
-    await callback.answer()
+    try:
+        await callback.answer()
+    except Exception:
+        pass
 
 
 async def back_to_students_menu_callback(callback: types.CallbackQuery):
@@ -680,7 +699,11 @@ async def back_to_students_menu_callback(callback: types.CallbackQuery):
         texts.get(lang, texts['uz']),
         reply_markup=get_students_submenu_keyboard(user_id)
     )
-    await callback.answer()
+
+    try:
+        await callback.answer()
+    except Exception:
+        pass
 
 
 # ===============================
