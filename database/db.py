@@ -318,15 +318,19 @@ class Database:
         finally:
             conn.close()
 
-    def get_user_applications(self, user_id: int, limit: int = 10) -> List[Tuple]:
+    def get_user_applications(self, user_id: int, limit: int = 5) -> List[Tuple]:
+        """
+        Foydalanuvchining murojaatlarini olish (oxirgi N ta)
+        Returns: (id, message, status, created_at, admin_response)
+        """
         conn = self.get_connection()
         c = conn.cursor()
         try:
             c.execute(
-                """SELECT id, message, status, created_at 
-                   FROM applications 
-                   WHERE user_id=? 
-                   ORDER BY created_at DESC 
+                """SELECT id, message, status, created_at, admin_response
+                   FROM applications
+                   WHERE user_id=?
+                   ORDER BY created_at DESC
                    LIMIT ?""",
                 (user_id, limit)
             )
@@ -334,6 +338,37 @@ class Database:
         except Exception as e:
             logger.error(f"Error getting user applications: {e}")
             return []
+        finally:
+            conn.close()
+
+    def cleanup_old_user_applications(self, user_id: int, keep_last: int = 5) -> int:
+        """
+        Foydalanuvchining eski murojaatlarini o'chirish (faqat oxirgi N ta saqlanadi)
+        Returns: O'chirilgan murojaatlar soni
+        """
+        conn = self.get_connection()
+        c = conn.cursor()
+        try:
+            # Oxirgi N ta murojaatni saqlash, qolganlarini o'chirish
+            c.execute(
+                """DELETE FROM applications
+                   WHERE user_id=?
+                   AND id NOT IN (
+                       SELECT id FROM applications
+                       WHERE user_id=?
+                       ORDER BY created_at DESC
+                       LIMIT ?
+                   )""",
+                (user_id, user_id, keep_last)
+            )
+            deleted_count = c.rowcount
+            conn.commit()
+            if deleted_count > 0:
+                logger.info(f"Cleaned up {deleted_count} old applications for user {user_id}")
+            return deleted_count
+        except Exception as e:
+            logger.error(f"Error cleaning up user applications: {e}")
+            return 0
         finally:
             conn.close()
 
