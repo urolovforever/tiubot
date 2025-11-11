@@ -673,15 +673,16 @@ async def my_applications_handler(message: types.Message):
 
     text = header_texts.get(lang, header_texts['uz'])
 
-    # app structure: (id, message, status, created_at, admin_response)
+    # app structure: (id, message, status, created_at, admin_response, answered_at)
     for i, app in enumerate(apps):
         app_id = app[0]
         app_message = app[1]
         status = app[2]
         created_at = app[3]
         admin_response = app[4]
+        answered_at = app[5] if len(app) > 5 else None
 
-        text += f"<b>#{app_id}</b>\n"
+        # Murojaat raqami yo'q, faqat ma'lumotlar
         text += f"{sent_date_label.get(lang, sent_date_label['uz'])} {created_at}\n"
         text += f"{message_label.get(lang, message_label['uz'])} {app_message}\n"
 
@@ -690,7 +691,9 @@ async def my_applications_handler(message: types.Message):
 
         # Agar javob berilgan bo'lsa
         if status == 'answered' and admin_response:
-            # Javob sanasi (created_at dan keyingi sana deb hisoblaymiz, yoki alohida saqlash mumkin)
+            # Javob sanasini ko'rsatish
+            if answered_at:
+                text += f"{answer_date_label.get(lang, answer_date_label['uz'])} {answered_at}\n"
             text += f"{answer_label.get(lang, answer_label['uz'])} {admin_response}\n"
 
         # Keyingi murojaat uchun separator

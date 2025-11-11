@@ -78,6 +78,12 @@ class Database:
         except:
             pass
 
+        # Migration: Add answered_at column for tracking when response was sent
+        try:
+            c.execute("ALTER TABLE applications ADD COLUMN answered_at TEXT")
+        except:
+            pass
+
         # Events table
         c.execute('''CREATE TABLE IF NOT EXISTS events
                      (id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -321,13 +327,13 @@ class Database:
     def get_user_applications(self, user_id: int, limit: int = 5) -> List[Tuple]:
         """
         Foydalanuvchining murojaatlarini olish (oxirgi N ta)
-        Returns: (id, message, status, created_at, admin_response)
+        Returns: (id, message, status, created_at, admin_response, answered_at)
         """
         conn = self.get_connection()
         c = conn.cursor()
         try:
             c.execute(
-                """SELECT id, message, status, created_at, admin_response
+                """SELECT id, message, status, created_at, admin_response, answered_at
                    FROM applications
                    WHERE user_id=?
                    ORDER BY created_at DESC
@@ -373,12 +379,14 @@ class Database:
             conn.close()
 
     def update_application_response(self, app_id: int, response: str):
+        """Murojaatga javob berish va javob berilgan vaqtni saqlash"""
         conn = self.get_connection()
         c = conn.cursor()
         try:
+            answered_at = get_tashkent_now().strftime("%Y-%m-%d %H:%M:%S")
             c.execute(
-                "UPDATE applications SET admin_response=?, status='answered' WHERE id=?",
-                (response, app_id)
+                "UPDATE applications SET admin_response=?, status='answered', answered_at=? WHERE id=?",
+                (response, answered_at, app_id)
             )
             conn.commit()
         except Exception as e:
