@@ -235,13 +235,13 @@ async def student_life_info(message: types.Message):
     texts = {
         'uz': '''🎉 <b>Talabalar hayoti</b>
 
-Quyidagi bo'limlardan birini tanlang ↓''',
+Quyidagi bo'limlardan birini tanlang''',
         'ru': '''🎉 <b>Студенческая жизнь</b>
 
-Выберите раздел ↓''',
+Выберите раздел''',
         'en': '''🎉 <b>Student Life</b>
 
-Choose a section ↓'''
+Choose a section'''
     }
 
     keyboard = InlineKeyboardMarkup(row_width=1)
@@ -458,7 +458,7 @@ async def student_day_vlog_callback(callback: types.CallbackQuery):
 
 🎬 Bizning talabalarimizning bir kunlik hayotini tomosha qiling:
 
-🔗 https://youtube.com/watch?v=YOUR_VIDEO_ID
+🔗 https://youtu.be/oSepaRSf9_8?si=-UTVmrL2TeWS1I2c
 
 📱 Ko'proq videolar: @tiu_students''',
 
@@ -466,7 +466,7 @@ async def student_day_vlog_callback(callback: types.CallbackQuery):
 
 🎬 Посмотрите один день из жизни наших студентов:
 
-🔗 https://youtube.com/watch?v=YOUR_VIDEO_ID
+🔗 https://youtu.be/oSepaRSf9_8?si=-UTVmrL2TeWS1I2c
 
 📱 Больше видео: @tiu_students''',
 
@@ -474,7 +474,7 @@ async def student_day_vlog_callback(callback: types.CallbackQuery):
 
 🎬 Watch a day in the life of our students:
 
-🔗 https://youtube.com/watch?v=YOUR_VIDEO_ID
+🔗 https://youtu.be/oSepaRSf9_8?si=-UTVmrL2TeWS1I2c
 
 📱 More videos: @tiu_students'''
     }
