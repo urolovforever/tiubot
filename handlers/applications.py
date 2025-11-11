@@ -489,26 +489,24 @@ async def save_and_send_application(message: types.Message, state: FSMContext):
         reply_markup=get_main_keyboard(user_id)
     )
 
-    # Notify admins
+    # Notify admins - format admin panel bilan bir xil
     anonymity_status = '🕶 ANONIM (foydalanuvchi uchun)' if is_anonymous else '📱 OCHIQ'
     phone_display = f"  • Telefon: {phone}" if phone else "  • Telefon: -"
 
-    admin_text = f'''🆕 Yangi murojaat
+    admin_text = f'''📬 Murojaat #{app_id}
+🆕 Status: Yangi
 
 👤 Foydalanuvchi:
   • Ism: {full_name}
   • Username: @{username if username else "yo'q"}
+{phone_display}
   • ID: {user_id}
   • Link: tg://user?id={user_id}
-{phone_display}
 
-📋 Murojaat ma'lumotlari:
-  • Kim: {data.get('user_type', '')}
-  • Turi: {data.get('app_type', '')}
-  • Holat: {anonymity_status}
+💬 Murojaat:
+{data['message']}
 
-💬 Matn:
-{data['message']}'''
+📅 Sana: {get_tashkent_now().strftime("%Y-%m-%d %H:%M:%S")}'''
 
     # Adminlar guruhiga yuborish
     if ADMIN_GROUP_ID:
@@ -588,15 +586,43 @@ async def group_reply_handler(message: types.Message):
 
     # Foydalanuvchiga javobni yuborish
     try:
-        user_text = f'''✅ Sizning murojaatingizga javob berildi!
+        # Foydalanuvchi tilini olish
+        user_lang = db.get_user_language(user_id)
 
-📬 Murojaat #{app_id}
+        # Javob xabarini tayyorlash (admin panel bilan bir xil format)
+        response_texts = {
+            'uz': f'''✅ Murojaatingizga javob keldi!
+
+📬 Sizning murojaat #{app_id}:
+{app[5]}
 
 💬 Javob:
 {response_text}
 
-Agar qo'shimcha savollaringiz bo'lsa, yana murojaat yuborishingiz mumkin.'''
+📅 {get_tashkent_now().strftime("%Y-%m-%d %H:%M")}''',
 
+            'ru': f'''✅ Получен ответ на ваше обращение!
+
+📬 Ваше обращение #{app_id}:
+{app[5]}
+
+💬 Ответ:
+{response_text}
+
+📅 {get_tashkent_now().strftime("%Y-%m-%d %H:%M")}''',
+
+            'en': f'''✅ Response received for your application!
+
+📬 Your application #{app_id}:
+{app[5]}
+
+💬 Response:
+{response_text}
+
+📅 {get_tashkent_now().strftime("%Y-%m-%d %H:%M")}'''
+        }
+
+        user_text = response_texts.get(user_lang, response_texts['uz'])
         await message.bot.send_message(user_id, user_text)
 
         # Guruhda tasdiqlash xabari
