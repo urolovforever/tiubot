@@ -859,10 +859,16 @@ async def process_schedule_image(message: types.Message, state: FSMContext):
         conn.close()
 
         lang = db.get_user_language(user_id)
+
+        # Prepare direction text
+        dir_uz = direction if direction else "Yo'q"
+        dir_ru = direction if direction else "Нет"
+        dir_en = direction if direction else "None"
+
         texts = {
-            'uz': f'✅ Jadval muvaffaqiyatli saqlandi!\n\nFakultet: {faculty}\nKurs: {course}\nYo\'nalish: {direction if direction else "Yo\'q"}\nGuruh: {group}',
-            'ru': f'✅ Расписание успешно сохранено!\n\nФакультет: {faculty}\nКурс: {course}\nНаправление: {direction if direction else "Нет"}\nГруппа: {group}',
-            'en': f'✅ Schedule saved successfully!\n\nFaculty: {faculty}\nCourse: {course}\nDirection: {direction if direction else "None"}\nGroup: {group}'
+            'uz': f'✅ Jadval muvaffaqiyatli saqlandi!\n\nFakultet: {faculty}\nKurs: {course}\nYo\'nalish: {dir_uz}\nGuruh: {group}',
+            'ru': f'✅ Расписание успешно сохранено!\n\nФакультет: {faculty}\nКурс: {course}\nНаправление: {dir_ru}\nГруппа: {group}',
+            'en': f'✅ Schedule saved successfully!\n\nFaculty: {faculty}\nCourse: {course}\nDirection: {dir_en}\nGroup: {group}'
         }
 
         await message.answer_photo(
