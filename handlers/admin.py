@@ -236,20 +236,31 @@ async def process_admin_reply(message: types.Message, state: FSMContext):
 📅 {get_tashkent_now().strftime("%Y-%m-%d %H:%M")}'''
         }
 
+        # Foydalanuvchiga va adminga xabarlarni parallel yuborish
         try:
-            await message.bot.send_message(
-                app[1],
-                response_texts.get(user_lang, response_texts['uz'])
+            results = await asyncio.gather(
+                message.bot.send_message(
+                    app[1],
+                    response_texts.get(user_lang, response_texts['uz'])
+                ),
+                message.answer(
+                    f'✅ Javob yuborildi!\n\nMurojaat #{app_id} holati "Javob berilgan" ga o\'zgartirildi',
+                    reply_markup=get_admin_keyboard(user_id)
+                ),
+                return_exceptions=True
             )
 
-            await message.answer(
-                f'✅ Javob yuborildi!\n\nMurojaat #{app_id} holati "Javob berilgan" ga o\'zgartirildi',
-                reply_markup=get_admin_keyboard(user_id)
-            )
+            # Agar foydalanuvchiga yuborishda xatolik bo'lsa
+            if isinstance(results[0], Exception):
+                logger.error(f'Error sending response to user: {results[0]}')
+                await message.answer(
+                    f'⚠️ Ogohlantirish: Foydalanuvchiga xabar yuborilmadi ({results[0]})\n\nLekin javob database\'ga saqlandi',
+                    reply_markup=get_admin_keyboard(user_id)
+                )
         except Exception as e:
-            logger.error(f'Error sending response to user: {e}')
+            logger.error(f'Error in parallel operations: {e}')
             await message.answer(
-                f'❌ Xatolik: Foydalanuvchiga javob yuborib bo\'lmadi\n\nLekin javob database\'ga saqlandi',
+                f'❌ Xatolik: {e}',
                 reply_markup=get_admin_keyboard(user_id)
             )
     else:

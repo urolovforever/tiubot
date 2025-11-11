@@ -7,6 +7,7 @@ from states.forms import ScheduleStates, LibraryStates
 from utils.helpers import t
 from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton, InputFile, InputMediaPhoto
 import os
+import asyncio
 from pathlib import Path
 
 db = Database()
@@ -371,6 +372,12 @@ async def student_clubs_callback(callback: types.CallbackQuery):
 # ---- 2. Kampus fotolavhalari ----
 async def campus_photos_callback(callback: types.CallbackQuery):
     """Kampus fotolari callback handler"""
+    # Darhol callback javobini yuborish - bu loading hourglass ni ko'rsatadi
+    try:
+        await callback.answer()
+    except Exception:
+        pass
+
     lang = db.get_user_language(callback.from_user.id)
 
     captions = {
@@ -395,11 +402,8 @@ async def campus_photos_callback(callback: types.CallbackQuery):
                 break  # Bitta format topilsa, boshqasini tekshirmaymiz
 
     try:
-        # Eski xabarni o'chirish
-        try:
-            await callback.message.delete()
-        except:
-            pass
+        # Eski xabarni o'chirish (kutmasdan)
+        asyncio.create_task(callback.message.delete())
 
         if available_photos:
             # Agar fotolar mavjud bo'lsa - media group (albom) yuborish
@@ -440,12 +444,6 @@ async def campus_photos_callback(callback: types.CallbackQuery):
             parse_mode="HTML",
             reply_markup=keyboard
         )
-
-    # Callback query javob berish (eski querylar uchun xatolikni ignore qilish)
-    try:
-        await callback.answer()
-    except Exception:
-        pass
 
 
 # ---- 3. Talaba hayotidagi 1 kun ----
@@ -499,6 +497,12 @@ async def student_day_vlog_callback(callback: types.CallbackQuery):
 # ---- 4. Career Center ----
 async def career_center_callback(callback: types.CallbackQuery):
     """Career Center callback handler"""
+    # Darhol callback javobini yuborish
+    try:
+        await callback.answer()
+    except Exception:
+        pass
+
     lang = db.get_user_language(callback.from_user.id)
 
     texts = {
@@ -556,11 +560,8 @@ During this trip, they are not only increasing their knowledge and experience, b
                 break  # Bitta format topilsa, boshqasini tekshirmaymiz
 
     try:
-        # Eski xabarni o'chirish
-        try:
-            await callback.message.delete()
-        except:
-            pass
+        # Eski xabarni o'chirish (kutmasdan)
+        asyncio.create_task(callback.message.delete())
 
         if available_photos:
             # Agar fotolar mavjud bo'lsa - media group (albom) yuborish
@@ -602,12 +603,6 @@ During this trip, they are not only increasing their knowledge and experience, b
             reply_markup=keyboard,
             disable_web_page_preview=True
         )
-
-    # Callback query javob berish (eski querylar uchun xatolikni ignore qilish)
-    try:
-        await callback.answer()
-    except Exception:
-        pass
 
 
 # ---- Orqaga qaytish handlarlari ----
