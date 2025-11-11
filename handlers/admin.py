@@ -73,7 +73,6 @@ async def view_new_applications_handler(message: types.Message):
   • Ism: {app[3]}
   • Username: @{app[2] if app[2] else "yo'q"}
   • Telefon: {app[4]}
-  • ID: {app[1]}
   • Link: tg://user?id={app[1]}
 
 💬 Murojaat:

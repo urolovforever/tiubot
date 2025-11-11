@@ -500,7 +500,6 @@ async def save_and_send_application(message: types.Message, state: FSMContext):
   • Ism: {full_name}
   • Username: @{username if username else "yo'q"}
 {phone_display}
-  • ID: {user_id}
   • Link: tg://user?id={user_id}
 
 💬 Murojaat:
@@ -628,8 +627,7 @@ async def group_reply_handler(message: types.Message):
         # Guruhda tasdiqlash xabari
         await message.reply(
             f"✅ Javob yuborildi!\n\n"
-            f"Murojaat #{app_id}\n"
-            f"Foydalanuvchi: {user_id}"
+            f"Murojaat #{app_id}"
         )
 
         # Asl xabarni edit qilib, "Javob berilgan" statusini qo'shish
