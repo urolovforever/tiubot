@@ -67,7 +67,6 @@ async def view_new_applications_handler(message: types.Message):
 
     for app in applications:
         text = f'''📬 Murojaat #{app[0]}
-🆕 Status: Yangi
 
 👤 Foydalanuvchi:
   • Ism: {app[3]}
@@ -79,6 +78,8 @@ async def view_new_applications_handler(message: types.Message):
 {app[5]}
 
 📅 Sana: {app[8]}
+
+🆕 Status: Yangi
 
 📌 Javob berish: /reply_{app[0]}'''
 

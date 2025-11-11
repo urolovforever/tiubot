@@ -491,21 +491,21 @@ async def save_and_send_application(message: types.Message, state: FSMContext):
 
     # Notify admins - format admin panel bilan bir xil
     anonymity_status = '🕶 ANONIM (foydalanuvchi uchun)' if is_anonymous else '📱 OCHIQ'
-    phone_display = f"  • Telefon: {phone}" if phone else "  • Telefon: -"
 
     admin_text = f'''📬 Murojaat #{app_id}
-🆕 Status: Yangi
 
 👤 Foydalanuvchi:
   • Ism: {full_name}
   • Username: @{username if username else "yo'q"}
-{phone_display}
+  • Telefon: {phone if phone else "-"}
   • Link: tg://user?id={user_id}
 
 💬 Murojaat:
 {data['message']}
 
-📅 Sana: {get_tashkent_now().strftime("%Y-%m-%d %H:%M:%S")}'''
+📅 Sana: {get_tashkent_now().strftime("%Y-%m-%d %H:%M:%S")}
+
+🆕 Status: Yangi'''
 
     # Adminlar guruhiga yuborish
     if ADMIN_GROUP_ID:
@@ -630,10 +630,11 @@ async def group_reply_handler(message: types.Message):
             f"Murojaat #{app_id}"
         )
 
-        # Asl xabarni edit qilib, "Javob berilgan" statusini qo'shish
+        # Asl xabarni edit qilib, statusni "Javob berilgan"ga o'zgartirish
         try:
             original_text = message.reply_to_message.text or message.reply_to_message.caption
-            updated_text = f"{original_text}\n\n✅ <b>JAVOB BERILGAN</b>"
+            # Statusni "Yangi"dan "Javob berilgan"ga o'zgartirish
+            updated_text = original_text.replace('🆕 Status: Yangi', '✅ Status: Javob berilgan')
 
             if message.reply_to_message.photo:
                 await message.reply_to_message.edit_caption(
