@@ -85,9 +85,17 @@ async def process_faculty(message: types.Message, state: FSMContext):
 
     if message.text in ['⬅️ Orqaga', '⬅️ Назад', '⬅️ Back']:
         await state.finish()
+
+        lang = db.get_user_language(user_id)
+        texts = {
+            'uz': '🎓 Talabalar uchun\n\nQuyidagi bo\'limlardan birini tanlang:',
+            'ru': '🎓 Для студентов\n\nВыберите один из разделов:',
+            'en': '🎓 For Students\n\nChoose one of the sections:'
+        }
+
         await message.answer(
-            t(user_id, 'main_menu'),
-            reply_markup=get_main_keyboard(user_id)
+            texts.get(lang, texts['uz']),
+            reply_markup=get_students_submenu_keyboard(user_id)
         )
         return
 
