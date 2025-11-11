@@ -7,6 +7,7 @@ from keyboards.reply import get_cancel_keyboard, get_phone_keyboard, get_main_ke
 from utils.helpers import t
 from config import ADMIN_IDS, ADMIN_GROUP_ID
 import logging
+import asyncio
 
 db = Database()
 logger = logging.getLogger(__name__)
@@ -583,14 +584,12 @@ async def group_reply_handler(message: types.Message):
     response_text = message.text
     db.update_application_response(app_id, response_text)
 
-    # Foydalanuvchiga javobni yuborish
-    try:
-        # Foydalanuvchi tilini olish
-        user_lang = db.get_user_language(user_id)
+    # Foydalanuvchi tilini olish
+    user_lang = db.get_user_language(user_id)
 
-        # Javob xabarini tayyorlash (admin panel bilan bir xil format)
-        response_texts = {
-            'uz': f'''✅ Murojaatingizga javob keldi!
+    # Javob xabarini tayyorlash (admin panel bilan bir xil format)
+    response_texts = {
+        'uz': f'''✅ Murojaatingizga javob keldi!
 
 📬 Sizning murojaat #{app_id}:
 {app[5]}
@@ -600,7 +599,7 @@ async def group_reply_handler(message: types.Message):
 
 📅 {get_tashkent_now().strftime("%Y-%m-%d %H:%M")}''',
 
-            'ru': f'''✅ Получен ответ на ваше обращение!
+        'ru': f'''✅ Получен ответ на ваше обращение!
 
 📬 Ваше обращение #{app_id}:
 {app[5]}
@@ -610,7 +609,7 @@ async def group_reply_handler(message: types.Message):
 
 📅 {get_tashkent_now().strftime("%Y-%m-%d %H:%M")}''',
 
-            'en': f'''✅ Response received for your application!
+        'en': f'''✅ Response received for your application!
 
 📬 Your application #{app_id}:
 {app[5]}
@@ -619,21 +618,14 @@ async def group_reply_handler(message: types.Message):
 {response_text}
 
 📅 {get_tashkent_now().strftime("%Y-%m-%d %H:%M")}'''
-        }
+    }
 
-        user_text = response_texts.get(user_lang, response_texts['uz'])
-        await message.bot.send_message(user_id, user_text)
+    user_text = response_texts.get(user_lang, response_texts['uz'])
 
-        # Guruhda tasdiqlash xabari
-        await message.reply(
-            f"✅ Javob yuborildi!\n\n"
-            f"Murojaat #{app_id}"
-        )
-
-        # Asl xabarni edit qilib, statusni "Javob berilgan"ga o'zgartirish
+    # Asl xabarni edit qilish uchun funksiya
+    async def update_status():
         try:
             original_text = message.reply_to_message.text or message.reply_to_message.caption
-            # Statusni "Yangi"dan "Javob berilgan"ga o'zgartirish
             updated_text = original_text.replace('🆕 Status: Yangi', '✅ Status: Javob berilgan')
 
             if message.reply_to_message.photo:
@@ -649,9 +641,17 @@ async def group_reply_handler(message: types.Message):
         except Exception as e:
             logger.error(f"Error updating message status: {e}")
 
+    # Barcha operatsiyalarni parallel bajarish
+    try:
+        await asyncio.gather(
+            message.bot.send_message(user_id, user_text),
+            message.reply(f"✅ Javob yuborildi!\n\nMurojaat #{app_id}"),
+            update_status(),
+            return_exceptions=True
+        )
     except Exception as e:
-        logger.error(f'Error sending response to user {user_id}: {e}')
-        await message.reply(f"❌ Xatolik: Foydalanuvchiga javob yuborib bo'lmadi.\n{e}")
+        logger.error(f'Error in parallel operations: {e}')
+        await message.reply(f"❌ Xatolik yuz berdi: {e}")
 
 
 async def my_applications_handler(message: types.Message):
