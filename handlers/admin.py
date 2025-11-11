@@ -4,7 +4,7 @@ from keyboards.reply import (get_admin_keyboard, get_cancel_keyboard, get_events
                              get_main_keyboard, get_statistics_keyboard,
                              get_skip_keyboard)
 # get_broadcast_confirm_keyboard endi ishlatilmaydi
-from database.db import Database
+from database.db import Database, get_tashkent_now
 from states.forms import AdminReplyState, EventCreateState, EventDeleteState
 # BroadcastState endi universal_broadcast.py da ishlatiladi
 from utils.helpers import t, is_admin
@@ -79,7 +79,9 @@ async def view_new_applications_handler(message: types.Message):
 💬 Murojaat:
 {app[5]}
 
-📅 Sana: {app[8]}'''
+📅 Sana: {app[8]}
+
+📌 Javob berish: /reply_{app[0]}'''
 
         if app[6]:  # file_id
             try:
@@ -211,7 +213,7 @@ async def process_admin_reply(message: types.Message, state: FSMContext):
 💬 Javob:
 {response}
 
-📅 {datetime.now().strftime("%Y-%m-%d %H:%M")}''',
+📅 {get_tashkent_now().strftime("%Y-%m-%d %H:%M")}''',
 
             'ru': f'''✅ Получен ответ на ваше обращение!
 
@@ -221,7 +223,7 @@ async def process_admin_reply(message: types.Message, state: FSMContext):
 💬 Ответ:
 {response}
 
-📅 {datetime.now().strftime("%Y-%m-%d %H:%M")}''',
+📅 {get_tashkent_now().strftime("%Y-%m-%d %H:%M")}''',
 
             'en': f'''✅ Response received for your application!
 
@@ -231,7 +233,7 @@ async def process_admin_reply(message: types.Message, state: FSMContext):
 💬 Response:
 {response}
 
-📅 {datetime.now().strftime("%Y-%m-%d %H:%M")}'''
+📅 {get_tashkent_now().strftime("%Y-%m-%d %H:%M")}'''
         }
 
         try:
