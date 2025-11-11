@@ -491,14 +491,13 @@ async def save_and_send_application(message: types.Message, state: FSMContext):
 
     # Notify admins - format admin panel bilan bir xil
     anonymity_status = '🕶 ANONIM (foydalanuvchi uchun)' if is_anonymous else '📱 OCHIQ'
-    phone_display = f"  • Telefon: {phone}" if phone else "  • Telefon: -"
 
     admin_text = f'''📬 Murojaat #{app_id}
 
 👤 Foydalanuvchi:
   • Ism: {full_name}
   • Username: @{username if username else "yo'q"}
-{phone_display}
+  • Telefon: {phone if phone else "-"}
   • Link: tg://user?id={user_id}
 
 💬 Murojaat:
