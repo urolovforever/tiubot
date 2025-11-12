@@ -3,7 +3,6 @@ from aiogram import types, Dispatcher
 from aiogram.dispatcher import FSMContext
 from keyboards.reply import get_main_keyboard
 from database.db import Database
-from states.forms import LibraryStates
 from utils.helpers import t
 from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton, InputFile, InputMediaPhoto
 import os
@@ -68,22 +67,48 @@ async def students_handler(message: types.Message):
     )
 
 async def library_resources_info(message: types.Message, state: FSMContext):
-    """Redirect to new library system with categories"""
+    """Show library e-library link"""
     user_id = message.from_user.id
     lang = db.get_user_language(user_id)
 
     # Clear any previous state
     await state.finish()
-    await LibraryStates.choosing_category.set()
 
-    # Import here to avoid circular dependency
-    from handlers.library import get_library_categories_keyboard
+    texts = {
+        'uz': '''📚 <b>Kutubxona / Resurslar</b>
 
-    keyboard = get_library_categories_keyboard(lang)
+Elektron kutubxonaga kirish uchun quyidagi havoladan foydalaning:
+
+🔗 <a href="https://www.tiu.uz/elibrary">https://www.tiu.uz/elibrary</a>
+
+Bu yerda darsliklar, ilmiy maqolalar va boshqa ta'lim resurslari mavjud.''',
+        'ru': '''📚 <b>Библиотека / Ресурсы</b>
+
+Для доступа к электронной библиотеке используйте следующую ссылку:
+
+🔗 <a href="https://www.tiu.uz/elibrary">https://www.tiu.uz/elibrary</a>
+
+Здесь доступны учебники, научные статьи и другие образовательные ресурсы.''',
+        'en': '''📚 <b>Library / Resources</b>
+
+To access the e-library, use the following link:
+
+🔗 <a href="https://www.tiu.uz/elibrary">https://www.tiu.uz/elibrary</a>
+
+Here you can find textbooks, scientific articles and other educational resources.'''
+    }
+
+    keyboard = InlineKeyboardMarkup().add(
+        InlineKeyboardButton(
+            text="🔙 Orqaga" if lang == 'uz' else "🔙 Назад" if lang == 'ru' else "🔙 Back",
+            callback_data="back_to_students_menu"
+        )
+    )
 
     await message.answer(
-        t(user_id, 'library_title'),
-        reply_markup=keyboard
+        texts.get(lang, texts['uz']),
+        reply_markup=keyboard,
+        disable_web_page_preview=True
     )
 
 
