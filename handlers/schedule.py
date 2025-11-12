@@ -228,7 +228,7 @@ def register_schedule_handlers(dp: Dispatcher):
         state='*'
     )
     dp.register_message_handler(process_faculty, state=ScheduleStates.waiting_for_faculty)
-    dp.register_message_handler(process_direction, state=ScheduleStates.waiting_for_direction)
     dp.register_message_handler(process_course, state=ScheduleStates.waiting_for_course)
+    dp.register_message_handler(process_direction, state=ScheduleStates.waiting_for_direction)
     dp.register_message_handler(process_group, state=ScheduleStates.waiting_for_group)
 
