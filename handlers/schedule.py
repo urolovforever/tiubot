@@ -142,9 +142,18 @@ async def process_direction(message: types.Message, state: FSMContext):
                 await message.answer(t(user_id, 'schedule_not_found'))
 
             await state.finish()
+
+            lang = db.get_user_language(user_id)
+            texts = {
+                'uz': '🎓 Talabalar uchun\n\nQuyidagi bo\'limlardan birini tanlang:',
+                'ru': '🎓 Для студентов\n\nВыберите один из разделов:',
+                'en': '🎓 For Students\n\nChoose one of the sections:'
+            }
+
+            from handlers.students import get_students_submenu_keyboard
             await message.answer(
-                t(user_id, 'main_menu'),
-                reply_markup=get_main_keyboard(user_id)
+                texts.get(lang, texts['uz']),
+                reply_markup=get_students_submenu_keyboard(user_id)
             )
         else:
             # This is other faculty - direction_or_group is a direction
@@ -197,9 +206,18 @@ async def process_group(message: types.Message, state: FSMContext):
         await message.answer(t(user_id, 'schedule_not_found'))
 
     await state.finish()
+
+    lang = db.get_user_language(user_id)
+    texts = {
+        'uz': '🎓 Talabalar uchun\n\nQuyidagi bo\'limlardan birini tanlang:',
+        'ru': '🎓 Для студентов\n\nВыберите один из разделов:',
+        'en': '🎓 For Students\n\nChoose one of the sections:'
+    }
+
+    from handlers.students import get_students_submenu_keyboard
     await message.answer(
-        t(user_id, 'main_menu'),
-        reply_markup=get_main_keyboard(user_id)
+        texts.get(lang, texts['uz']),
+        reply_markup=get_students_submenu_keyboard(user_id)
     )
 
 
