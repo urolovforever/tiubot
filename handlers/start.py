@@ -94,5 +94,5 @@ def register_start_handlers(dp: Dispatcher):
     dp.register_message_handler(
         back_to_main_handler,
         lambda message: message.text in ['⬅️ Orqaga', '⬅️ Назад', '⬅️ Back'],
-        state='*'
+        state=None
     )
