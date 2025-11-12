@@ -224,7 +224,7 @@ async def process_group(message: types.Message, state: FSMContext):
 def register_schedule_handlers(dp: Dispatcher):
     dp.register_message_handler(
         schedule_start_handler,
-        lambda message: message.text in ['📅 Dars jadvali', '📅 Расписание', '📅 Schedule'],
+        lambda message: message.text in ['📅 Dars jadvali', '📅 Расписание занятий', '📅 Class schedule'],
         state='*'
     )
     dp.register_message_handler(process_faculty, state=ScheduleStates.waiting_for_faculty)
