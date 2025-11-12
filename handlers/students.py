@@ -341,69 +341,72 @@ Choose a section'''
 clubs_data = {
     "uz": """🎉 <b>TALABALAR KLUBLARI</b>
 
-🎯 <b>Yosh analitiklar klubi</b>
-👤 Mentor: @imkamronbek
+📚 <b>Kitobxonlik & Mushoira Klubi</b>
+🔗 @KMK_TIU_official
 
-⚽️ <b>Futbol klubi</b>
-👤 Mentor: @imkamronbek
+⚖️ <b>Yuristlar klubi</b>
+🔗 @Yuristlar_klubi_TIU
 
-♟ <b>Shaxmat-shashka klubi</b>
-👤 Mentor: @imkamronbek
+🧠 <b>Zakovat Klubi</b>
+👤 @Shamsiddin_Sherzodbekvich
 
-🎭 <b>San'at klubi</b>
-👤 Mentor: @imkamronbek
+👑 <b>"Miss Yurist"</b>
+🔗 @missyuristqizlarklubi0107
 
-📸 <b>Fotoklab</b>
-👤 Mentor: @imkamronbek
+💼 <b>Yosh Iqtisodchilar Klubi</b>
+🔗 @XKB000
 
-💡 <b>Innovatsiya klubi</b>
-👤 Mentor: @imkamronbek
+🎭 <b>TIU Ijodkor Yoshlari</b>
+👤 @Abrorjon_4033
 
-🔗 Barcha klublar: @tiu_clubs""",
+🎯 <b>Yosh Analitiklar Klubi</b>
+👤 @Habibullo_Nazarov""",
 
     "ru": """🎉 <b>СТУДЕНЧЕСКИЕ КЛУБЫ</b>
 
+📚 <b>Клуб чтения и поэзии</b>
+🔗 @KMK_TIU_official
+
+⚖️ <b>Клуб юристов</b>
+🔗 @Yuristlar_klubi_TIU
+
+🧠 <b>Клуб интеллектуальных игр</b>
+👤 @Shamsiddin_Sherzodbekvich
+
+👑 <b>"Мисс Юрист"</b>
+🔗 @missyuristqizlarklubi0107
+
+💼 <b>Клуб молодых экономистов</b>
+🔗 @XKB000
+
+🎭 <b>Творческая молодежь TIU</b>
+👤 @Abrorjon_4033
+
 🎯 <b>Клуб молодых аналитиков</b>
-👤 Ментор: @imkamronbek
-
-⚽️ <b>Футбольный клуб</b>
-👤 Ментор: @imkamronbek
-
-♟ <b>Шахматно-шашечный клуб</b>
-👤 Ментор: @imkamronbek
-
-🎭 <b>Художественный клуб</b>
-👤 Ментор: @imkamronbek
-
-📸 <b>Фотоклуб</b>
-👤 Ментор: @imkamronbek
-
-💡 <b>Инновационный клуб</b>
-👤 Ментор: @imkamronbek
-
-🔗 Все клубы: @tiu_clubs""",
+👤 @Habibullo_Nazarov""",
 
     "en": """🎉 <b>STUDENT CLUBS</b>
 
+📚 <b>Reading & Poetry Club</b>
+🔗 @KMK_TIU_official
+
+⚖️ <b>Law Club</b>
+🔗 @Yuristlar_klubi_TIU
+
+🧠 <b>Intellectual Games Club</b>
+👤 @Shamsiddin_Sherzodbekvich
+
+👑 <b>"Miss Lawyer"</b>
+🔗 @missyuristqizlarklubi0107
+
+💼 <b>Young Economists Club</b>
+🔗 @XKB000
+
+🎭 <b>TIU Creative Youth</b>
+👤 @Abrorjon_4033
+
 🎯 <b>Young Analysts Club</b>
-👤 Mentor: @imkamronbek
-
-⚽️ <b>Football Club</b>
-👤 Mentor: @imkamronbek
-
-♟ <b>Chess & Checkers Club</b>
-👤 Mentor: @imkamronbek
-
-🎭 <b>Art Club</b>
-👤 Mentor: @imkamronbek
-
-📸 <b>Photo Club</b>
-👤 Mentor: @imkamronbek
-
-💡 <b>Innovation Club</b>
-👤 Mentor: @imkamronbek
-
-🔗 All clubs: @tiu_clubs"""
+👤 @Habibullo_Nazarov"""
 }
 
 
