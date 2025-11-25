@@ -757,8 +757,6 @@ Please enter the correct passport series or contact the administrator.'''
         'uz': f'''✅ <b>Kontrakt ma'lumotlari</b>
 
 👤 <b>Talaba:</b> {full_name}
-📝 <b>Pasport:</b> {passport_series}
-🆔 <b>JSHSHIR:</b> {jshshir}
 📚 <b>Kurs:</b> {course}
 
 💰 <b>Kontrakt summasi:</b> {format_amount(total_amount)} so'm
@@ -769,8 +767,6 @@ Please enter the correct passport series or contact the administrator.'''
         'ru': f'''✅ <b>Информация о контракте</b>
 
 👤 <b>Студент:</b> {full_name}
-📝 <b>Паспорт:</b> {passport_series}
-🆔 <b>ПИНФЛ:</b> {jshshir}
 📚 <b>Курс:</b> {course}
 
 💰 <b>Сумма контракта:</b> {format_amount(total_amount)} сум
@@ -781,8 +777,6 @@ Please enter the correct passport series or contact the administrator.'''
         'en': f'''✅ <b>Contract Information</b>
 
 👤 <b>Student:</b> {full_name}
-📝 <b>Passport:</b> {passport_series}
-🆔 <b>Personal ID:</b> {jshshir}
 📚 <b>Course:</b> {course}
 
 💰 <b>Contract amount:</b> {format_amount(total_amount)} sum
