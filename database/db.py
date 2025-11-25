@@ -1,9 +1,18 @@
-import sqlite3
+import logging
 from datetime import datetime, timedelta
 from typing import Optional, List, Tuple
-import logging
+from config import DATABASE_NAME, DATABASE_URL
 
 logger = logging.getLogger(__name__)
+
+# Import appropriate database driver
+if DATABASE_URL:
+    import psycopg2
+    from psycopg2.extras import RealDictCursor
+    USE_POSTGRES = True
+else:
+    import sqlite3
+    USE_POSTGRES = False
 
 # Tashkent timezone (UTC+5)
 try:
@@ -21,12 +30,18 @@ def get_tashkent_now():
 
 
 class Database:
-    def __init__(self, db_name: str = 'tiu_bot.db'):
-        self.db_name = db_name
+    def __init__(self, db_name: str = None):
+        self.db_name = db_name or DATABASE_NAME
+        self.db_url = DATABASE_URL
+        self.use_postgres = USE_POSTGRES
         self.init_db()
 
     def get_connection(self):
-        return sqlite3.connect(self.db_name)
+        """Get database connection (PostgreSQL or SQLite)"""
+        if self.use_postgres:
+            return psycopg2.connect(self.db_url)
+        else:
+            return sqlite3.connect(self.db_name)
 
     def init_db(self):
         conn = self.get_connection()

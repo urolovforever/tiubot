@@ -28,7 +28,12 @@ LIBRARY_CHANNELS = {
 }
 
 # Database settings
+# For local development, use SQLite
 DATABASE_NAME = 'tiu_bot.db'
+
+# For production, use PostgreSQL
+# Format: postgresql://username:password@host:port/database
+DATABASE_URL = os.getenv('DATABASE_URL', None)  # If None, will use SQLite
 
 # Faculties - NEW STRUCTURE: Faculty → Course → Direction → Groups
 FACULTIES = {
