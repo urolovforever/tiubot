@@ -903,39 +903,42 @@ async def upload_contract_start(message: types.Message, state: FSMContext):
 
 Excel faylni yuboring. Fayl quyidagi ustunlarga ega bo'lishi kerak:
 
-1. Pasport raqami (AD1668649)
+1. № (tartib raqami)
 2. Talaba F.I.O
-3. JSHSHIR-kod
-4. Talaba kursi
-5. Kontrakt summasi
-6. To'langan summa
-7. Qoldiq summa
+3. Pasport raqami (AD1668649)
+4. JSHSHIR-kod
+5. Talaba kursi
+6. Kontrakt summasi
+7. To'langan summa
+8. Qoldiq summa
 
 <i>Eslatma: Eski ma'lumotlar o'chiriladi va yangi ma'lumotlar saqlanadi.</i>''',
         'ru': '''💼 <b>Загрузка данных контрактов</b>
 
 Отправьте Excel файл. Файл должен содержать следующие колонки:
 
-1. Серия паспорта (AD1668649)
+1. № (порядковый номер)
 2. Ф.И.О студента
-3. ПИНФЛ
-4. Курс студента
-5. Сумма контракта
-6. Оплаченная сумма
-7. Остаток
+3. Серия паспорта (AD1668649)
+4. ПИНФЛ
+5. Курс студента
+6. Сумма контракта
+7. Оплаченная сумма
+8. Остаток
 
 <i>Примечание: Старые данные будут удалены и сохранены новые данные.</i>''',
         'en': '''💼 <b>Upload Contract Data</b>
 
 Send an Excel file. The file should have the following columns:
 
-1. Passport series (AD1668649)
+1. № (serial number)
 2. Student Full Name
-3. Personal ID
-4. Student course
-5. Contract amount
-6. Paid amount
-7. Remaining amount
+3. Passport series (AD1668649)
+4. Personal ID
+5. Student course
+6. Contract amount
+7. Paid amount
+8. Remaining amount
 
 <i>Note: Old data will be deleted and new data will be saved.</i>'''
     }
@@ -1020,8 +1023,17 @@ async def process_contract_excel(message: types.Message, state: FSMContext):
 
             try:
                 # Parse row data
-                passport_series = str(row[1]).strip() if row[1] else None
-                full_name = str(row[2]).strip() if row[2] else None
+                # row[0] = № (serial number)
+                # row[1] = Full Name of student
+                # row[2] = Pasport raqami
+                # row[3] = JSHSHIR-kod
+                # row[4] = Talaba kursi
+                # row[5] = Суммаси (total_amount)
+                # row[6] = холатига тўлов (paid_amount)
+                # row[7] = қолдиқ сумма (remaining_amount)
+
+                full_name = str(row[1]).strip() if row[1] else None
+                passport_series = str(row[2]).strip() if row[2] else None
                 jshshir = str(row[3]).strip() if row[3] else None
                 course = str(row[4]).strip() if row[4] else None
 
