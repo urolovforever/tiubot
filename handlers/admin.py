@@ -886,6 +886,224 @@ async def process_schedule_image(message: types.Message, state: FSMContext):
     await state.finish()
 
 
+# ==================== KONTRAKT YUKLASH ====================
+
+async def upload_contract_start(message: types.Message, state: FSMContext):
+    """Start contract upload - request Excel file"""
+    user_id = message.from_user.id
+
+    if not is_admin(user_id):
+        return
+
+    await state.finish()
+
+    lang = db.get_user_language(user_id)
+    texts = {
+        'uz': '''💼 <b>Kontrakt ma'lumotlarini yuklash</b>
+
+Excel faylni yuboring. Fayl quyidagi ustunlarga ega bo'lishi kerak:
+
+1. Pasport raqami (AD1668649)
+2. Talaba F.I.O
+3. JSHSHIR-kod
+4. Talaba kursi
+5. Kontrakt summasi
+6. To'langan summa
+7. Qoldiq summa
+
+<i>Eslatma: Eski ma'lumotlar o'chiriladi va yangi ma'lumotlar saqlanadi.</i>''',
+        'ru': '''💼 <b>Загрузка данных контрактов</b>
+
+Отправьте Excel файл. Файл должен содержать следующие колонки:
+
+1. Серия паспорта (AD1668649)
+2. Ф.И.О студента
+3. ПИНФЛ
+4. Курс студента
+5. Сумма контракта
+6. Оплаченная сумма
+7. Остаток
+
+<i>Примечание: Старые данные будут удалены и сохранены новые данные.</i>''',
+        'en': '''💼 <b>Upload Contract Data</b>
+
+Send an Excel file. The file should have the following columns:
+
+1. Passport series (AD1668649)
+2. Student Full Name
+3. Personal ID
+4. Student course
+5. Contract amount
+6. Paid amount
+7. Remaining amount
+
+<i>Note: Old data will be deleted and new data will be saved.</i>'''
+    }
+
+    # Show current statistics
+    contracts_count = db.get_contracts_count()
+    last_upload = db.get_last_contract_upload_date()
+
+    stats_text = ''
+    if contracts_count > 0:
+        stats_uz = f'\n\n📊 Hozirgi holat:\n• Kontrakt ma\'lumotlari: {contracts_count} ta\n• Oxirgi yangilanish: {last_upload}'
+        stats_ru = f'\n\n📊 Текущее состояние:\n• Данные контрактов: {contracts_count} шт.\n• Последнее обновление: {last_upload}'
+        stats_en = f'\n\n📊 Current status:\n• Contract data: {contracts_count} records\n• Last update: {last_upload}'
+
+        stats_text = stats_uz if lang == 'uz' else stats_ru if lang == 'ru' else stats_en
+
+    await message.answer(
+        texts.get(lang, texts['uz']) + stats_text,
+        reply_markup=get_cancel_keyboard(user_id),
+        parse_mode='HTML'
+    )
+
+    from states.forms import ContractUploadState
+    await ContractUploadState.waiting_for_excel.set()
+
+
+async def process_contract_excel(message: types.Message, state: FSMContext):
+    """Process uploaded Excel file with contract data"""
+    user_id = message.from_user.id
+    lang = db.get_user_language(user_id)
+
+    if message.text and message.text in ['❌ Bekor qilish', '❌ Отмена', '❌ Cancel']:
+        await state.finish()
+        await message.answer(
+            t(user_id, 'admin_panel'),
+            reply_markup=get_admin_keyboard(user_id)
+        )
+        return
+
+    # Check if document is provided
+    if not message.document:
+        await message.answer('❌ Iltimos, Excel faylni yuboring!')
+        return
+
+    # Check file extension
+    file_name = message.document.file_name
+    if not (file_name.endswith('.xlsx') or file_name.endswith('.xls')):
+        texts = {
+            'uz': '❌ Noto\'g\'ri fayl formati! Iltimos, .xlsx yoki .xls formatdagi faylni yuboring.',
+            'ru': '❌ Неверный формат файла! Пожалуйста, отправьте файл в формате .xlsx или .xls.',
+            'en': '❌ Invalid file format! Please send a file in .xlsx or .xls format.'
+        }
+        await message.answer(texts.get(lang, texts['uz']))
+        return
+
+    # Download file
+    try:
+        file = await message.bot.get_file(message.document.file_id)
+        file_path = f"/tmp/contracts_{user_id}_{datetime.now().timestamp()}.xlsx"
+        await message.bot.download_file(file.file_path, file_path)
+
+        # Parse Excel file
+        try:
+            import openpyxl
+        except ImportError:
+            await message.answer('❌ Server xatolik: openpyxl kutubxonasi o\'rnatilmagan')
+            await state.finish()
+            return
+
+        await message.answer('⏳ Fayl qayta ishlanmoqda...')
+
+        workbook = openpyxl.load_workbook(file_path, data_only=True)
+        sheet = workbook.active
+
+        contracts_data = []
+        errors = []
+
+        # Skip header row, start from row 2
+        for row_idx, row in enumerate(sheet.iter_rows(min_row=2, values_only=True), start=2):
+            if not row or not any(row):  # Skip empty rows
+                continue
+
+            try:
+                # Parse row data
+                passport_series = str(row[1]).strip() if row[1] else None
+                full_name = str(row[2]).strip() if row[2] else None
+                jshshir = str(row[3]).strip() if row[3] else None
+                course = str(row[4]).strip() if row[4] else None
+
+                # Parse amounts - handle different formats
+                total_amount = float(row[5]) if row[5] and str(row[5]).replace('.', '').replace(',', '').isdigit() else 0
+                paid_amount = float(row[6]) if row[6] and str(row[6]).replace('.', '').replace(',', '').isdigit() else 0
+                remaining_amount = float(row[7]) if row[7] and str(row[7]).replace('.', '').replace(',', '').isdigit() else 0
+
+                if not passport_series or not full_name:
+                    errors.append(f"Qator {row_idx}: Pasport yoki ism kiritilmagan")
+                    continue
+
+                contracts_data.append({
+                    'passport_series': passport_series,
+                    'full_name': full_name,
+                    'jshshir': jshshir,
+                    'course': course,
+                    'total_amount': total_amount,
+                    'paid_amount': paid_amount,
+                    'remaining_amount': remaining_amount
+                })
+
+            except Exception as e:
+                errors.append(f"Qator {row_idx}: {str(e)}")
+                continue
+
+        # Save to database
+        if contracts_data:
+            inserted_count = db.save_contracts_from_excel(contracts_data, file_name)
+
+            success_texts = {
+                'uz': f'''✅ <b>Kontrakt ma'lumotlari yuklandi!</b>
+
+📊 Yuklangan: {inserted_count} ta
+📁 Fayl: {file_name}
+📅 Sana: {datetime.now().strftime("%Y-%m-%d %H:%M")}''',
+                'ru': f'''✅ <b>Данные контрактов загружены!</b>
+
+📊 Загружено: {inserted_count} шт.
+📁 Файл: {file_name}
+📅 Дата: {datetime.now().strftime("%Y-%m-%d %H:%M")}''',
+                'en': f'''✅ <b>Contract data uploaded!</b>
+
+📊 Uploaded: {inserted_count} records
+📁 File: {file_name}
+📅 Date: {datetime.now().strftime("%Y-%m-%d %H:%M")}'''
+            }
+
+            result_text = success_texts.get(lang, success_texts['uz'])
+
+            if errors:
+                error_summary = '\n\n⚠️ Xatoliklar:\n' + '\n'.join(errors[:10])
+                if len(errors) > 10:
+                    error_summary += f'\n... va yana {len(errors) - 10} ta xatolik'
+                result_text += error_summary
+
+            await message.answer(
+                result_text,
+                reply_markup=get_admin_keyboard(user_id),
+                parse_mode='HTML'
+            )
+        else:
+            await message.answer(
+                '❌ Hech qanday ma\'lumot yuklanmadi. Faylni tekshiring.',
+                reply_markup=get_admin_keyboard(user_id)
+            )
+
+        # Clean up temp file
+        import os
+        if os.path.exists(file_path):
+            os.remove(file_path)
+
+    except Exception as e:
+        logger.error(f'Error processing contract Excel: {e}')
+        await message.answer(
+            f'❌ Xatolik yuz berdi: {str(e)}',
+            reply_markup=get_admin_keyboard(user_id)
+        )
+
+    await state.finish()
+
+
 # EDIT FUNKSIYALARI O'CHIRILDI - FAQAT DELETE QOLDIRILDI
 # async def edit_field_callback(callback: types.CallbackQuery, state: FSMContext):
 #     """Handle field edit button click"""
@@ -1116,4 +1334,18 @@ def register_admin_handlers(dp: Dispatcher):
         process_schedule_image,
         content_types=['photo', 'document'],
         state=ScheduleUploadState.waiting_for_image
+    )
+
+    # Contract upload handlers
+    dp.register_message_handler(
+        upload_contract_start,
+        lambda message: message.text in ['💼 Kontrakt yuklash', '💼 Загрузить контракты', '💼 Upload Contracts'] and is_admin(
+            message.from_user.id),
+        state='*'
+    )
+    from states.forms import ContractUploadState
+    dp.register_message_handler(
+        process_contract_excel,
+        content_types=['document', 'text'],
+        state=ContractUploadState.waiting_for_excel
     )

@@ -189,6 +189,19 @@ class Database:
                       file_id TEXT,
                       cached_at TEXT)''')
 
+        # Student contracts table - stores contract information from Excel
+        c.execute('''CREATE TABLE IF NOT EXISTS student_contracts
+                     (id INTEGER PRIMARY KEY AUTOINCREMENT,
+                      passport_series TEXT UNIQUE,
+                      full_name TEXT,
+                      jshshir TEXT,
+                      course TEXT,
+                      total_amount REAL,
+                      paid_amount REAL,
+                      remaining_amount REAL,
+                      upload_date TEXT,
+                      excel_filename TEXT)''')
+
         conn.commit()
         conn.close()
         logger.info("Database initialized successfully")
@@ -1172,6 +1185,91 @@ class Database:
             return [r[0] for r in results] if results else None
         except Exception as e:
             logger.error(f"Error getting cached media group: {e}")
+            return None
+        finally:
+            conn.close()
+
+    # ==================== CONTRACT METHODS ====================
+
+    def save_contracts_from_excel(self, contracts_data: List[dict], excel_filename: str) -> int:
+        """Save contract data from Excel file, replacing all existing data"""
+        conn = self.get_connection()
+        c = conn.cursor()
+        try:
+            # Delete all existing contract data
+            c.execute("DELETE FROM student_contracts")
+
+            # Insert new data
+            upload_date = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+            inserted_count = 0
+
+            for contract in contracts_data:
+                try:
+                    c.execute(
+                        '''INSERT INTO student_contracts
+                           (passport_series, full_name, jshshir, course, total_amount, paid_amount, remaining_amount, upload_date, excel_filename)
+                           VALUES (?,?,?,?,?,?,?,?,?)''',
+                        (
+                            contract.get('passport_series'),
+                            contract.get('full_name'),
+                            contract.get('jshshir'),
+                            contract.get('course'),
+                            contract.get('total_amount'),
+                            contract.get('paid_amount'),
+                            contract.get('remaining_amount'),
+                            upload_date,
+                            excel_filename
+                        )
+                    )
+                    inserted_count += 1
+                except Exception as e:
+                    logger.warning(f"Error inserting contract {contract.get('passport_series')}: {e}")
+                    continue
+
+            conn.commit()
+            return inserted_count
+        except Exception as e:
+            logger.error(f"Error saving contracts: {e}")
+            return 0
+        finally:
+            conn.close()
+
+    def get_contract_by_passport(self, passport_series: str) -> Optional[Tuple]:
+        """Get contract information by passport series"""
+        conn = self.get_connection()
+        c = conn.cursor()
+        try:
+            c.execute("SELECT * FROM student_contracts WHERE passport_series=?", (passport_series,))
+            return c.fetchone()
+        except Exception as e:
+            logger.error(f"Error getting contract: {e}")
+            return None
+        finally:
+            conn.close()
+
+    def get_contracts_count(self) -> int:
+        """Get total number of contracts in database"""
+        conn = self.get_connection()
+        c = conn.cursor()
+        try:
+            c.execute("SELECT COUNT(*) FROM student_contracts")
+            return c.fetchone()[0]
+        except Exception as e:
+            logger.error(f"Error getting contracts count: {e}")
+            return 0
+        finally:
+            conn.close()
+
+    def get_last_contract_upload_date(self) -> Optional[str]:
+        """Get the date of last contract upload"""
+        conn = self.get_connection()
+        c = conn.cursor()
+        try:
+            c.execute("SELECT upload_date FROM student_contracts ORDER BY upload_date DESC LIMIT 1")
+            result = c.fetchone()
+            return result[0] if result else None
+        except Exception as e:
+            logger.error(f"Error getting last upload date: {e}")
             return None
         finally:
             conn.close()

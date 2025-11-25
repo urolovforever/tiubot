@@ -64,3 +64,11 @@ class ScheduleUploadState(StatesGroup):
     waiting_for_direction = State()
     waiting_for_group = State()
     waiting_for_image = State()
+
+# Contract lookup states (student)
+class ContractLookupState(StatesGroup):
+    waiting_for_passport = State()
+
+# Contract upload states (admin)
+class ContractUploadState(StatesGroup):
+    waiting_for_excel = State()
