@@ -1013,8 +1013,28 @@ async def process_contract_excel(message: types.Message, state: FSMContext):
         workbook = openpyxl.load_workbook(file_path, data_only=True)
         sheet = workbook.active
 
+        logger.info(f"Excel file loaded. Sheet: {sheet.title}, Max row: {sheet.max_row}, Max col: {sheet.max_column}")
+
         contracts_data = []
         errors = []
+
+        # Helper function to parse amounts
+        def parse_amount(value):
+            """Parse amount from various formats"""
+            if value is None:
+                return 0.0
+            try:
+                # If already a number
+                if isinstance(value, (int, float)):
+                    return float(value)
+                # If string, remove common separators and spaces
+                if isinstance(value, str):
+                    cleaned = value.replace(',', '').replace(' ', '').replace('\xa0', '').strip()
+                    return float(cleaned) if cleaned else 0.0
+                return 0.0
+            except Exception as e:
+                logger.warning(f"Could not parse amount '{value}': {e}")
+                return 0.0
 
         # Skip header row, start from row 2
         for row_idx, row in enumerate(sheet.iter_rows(min_row=2, values_only=True), start=2):
@@ -1037,10 +1057,10 @@ async def process_contract_excel(message: types.Message, state: FSMContext):
                 jshshir = str(row[3]).strip() if row[3] else None
                 course = str(row[4]).strip() if row[4] else None
 
-                # Parse amounts - handle different formats
-                total_amount = float(row[5]) if row[5] and str(row[5]).replace('.', '').replace(',', '').isdigit() else 0
-                paid_amount = float(row[6]) if row[6] and str(row[6]).replace('.', '').replace(',', '').isdigit() else 0
-                remaining_amount = float(row[7]) if row[7] and str(row[7]).replace('.', '').replace(',', '').isdigit() else 0
+                # Parse amounts using helper function
+                total_amount = parse_amount(row[5])
+                paid_amount = parse_amount(row[6])
+                remaining_amount = parse_amount(row[7])
 
                 if not passport_series or not full_name:
                     errors.append(f"Qator {row_idx}: Pasport yoki ism kiritilmagan")
@@ -1059,6 +1079,9 @@ async def process_contract_excel(message: types.Message, state: FSMContext):
             except Exception as e:
                 errors.append(f"Qator {row_idx}: {str(e)}")
                 continue
+
+        # Log parsing results
+        logger.info(f"Parsed {len(contracts_data)} contracts. Errors: {len(errors)}")
 
         # Save to database
         if contracts_data:
