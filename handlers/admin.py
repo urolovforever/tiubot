@@ -899,48 +899,9 @@ async def upload_contract_start(message: types.Message, state: FSMContext):
 
     lang = db.get_user_language(user_id)
     texts = {
-        'uz': '''💼 <b>Kontrakt ma'lumotlarini yuklash</b>
-
-Excel faylni yuboring. Fayl quyidagi ustunlarga ega bo'lishi kerak:
-
-1. № (tartib raqami)
-2. Talaba F.I.O
-3. Pasport raqami (AD1668649)
-4. JSHSHIR-kod
-5. Talaba kursi
-6. Kontrakt summasi
-7. To'langan summa
-8. Qoldiq summa
-
-<i>Eslatma: Eski ma'lumotlar o'chiriladi va yangi ma'lumotlar saqlanadi.</i>''',
-        'ru': '''💼 <b>Загрузка данных контрактов</b>
-
-Отправьте Excel файл. Файл должен содержать следующие колонки:
-
-1. № (порядковый номер)
-2. Ф.И.О студента
-3. Серия паспорта (AD1668649)
-4. ПИНФЛ
-5. Курс студента
-6. Сумма контракта
-7. Оплаченная сумма
-8. Остаток
-
-<i>Примечание: Старые данные будут удалены и сохранены новые данные.</i>''',
-        'en': '''💼 <b>Upload Contract Data</b>
-
-Send an Excel file. The file should have the following columns:
-
-1. № (serial number)
-2. Student Full Name
-3. Passport series (AD1668649)
-4. Personal ID
-5. Student course
-6. Contract amount
-7. Paid amount
-8. Remaining amount
-
-<i>Note: Old data will be deleted and new data will be saved.</i>'''
+        'uz': '💼 <b>Kontrakt ma\'lumotlarini yuklash</b>\n\nExcel faylni yuboring.',
+        'ru': '💼 <b>Загрузка данных контрактов</b>\n\nОтправьте Excel файл.',
+        'en': '💼 <b>Upload Contract Data</b>\n\nSend an Excel file.'
     }
 
     # Show current statistics
