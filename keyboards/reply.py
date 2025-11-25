@@ -176,7 +176,8 @@ def get_admin_keyboard(user_id: int) -> ReplyKeyboardMarkup:
             '📢 Broadcast',
             '➕ Tadbir qo\'shish',
             '📝 Tadbirlarni boshqarish',
-            '📅 Jadval yuklash'
+            '📅 Jadval yuklash',
+            '💼 Kontrakt yuklash'
         ],
         'ru': [
             '📬 Новые обращения',
@@ -185,7 +186,8 @@ def get_admin_keyboard(user_id: int) -> ReplyKeyboardMarkup:
             '📢 Рассылка',
             '➕ Добавить мероприятие',
             '📝 Управление мероприятиями',
-            '📅 Загрузить расписание'
+            '📅 Загрузить расписание',
+            '💼 Загрузить контракты'
         ],
         'en': [
             '📬 New Applications',
@@ -194,7 +196,8 @@ def get_admin_keyboard(user_id: int) -> ReplyKeyboardMarkup:
             '📢 Broadcast',
             '➕ Add Event',
             '📝 Manage Events',
-            '📅 Upload Schedule'
+            '📅 Upload Schedule',
+            '💼 Upload Contracts'
         ]
     }
 

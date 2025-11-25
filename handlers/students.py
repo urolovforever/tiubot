@@ -30,16 +30,19 @@ def get_students_submenu_keyboard(user_id: int) -> ReplyKeyboardMarkup:
         'uz': [
             '📅 Dars jadvali',
             '📚 Kutubxona / resurslar',
+            '💼 Kontrakt',
             '🎉 Talabalar hayoti / klublar'
         ],
         'ru': [
             '📅 Расписание занятий',
             '📚 Библиотека / ресурсы',
+            '💼 Контракт',
             '🎉 Студенческая жизнь / клубы'
         ],
         'en': [
             '📅 Class schedule',
             '📚 Library / resources',
+            '💼 Contract',
             '🎉 Student life / clubs'
         ]
     }
@@ -639,6 +642,164 @@ async def back_to_students_menu_callback(callback: types.CallbackQuery):
 
 
 # ===============================
+# KONTRAKT BO'LIMI
+# ===============================
+
+async def contract_info_handler(message: types.Message, state: FSMContext):
+    """Contract menu handler - ask for passport series"""
+    user_id = message.from_user.id
+    lang = db.get_user_language(user_id)
+
+    # Clear any previous state
+    await state.finish()
+
+    texts = {
+        'uz': '''💼 <b>Kontrakt ma'lumotlari</b>
+
+Kontrakt ma'lumotlaringizni ko'rish uchun pasport seriangizni kiriting.
+
+<i>Misol: AD1668649</i>''',
+        'ru': '''💼 <b>Информация о контракте</b>
+
+Для просмотра информации о контракте введите серию вашего паспорта.
+
+<i>Пример: AD1668649</i>''',
+        'en': '''💼 <b>Contract Information</b>
+
+To view your contract information, please enter your passport series.
+
+<i>Example: AD1668649</i>'''
+    }
+
+    keyboard = ReplyKeyboardMarkup(resize_keyboard=True)
+    keyboard.add(KeyboardButton(t(user_id, 'back')))
+
+    await message.answer(
+        texts.get(lang, texts['uz']),
+        reply_markup=keyboard,
+        parse_mode='HTML'
+    )
+
+    from states.forms import ContractLookupState
+    await ContractLookupState.waiting_for_passport.set()
+
+
+async def process_passport_lookup(message: types.Message, state: FSMContext):
+    """Process passport series and show contract information"""
+    user_id = message.from_user.id
+    lang = db.get_user_language(user_id)
+
+    # Check if user wants to go back
+    if message.text in ['⬅️ Orqaga', '⬅️ Назад', '⬅️ Back']:
+        await state.finish()
+        await students_handler(message)
+        return
+
+    passport_series = message.text.strip().upper()
+
+    # Lookup contract in database
+    contract = db.get_contract_by_passport(passport_series)
+
+    if not contract:
+        # Contract not found
+        texts = {
+            'uz': f'''❌ <b>Topilmadi</b>
+
+Pasport seriya <code>{passport_series}</code> bo'yicha kontrakt ma'lumotlari topilmadi.
+
+Iltimos, pasport seriangizni to'g'ri kiriting yoki administrator bilan bog'laning.''',
+            'ru': f'''❌ <b>Не найдено</b>
+
+По серии паспорта <code>{passport_series}</code> информация о контракте не найдена.
+
+Пожалуйста, введите правильную серию паспорта или свяжитесь с администратором.''',
+            'en': f'''❌ <b>Not Found</b>
+
+Contract information for passport series <code>{passport_series}</code> was not found.
+
+Please enter the correct passport series or contact the administrator.'''
+        }
+
+        keyboard = ReplyKeyboardMarkup(resize_keyboard=True)
+        keyboard.add(KeyboardButton(t(user_id, 'back')))
+
+        await message.answer(
+            texts.get(lang, texts['uz']),
+            reply_markup=keyboard,
+            parse_mode='HTML'
+        )
+        return
+
+    # Contract found - display information
+    # contract[0] = id, contract[1] = passport_series, contract[2] = full_name,
+    # contract[3] = jshshir, contract[4] = course, contract[5] = total_amount,
+    # contract[6] = paid_amount, contract[7] = remaining_amount, contract[8] = upload_date, contract[9] = excel_filename
+
+    full_name = contract[2]
+    jshshir = contract[3]
+    course = contract[4]
+    total_amount = contract[5]
+    paid_amount = contract[6]
+    remaining_amount = contract[7]
+
+    # Calculate payment percentage
+    payment_percentage = 0
+    if total_amount and total_amount > 0:
+        payment_percentage = (paid_amount / total_amount) * 100
+
+    # Format amounts with thousand separators
+    def format_amount(amount):
+        if amount:
+            return f"{amount:,.2f}".replace(',', ' ')
+        return "0.00"
+
+    texts = {
+        'uz': f'''✅ <b>Kontrakt ma'lumotlari</b>
+
+👤 <b>Talaba:</b> {full_name}
+📝 <b>Pasport:</b> {passport_series}
+🆔 <b>JSHSHIR:</b> {jshshir}
+📚 <b>Kurs:</b> {course}
+
+💰 <b>Kontrakt summasi:</b> {format_amount(total_amount)} so'm
+💳 <b>To'langan:</b> {format_amount(paid_amount)} so'm
+📊 <b>To'lov foizi:</b> {payment_percentage:.1f}%
+💵 <b>Qoldiq:</b> {format_amount(remaining_amount)} so'm''',
+
+        'ru': f'''✅ <b>Информация о контракте</b>
+
+👤 <b>Студент:</b> {full_name}
+📝 <b>Паспорт:</b> {passport_series}
+🆔 <b>ПИНФЛ:</b> {jshshir}
+📚 <b>Курс:</b> {course}
+
+💰 <b>Сумма контракта:</b> {format_amount(total_amount)} сум
+💳 <b>Оплачено:</b> {format_amount(paid_amount)} сум
+📊 <b>Процент оплаты:</b> {payment_percentage:.1f}%
+💵 <b>Остаток:</b> {format_amount(remaining_amount)} сум''',
+
+        'en': f'''✅ <b>Contract Information</b>
+
+👤 <b>Student:</b> {full_name}
+📝 <b>Passport:</b> {passport_series}
+🆔 <b>Personal ID:</b> {jshshir}
+📚 <b>Course:</b> {course}
+
+💰 <b>Contract amount:</b> {format_amount(total_amount)} sum
+💳 <b>Paid:</b> {format_amount(paid_amount)} sum
+📊 <b>Payment percentage:</b> {payment_percentage:.1f}%
+💵 <b>Remaining:</b> {format_amount(remaining_amount)} sum'''
+    }
+
+    await state.finish()
+    await message.answer(
+        texts.get(lang, texts['uz']),
+        reply_markup=get_students_submenu_keyboard(user_id),
+        parse_mode='HTML'
+    )
+
+
+# ===============================
 # HANDLERLARNI RO'YXATDAN O'TKAZISH
 # ===============================
 
@@ -659,6 +820,24 @@ def register_students_handlers(dp: Dispatcher):
             '📚 Library / resources'
         ],
         state='*'
+    )
+
+    # Contract menu
+    dp.register_message_handler(
+        contract_info_handler,
+        lambda message: message.text in [
+            '💼 Kontrakt',
+            '💼 Контракт',
+            '💼 Contract'
+        ],
+        state='*'
+    )
+
+    # Contract passport lookup
+    from states.forms import ContractLookupState
+    dp.register_message_handler(
+        process_passport_lookup,
+        state=ContractLookupState.waiting_for_passport
     )
 
     # Talabalar hayoti - message handler
