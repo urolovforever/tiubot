@@ -5,7 +5,7 @@ load_dotenv()
 
 # Bot settings
 BOT_TOKEN = os.getenv('BOT_TOKEN', '8349358796:AAGh9cZHo31Ao1XTsh4TSgWlZRrPAAbgmS0')
-ADMIN_IDS = [1920079641, 5384126744]  # O'z telegram ID laringizni kiriting
+ADMIN_IDS = [1920079641, 5384126744, 679412106]  # O'z telegram ID laringizni kiriting
 
 # Admin group for applications
 # Murojaatlar adminlar guruhiga yuboriladi
