@@ -375,7 +375,7 @@ async def student_day_vlog_callback(callback: types.CallbackQuery):
 
 🔗 https://youtu.be/oSepaRSf9_8?si=-UTVmrL2TeWS1I2c
 
-📱 Ko'proq videolar: @tiu_students''',
+📱 Ko'proq videolar: https://www.youtube.com/@tiu_uz''',
 
         'ru': '''☕️ <b>Один день из жизни студента</b>
 
@@ -383,7 +383,7 @@ async def student_day_vlog_callback(callback: types.CallbackQuery):
 
 🔗 https://youtu.be/oSepaRSf9_8?si=-UTVmrL2TeWS1I2c
 
-📱 Больше видео: @tiu_students''',
+📱 Больше видео: https://www.youtube.com/@tiu_uz''',
 
         'en': '''☕️ <b>A Day in Student Life</b>
 
@@ -391,7 +391,7 @@ async def student_day_vlog_callback(callback: types.CallbackQuery):
 
 🔗 https://youtu.be/oSepaRSf9_8?si=-UTVmrL2TeWS1I2c
 
-📱 More videos: @tiu_students'''
+📱 More videos: https://www.youtube.com/@tiu_uz'''
     }
 
     keyboard = InlineKeyboardMarkup(row_width=1)
@@ -658,17 +658,17 @@ async def contract_info_handler(message: types.Message, state: FSMContext):
 
 Kontrakt ma'lumotlaringizni ko'rish uchun pasport seriangizni kiriting.
 
-<i>Misol: AD1668649</i>''',
+<i>Misol: AA1234567</i>''',
         'ru': '''💼 <b>Информация о контракте</b>
 
 Для просмотра информации о контракте введите серию вашего паспорта.
 
-<i>Пример: AD1668649</i>''',
+<i>Пример: AA1234567</i>''',
         'en': '''💼 <b>Contract Information</b>
 
 To view your contract information, please enter your passport series.
 
-<i>Example: AD1668649</i>'''
+<i>Example: AA1234567</i>'''
     }
 
     keyboard = ReplyKeyboardMarkup(resize_keyboard=True)
