@@ -109,7 +109,7 @@ celerybeat.pid
 *.sage.py
 
 # Environments
-.env
+# .env - private repo uchun track qilinadi
 .venv
 env/
 venv/
@@ -171,8 +171,8 @@ backups/
 # Environment Variables
 # ============================================
 
-# Dotenv
-.env
+# Dotenv - .env private repo uchun track qilinadi
+# .env
 .env.local
 .env.*.local
 .env.production
