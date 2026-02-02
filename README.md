@@ -163,28 +163,21 @@ cp .env.example .env
 copy .env.example .env
 ```
 
-`.env` faylini oching va BOT_TOKEN ni kiriting:
+`.env` faylini oching va sozlamalarni kiriting:
 ```env
 BOT_TOKEN=your_actual_bot_token_here
+ADMIN_IDS=1920079641,5384126744,679412106
 ADMIN_GROUP_ID=-5012065617
 DIGEST_CHANNEL_ID=-1003285608799
 ```
 
-> **Muhim:** BOT_TOKEN majburiy. `.env` faylida bo'lmasa bot ishlamaydi.
-
-### 5. `config.py` ni sozlang
-
-`config.py` faylida admin ID larini o'zgartiring:
-
-```python
-ADMIN_IDS = [123456789]  # O'z telegram ID ngizni kiriting
-```
+> **Muhim:** `BOT_TOKEN` va `ADMIN_IDS` majburiy. `.env` faylida bo'lmasa bot ishlamaydi.
 
 💡 **ID ni qanday bilish:**
 - [@userinfobot](https://t.me/userinfobot) ga `/start` yozing
 - Bot sizga ID ni beradi
 
-### 6. Botni ishga tushiring
+### 5. Botni ishga tushiring
 
 ```bash
 python bot.py
@@ -196,33 +189,18 @@ python bot.py
 
 ## ⚙️ Konfiguratsiya
 
-### `config.py` fayli
-
-```python
-# Bot sozlamalari (.env faylidan o'qiladi)
-BOT_TOKEN = os.getenv('BOT_TOKEN')  # MAJBURIY - .env faylida bo'lishi kerak
-ADMIN_IDS = [123456789, 987654321]  # Admin ID lari
-
-# Fakultetlar va yo'nalishlar
-FACULTIES = {
-    'uz': {
-        'Biznes va innovatsion ta\'lim': {...},
-        'Yurisprudensiya': {...}
-    },
-    'ru': {...},
-    'en': {...}
-}
-```
-
 ### Muhim sozlamalar
 
-| O'zgaruvchi | Tavsif | Joylashuv |
-|-------------|--------|-----------|
-| `BOT_TOKEN` | Telegram bot tokeni (MAJBURIY) | `.env` |
-| `ADMIN_GROUP_ID` | Murojaatlar guruhi ID | `.env` |
-| `DIGEST_CHANNEL_ID` | Haftalik yangiliklar kanali | `.env` |
-| `ADMIN_IDS` | Admin foydalanuvchilar ID lari | `config.py` |
-| `FACULTIES` | Fakultet va yo'nalishlar | `config.py` |
+Barcha muhim sozlamalar `.env` faylida saqlanadi:
+
+| O'zgaruvchi | Tavsif | Majburiy |
+|-------------|--------|----------|
+| `BOT_TOKEN` | Telegram bot tokeni | Ha |
+| `ADMIN_IDS` | Admin ID lari (vergul bilan ajratilgan) | Ha |
+| `ADMIN_GROUP_ID` | Murojaatlar guruhi ID | Yo'q |
+| `DIGEST_CHANNEL_ID` | Haftalik yangiliklar kanali | Yo'q |
+
+`config.py` faylida faqat fakultetlar va yo'nalishlar saqlanadi.
 
 ---
 
