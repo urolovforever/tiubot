@@ -41,22 +41,7 @@ source venv/bin/activate  # Linux/Mac
 # Kutubxonalarni o'rnating
 pip install -r requirements.txt
 ```
-
-### 3. Konfiguratsiya
-
-`.env` faylida `BOT_TOKEN` ni kiriting:
-
-```bash
-nano .env  # yoki boshqa editor
-```
-
-```env
-BOT_TOKEN=1234567890:ABCdefGHIjklMNOpqrsTUVwxyz  # @BotFather dan oling
-```
-
-Boshqa sozlamalar (ADMIN_IDS, ADMIN_GROUP_ID, DIGEST_CHANNEL_ID) allaqachon kiritilgan.
-
-### 4. Botni ishga tushirish
+### 3. Botni ishga tushirish
 
 ```bash
 python bot.py
@@ -240,9 +225,3 @@ tail -50 bot.log
 - **python-dotenv** - Environment variables
 
 ---
-
-## Aloqa
-
-Savollar bo'lsa:
-- Telegram: @tiuofficial
-- Website: www.tiu.uz
