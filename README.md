@@ -44,29 +44,17 @@ pip install -r requirements.txt
 
 ### 3. Konfiguratsiya
 
-```bash
-# .env.example dan nusxa oling
-cp .env.example .env
+`.env` faylida `BOT_TOKEN` ni kiriting:
 
-# .env faylini tahrirlang
+```bash
 nano .env  # yoki boshqa editor
 ```
 
-**.env faylida quyidagilarni to'ldiring:**
-
 ```env
-# MAJBURIY:
 BOT_TOKEN=1234567890:ABCdefGHIjklMNOpqrsTUVwxyz  # @BotFather dan oling
-ADMIN_IDS=123456789,987654321                     # Admin Telegram ID lari
-
-# IXTIYORIY:
-ADMIN_GROUP_ID=-1001234567890    # Murojaatlar keladigan guruh
-DIGEST_CHANNEL_ID=-1001234567890 # Haftalik digest kanali
 ```
 
-**ID larni qanday olish:**
-- O'z ID: [@userinfobot](https://t.me/userinfobot) ga `/start` yozing
-- Guruh ID: Guruhga [@raw_data_bot](https://t.me/raw_data_bot) ni qo'shing va xabar yozing
+Boshqa sozlamalar (ADMIN_IDS, ADMIN_GROUP_ID, DIGEST_CHANNEL_ID) allaqachon kiritilgan.
 
 ### 4. Botni ishga tushirish
 
@@ -84,8 +72,7 @@ Bot ishga tushdi! Telegram'da botga `/start` yuboring.
 tiubot/
 ├── bot.py                 # Asosiy fayl - botni shu fayl bilan ishga tushirasiz
 ├── config.py              # Konfiguratsiya (fakultetlar, yo'nalishlar)
-├── .env                   # Maxfiy sozlamalar (git'ga qo'shilmaydi)
-├── .env.example           # Namuna sozlamalar fayli
+├── .env                   # Bot sozlamalari (token, ID lar)
 ├── requirements.txt       # Python kutubxonalari
 ├── database/
 │   └── db.py              # SQLite database operatsiyalari
@@ -173,8 +160,7 @@ docker run -d --name tiubot --restart always --env-file .env tiubot
 
 | Fayl | Tavsif | Git'da |
 |------|--------|--------|
-| `.env` | Bot tokeni va ID lar | Yo'q |
-| `.env.example` | Namuna sozlamalar | Ha |
+| `.env` | Bot tokeni va ID lar | Ha |
 | `requirements.txt` | Python kutubxonalar | Ha |
 | `tiu_bot.db` | SQLite database | Yo'q |
 | `bot.log` | Log fayli | Yo'q |
