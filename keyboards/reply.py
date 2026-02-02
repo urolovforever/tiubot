@@ -1,5 +1,6 @@
 from aiogram.types import ReplyKeyboardMarkup, KeyboardButton
 
+from config import FACULTIES
 from database.db import Database
 from utils.helpers import t, is_admin
 
@@ -68,9 +69,6 @@ def get_phone_keyboard(user_id: int) -> ReplyKeyboardMarkup:
 
 
 def get_faculty_keyboard(user_id: int) -> ReplyKeyboardMarkup:
-    from config import FACULTIES
-    from database.db import Database
-
     lang = db.get_user_language(user_id)
 
     keyboard = ReplyKeyboardMarkup(resize_keyboard=True, row_width=2)
@@ -82,9 +80,6 @@ def get_faculty_keyboard(user_id: int) -> ReplyKeyboardMarkup:
 
 def get_course_keyboard(user_id: int, faculty: str) -> ReplyKeyboardMarkup:
     """Get keyboard with courses for selected faculty"""
-    from config import FACULTIES
-    from database.db import Database
-
     lang = db.get_user_language(user_id)
 
     keyboard = ReplyKeyboardMarkup(resize_keyboard=True, row_width=3)
@@ -100,10 +95,6 @@ def get_course_keyboard(user_id: int, faculty: str) -> ReplyKeyboardMarkup:
 
 def get_direction_keyboard(user_id: int, faculty: str, course: str) -> ReplyKeyboardMarkup:
     """Get keyboard with directions for selected faculty and course"""
-    from config import FACULTIES
-    from database.db import Database
-    from utils.helpers import t
-
     lang = db.get_user_language(user_id)
 
     keyboard = ReplyKeyboardMarkup(resize_keyboard=True, row_width=2)
@@ -208,24 +199,6 @@ def get_admin_keyboard(user_id: int) -> ReplyKeyboardMarkup:
 
     keyboard.row(KeyboardButton(t(user_id, 'back')))
     return keyboard
-
-def get_broadcast_confirm_keyboard(user_id: int) -> ReplyKeyboardMarkup:
-    """Broadcast tasdiqlash klaviaturasi"""
-    lang = db.get_user_language(user_id)
-    keyboard = ReplyKeyboardMarkup(resize_keyboard=True, row_width=2)
-
-    confirm_texts = {
-        'uz': '✅ Ha, yuborish',
-        'ru': '✅ Да, отправить',
-        'en': '✅ Yes, send'
-    }
-
-    keyboard.add(
-        KeyboardButton(confirm_texts.get(lang, confirm_texts['uz'])),
-        KeyboardButton(t(user_id, 'cancel'))
-    )
-    return keyboard
-
 
 def get_statistics_keyboard(user_id: int) -> ReplyKeyboardMarkup:
     """Statistika klaviaturasi"""

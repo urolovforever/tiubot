@@ -4,15 +4,17 @@ from dotenv import load_dotenv
 load_dotenv()
 
 # Bot settings
-BOT_TOKEN = os.getenv('BOT_TOKEN', '8349358796:AAGh9cZHo31Ao1XTsh4TSgWlZRrPAAbgmS0')
+BOT_TOKEN = os.getenv('BOT_TOKEN')
+if not BOT_TOKEN:
+    raise ValueError("BOT_TOKEN environment variable is required. Please set it in .env file.")
 ADMIN_IDS = [1920079641, 5384126744, 679412106]  # O'z telegram ID laringizni kiriting
 
 # Admin group for applications
 # Murojaatlar adminlar guruhiga yuboriladi
-ADMIN_GROUP_ID = os.getenv('ADMIN_GROUP_ID', -5012065617)  # Adminlar guruhi ID sini kiriting
+ADMIN_GROUP_ID = int(os.getenv('ADMIN_GROUP_ID', '-5012065617'))
 
 # Channel settings
-DIGEST_CHANNEL_ID = os.getenv('DIGEST_CHANNEL_ID', '-1003285608799')  # Hafta dayjesti kanali ID
+DIGEST_CHANNEL_ID = os.getenv('DIGEST_CHANNEL_ID', '-1003285608799')
 
 # Library channel settings
 LIBRARY_CHANNELS = {

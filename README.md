@@ -156,17 +156,21 @@ pip install -r requirements.txt
 ### 4. `.env` faylini yarating
 
 ```bash
-# .env faylini yarating
-touch .env
+# .env.example faylidan nusxa oling
+cp .env.example .env
 
 # Yoki Windows da
-type nul > .env
+copy .env.example .env
 ```
 
-`.env` fayliga quyidagini yozing:
+`.env` faylini oching va BOT_TOKEN ni kiriting:
 ```env
-BOT_TOKEN=your_bot_token_here
+BOT_TOKEN=your_actual_bot_token_here
+ADMIN_GROUP_ID=-5012065617
+DIGEST_CHANNEL_ID=-1003285608799
 ```
+
+> **Muhim:** BOT_TOKEN majburiy. `.env` faylida bo'lmasa bot ishlamaydi.
 
 ### 5. `config.py` ni sozlang
 
@@ -195,37 +199,30 @@ python bot.py
 ### `config.py` fayli
 
 ```python
-# Bot sozlamalari
-BOT_TOKEN = os.getenv('BOT_TOKEN', 'YOUR_BOT_TOKEN_HERE')
+# Bot sozlamalari (.env faylidan o'qiladi)
+BOT_TOKEN = os.getenv('BOT_TOKEN')  # MAJBURIY - .env faylida bo'lishi kerak
 ADMIN_IDS = [123456789, 987654321]  # Admin ID lari
 
 # Fakultetlar va yo'nalishlar
 FACULTIES = {
     'uz': {
-        'IT fakulteti': [
-            'Dasturiy injiniring',
-            'Kompyuter injiniring',
-            # ... 9 ta yo'nalish
-        ],
-        'Biznes fakulteti': [
-            'Biznes boshqaruv',
-            'Marketing',
-            # ... 9 ta yo'nalish
-        ]
+        'Biznes va innovatsion ta\'lim': {...},
+        'Yurisprudensiya': {...}
     },
-    # ru va en uchun ham
+    'ru': {...},
+    'en': {...}
 }
-
-# Kurslar
-COURSES = ['1-kurs', '2-kurs', '3-kurs', '4-kurs']
 ```
 
 ### Muhim sozlamalar
 
-- **BOT_TOKEN**: Telegram bot tokeni
-- **ADMIN_IDS**: Admin foydalanuvchilar ID lari (list)
-- **FACULTIES**: Fakultet va yo'nalishlar
-- **COURSES**: Mavjud kurslar
+| O'zgaruvchi | Tavsif | Joylashuv |
+|-------------|--------|-----------|
+| `BOT_TOKEN` | Telegram bot tokeni (MAJBURIY) | `.env` |
+| `ADMIN_GROUP_ID` | Murojaatlar guruhi ID | `.env` |
+| `DIGEST_CHANNEL_ID` | Haftalik yangiliklar kanali | `.env` |
+| `ADMIN_IDS` | Admin foydalanuvchilar ID lari | `config.py` |
+| `FACULTIES` | Fakultet va yo'nalishlar | `config.py` |
 
 ---
 
@@ -236,7 +233,9 @@ tiu_bot/
 ├── 📄 bot.py                      # Asosiy ishga tushiruvchi fayl
 ├── ⚙️ config.py                   # Konfiguratsiya va sozlamalar
 ├── 🔐 .env                        # Bot tokeni (git'ga qo'shilmaydi)
-├── 📋 requirements.txt            # Python kutubxonalari
+├── 📝 .env.example                # Namuna environment fayli
+├── 📋 requirements.txt            # Production kutubxonalari
+├── 📋 requirements-dev.txt        # Development kutubxonalari (testlar)
 ├── 📖 README.md                   # Bu fayl
 ├── 🚫 .gitignore                  # Git ignore fayli
 │
@@ -246,7 +245,8 @@ tiu_bot/
 │
 ├── 📂 keyboards/
 │   ├── __init__.py
-│   └── reply.py                   # Reply klaviaturalar
+│   ├── reply.py                   # Reply klaviaturalar
+│   └── inline.py                  # Inline klaviaturalar
 │
 ├── 📂 handlers/
 │   ├── __init__.py
@@ -258,17 +258,33 @@ tiu_bot/
 │   ├── students.py                # Talabalar (4 submenu + jadval)
 │   ├── news.py                    # Yangiliklar (3 submenu)
 │   ├── events.py                  # Tadbirlar
+│   ├── event_quick_create.py      # Tez tadbir qo'shish
 │   ├── applications.py            # Murojaatlar (6 bosqich)
+│   ├── library.py                 # Kutubxona tizimi
+│   ├── universal_broadcast.py     # Broadcast tizimi
+│   ├── channel_handler.py         # Kanal postlarini saqlash
 │   └── admin.py                   # Admin panel
 │
 ├── 📂 utils/
 │   ├── __init__.py
 │   ├── translations.py            # 3 tilda tarjimalar
-│   └── helpers.py                 # Yordamchi funksiyalar
+│   ├── helpers.py                 # Yordamchi funksiyalar
+│   └── event_reminders.py         # Tadbir eslatmalari
 │
-└── 📂 states/
-    ├── __init__.py
-    └── forms.py                   # FSM states
+├── 📂 states/
+│   ├── __init__.py
+│   └── forms.py                   # FSM states
+│
+├── 📂 scripts/                    # Yordamchi skriptlar
+│   ├── init_library_categories.py # Kutubxona kategoriyalarini yaratish
+│   └── add_demo_books.py          # Demo kitoblarni qo'shish
+│
+├── 📂 tests/                      # Testlar
+│   ├── conftest.py
+│   ├── unit/                      # Unit testlar
+│   └── integration/               # Integration testlar
+│
+└── 📂 photos/                     # Rasm fayllar
 ```
 
 ---

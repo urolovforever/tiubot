@@ -5,7 +5,9 @@ This script adds sample books to test the library system
 
 import sys
 import os
-sys.path.insert(0, os.path.dirname(__file__))
+
+# Add parent directory to path for imports
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from database.db import Database
 from datetime import datetime
