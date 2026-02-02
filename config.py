@@ -7,27 +7,18 @@ load_dotenv()
 BOT_TOKEN = os.getenv('BOT_TOKEN')
 if not BOT_TOKEN:
     raise ValueError("BOT_TOKEN environment variable is required. Please set it in .env file.")
-ADMIN_IDS = [1920079641, 5384126744, 679412106]  # O'z telegram ID laringizni kiriting
+
+# Admin IDs - comma separated in .env (e.g., "123456789,987654321")
+ADMIN_IDS_STR = os.getenv('ADMIN_IDS', '')
+if not ADMIN_IDS_STR:
+    raise ValueError("ADMIN_IDS environment variable is required. Please set it in .env file.")
+ADMIN_IDS = [int(id.strip()) for id in ADMIN_IDS_STR.split(',') if id.strip()]
 
 # Admin group for applications
-# Murojaatlar adminlar guruhiga yuboriladi
-ADMIN_GROUP_ID = int(os.getenv('ADMIN_GROUP_ID', '-5012065617'))
+ADMIN_GROUP_ID = int(os.getenv('ADMIN_GROUP_ID', '0'))
 
 # Channel settings
-DIGEST_CHANNEL_ID = os.getenv('DIGEST_CHANNEL_ID', '-1003285608799')
-
-# Library channel settings
-LIBRARY_CHANNELS = {
-    1: {'username': '@tiu_library_top', 'id': None},  # TOP-ADABIYOTLAR
-    2: {'username': '@tiu_library_economics', 'id': None},  # IQTISODIY ADABIYOTLAR
-    3: {'username': '@tiu_library_fiction', 'id': None},  # BADIY ADABIYOTLAR
-    4: {'username': '@tiu_library_it', 'id': None},  # IT SOHA
-    5: {'username': '@tiu_library_education', 'id': None},  # TA'LIM ADABIYOTLARI
-    6: {'username': '@tiu_library_languages', 'id': None},  # XORIJIY TIL ADABIYOTLARI
-    7: {'username': '@tiu_library_law', 'id': None},  # HUQUQIY SOHA
-    8: {'username': '@tiu_library_science', 'id': None},  # ILMIY ADABIYOTLAR
-    9: {'username': '@tiu_library_other', 'id': None},  # BOSHQA TURDAGI
-}
+DIGEST_CHANNEL_ID = os.getenv('DIGEST_CHANNEL_ID', '')
 
 # Database settings
 DATABASE_NAME = 'tiu_bot.db'
