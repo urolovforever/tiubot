@@ -470,7 +470,7 @@ Experience the TIU atmosphere right now 👇'''
     keyboard = InlineKeyboardMarkup(inline_keyboard=[
         [InlineKeyboardButton(
             text=button_texts.get(lang, button_texts['uz']),
-            url="https://test.tiu.uz/tour/"  # 3D sayohat web sayt manzilini bu yerga qo'ying
+            url="https://pro360.uz/tiu/"  # 3D sayohat web sayt manzilini bu yerga qo'ying
         )]
     ])
 
