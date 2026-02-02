@@ -213,7 +213,7 @@ class Database:
             c.execute(
                 "INSERT OR REPLACE INTO users VALUES (?,?,?,?,?)",
                 (user_id, username, full_name, language,
-                 datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
+                 get_tashkent_now().strftime("%Y-%m-%d %H:%M:%S"))
             )
             conn.commit()
         except Exception as e:
@@ -282,7 +282,7 @@ class Database:
                    (user_id, username, full_name, phone_number, message, file_id, status, created_at, admin_response, user_type, app_type, is_anonymous)
                    VALUES (?,?,?,?,?,?,?,?,?,?,?,?)''',
                 (user_id, username, full_name, phone_number, message, file_id, 'new',
-                 datetime.now().strftime("%Y-%m-%d %H:%M:%S"), None, user_type, app_type, 1 if is_anonymous else 0)
+                 get_tashkent_now().strftime("%Y-%m-%d %H:%M:%S"), None, user_type, app_type, 1 if is_anonymous else 0)
             )
             app_id = c.lastrowid
             conn.commit()
@@ -493,25 +493,28 @@ class Database:
             else:
                 days = 7
 
+            # Tashkent vaqti bo'yicha cutoff sanani hisoblash
+            cutoff_date = (get_tashkent_now() - timedelta(days=days)).strftime("%Y-%m-%d")
+
             # Yangi foydalanuvchilar
-            c.execute(f"""
-                SELECT COUNT(*) FROM users 
-                WHERE date(registration_date) >= date('now', '-{days} days')
-            """)
+            c.execute("""
+                SELECT COUNT(*) FROM users
+                WHERE date(registration_date) >= ?
+            """, (cutoff_date,))
             new_users = c.fetchone()[0]
 
             # Yangi murojaatlar
-            c.execute(f"""
-                SELECT COUNT(*) FROM applications 
-                WHERE date(created_at) >= date('now', '-{days} days')
-            """)
+            c.execute("""
+                SELECT COUNT(*) FROM applications
+                WHERE date(created_at) >= ?
+            """, (cutoff_date,))
             new_applications = c.fetchone()[0]
 
             # Javob berilgan murojaatlar
-            c.execute(f"""
-                SELECT COUNT(*) FROM applications 
-                WHERE status='answered' AND date(created_at) >= date('now', '-{days} days')
-            """)
+            c.execute("""
+                SELECT COUNT(*) FROM applications
+                WHERE status='answered' AND date(created_at) >= ?
+            """, (cutoff_date,))
             answered = c.fetchone()[0]
 
             # Javob berilmagan
@@ -551,7 +554,7 @@ class Database:
                 '''INSERT INTO events (title, description, date, time, location, registration_link, image_id, created_at)
                    VALUES (?,?,?,?,?,?,?,?)''',
                 (title, description, date, time, location, registration_link, image_id,
-                 datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
+                 get_tashkent_now().strftime("%Y-%m-%d %H:%M:%S"))
             )
             event_id = c.lastrowid
             conn.commit()
@@ -673,7 +676,7 @@ class Database:
             c.execute(
                 '''INSERT INTO event_reminders (event_id, user_id, reminder_type, sent_at)
                    VALUES (?,?,?,?)''',
-                (event_id, user_id, reminder_type, datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
+                (event_id, user_id, reminder_type, get_tashkent_now().strftime("%Y-%m-%d %H:%M:%S"))
             )
             conn.commit()
         except Exception as e:
@@ -789,7 +792,7 @@ class Database:
                     '''INSERT INTO schedules (faculty, course, group_name, image_id, created_at)
                        VALUES (?,?,?,?,?)''',
                     (faculty, course, group_name, image_id,
-                     datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
+                     get_tashkent_now().strftime("%Y-%m-%d %H:%M:%S"))
                 )
                 schedule_id = c.lastrowid
 
@@ -873,7 +876,7 @@ class Database:
             c.execute(
                 '''INSERT OR REPLACE INTO channel_posts (channel_id, message_id, post_date)
                    VALUES (?, ?, ?)''',
-                (channel_id, message_id, datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
+                (channel_id, message_id, get_tashkent_now().strftime("%Y-%m-%d %H:%M:%S"))
             )
             conn.commit()
         except Exception as e:
@@ -1018,7 +1021,7 @@ class Database:
             # Save to downloads table
             c.execute(
                 "INSERT INTO library_downloads (book_id, user_id, downloaded_at) VALUES (?,?,?)",
-                (book_id, user_id, datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
+                (book_id, user_id, get_tashkent_now().strftime("%Y-%m-%d %H:%M:%S"))
             )
             conn.commit()
         except Exception as e:
@@ -1044,7 +1047,7 @@ class Database:
                 # Add to favorites
                 c.execute(
                     "INSERT INTO library_favorites (book_id, user_id, added_at) VALUES (?,?,?)",
-                    (book_id, user_id, datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
+                    (book_id, user_id, get_tashkent_now().strftime("%Y-%m-%d %H:%M:%S"))
                 )
                 conn.commit()
                 return True
@@ -1164,7 +1167,7 @@ class Database:
         try:
             c.execute(
                 "INSERT OR REPLACE INTO media_cache (media_key, file_id, cached_at) VALUES (?, ?, ?)",
-                (media_key, file_id, datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
+                (media_key, file_id, get_tashkent_now().strftime("%Y-%m-%d %H:%M:%S"))
             )
             conn.commit()
         except Exception as e:
@@ -1200,7 +1203,7 @@ class Database:
             c.execute("DELETE FROM student_contracts")
 
             # Insert new data
-            upload_date = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+            upload_date = get_tashkent_now().strftime("%Y-%m-%d %H:%M:%S")
             inserted_count = 0
 
             for contract in contracts_data:

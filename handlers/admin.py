@@ -313,7 +313,7 @@ async def show_weekly_statistics(message: types.Message):
 👥 Jami foydalanuvchilar: {stats.get('total_users', 0)}
 📬 Jami murojaatlar: {stats.get('total_applications', 0)}
 
-📅 {datetime.now().strftime("%Y-%m-%d %H:%M")}'''
+📅 {get_tashkent_now().strftime("%Y-%m-%d %H:%M")}'''
 
     await message.answer(text, reply_markup=get_admin_keyboard(user_id))
 
@@ -337,7 +337,7 @@ async def show_monthly_statistics(message: types.Message):
 👥 Jami foydalanuvchilar: {stats.get('total_users', 0)}
 📬 Jami murojaatlar: {stats.get('total_applications', 0)}
 
-📅 {datetime.now().strftime("%Y-%m-%d %H:%M")}'''
+📅 {get_tashkent_now().strftime("%Y-%m-%d %H:%M")}'''
 
     await message.answer(text, reply_markup=get_admin_keyboard(user_id))
 
@@ -852,7 +852,7 @@ async def process_schedule_image(message: types.Message, state: FSMContext):
             c.execute(
                 '''INSERT INTO schedules (faculty, direction, course, group_name, image_id, created_at)
                    VALUES (?,?,?,?,?,?)''',
-                (faculty, direction, course, group, image_id, datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
+                (faculty, direction, course, group, image_id, get_tashkent_now().strftime("%Y-%m-%d %H:%M:%S"))
             )
 
         conn.commit()
@@ -1053,17 +1053,17 @@ async def process_contract_excel(message: types.Message, state: FSMContext):
 
 📊 Yuklangan: {inserted_count} ta
 📁 Fayl: {file_name}
-📅 Sana: {datetime.now().strftime("%Y-%m-%d %H:%M")}''',
+📅 Sana: {get_tashkent_now().strftime("%Y-%m-%d %H:%M")}''',
                 'ru': f'''✅ <b>Данные контрактов загружены!</b>
 
 📊 Загружено: {inserted_count} шт.
 📁 Файл: {file_name}
-📅 Дата: {datetime.now().strftime("%Y-%m-%d %H:%M")}''',
+📅 Дата: {get_tashkent_now().strftime("%Y-%m-%d %H:%M")}''',
                 'en': f'''✅ <b>Contract data uploaded!</b>
 
 📊 Uploaded: {inserted_count} records
 📁 File: {file_name}
-📅 Date: {datetime.now().strftime("%Y-%m-%d %H:%M")}'''
+📅 Date: {get_tashkent_now().strftime("%Y-%m-%d %H:%M")}'''
             }
 
             result_text = success_texts.get(lang, success_texts['uz'])
