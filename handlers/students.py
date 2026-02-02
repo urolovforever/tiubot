@@ -762,7 +762,9 @@ Please enter the correct passport series or contact the administrator.'''
 💰 <b>Kontrakt summasi:</b> {format_amount(total_amount)} so'm
 💳 <b>To'langan:</b> {format_amount(paid_amount)} so'm
 📊 <b>To'lov foizi:</b> {payment_percentage:.1f}%
-💵 <b>Qoldiq:</b> {format_amount(remaining_amount)} so'm''',
+💵 <b>Qoldiq:</b> {format_amount(remaining_amount)} so'm
+
+<i>Boshqa passport seriyasini kiriting yoki orqaga qayting.</i>''',
 
         'ru': f'''✅ <b>Информация о контракте</b>
 
@@ -772,7 +774,9 @@ Please enter the correct passport series or contact the administrator.'''
 💰 <b>Сумма контракта:</b> {format_amount(total_amount)} сум
 💳 <b>Оплачено:</b> {format_amount(paid_amount)} сум
 📊 <b>Процент оплаты:</b> {payment_percentage:.1f}%
-💵 <b>Остаток:</b> {format_amount(remaining_amount)} сум''',
+💵 <b>Остаток:</b> {format_amount(remaining_amount)} сум
+
+<i>Введите другую серию паспорта или вернитесь назад.</i>''',
 
         'en': f'''✅ <b>Contract Information</b>
 
@@ -782,13 +786,18 @@ Please enter the correct passport series or contact the administrator.'''
 💰 <b>Contract amount:</b> {format_amount(total_amount)} sum
 💳 <b>Paid:</b> {format_amount(paid_amount)} sum
 📊 <b>Payment percentage:</b> {payment_percentage:.1f}%
-💵 <b>Remaining:</b> {format_amount(remaining_amount)} sum'''
+💵 <b>Remaining:</b> {format_amount(remaining_amount)} sum
+
+<i>Enter another passport series or go back.</i>'''
     }
 
-    await state.finish()
+    # State ni tugatmaymiz - yana passport kiritishga ruxsat beramiz
+    keyboard = ReplyKeyboardMarkup(resize_keyboard=True)
+    keyboard.add(KeyboardButton(t(user_id, 'back')))
+
     await message.answer(
         texts.get(lang, texts['uz']),
-        reply_markup=get_students_submenu_keyboard(user_id),
+        reply_markup=keyboard,
         parse_mode='HTML'
     )
 
