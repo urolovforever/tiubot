@@ -218,6 +218,7 @@ TRANSLATIONS = {
         'answered_applications': '✅ Отвеченные',
         'statistics': '📊 Статистика',
         'broadcast': '📢 Рассылка',
+        'no_new_applications': '📭 Нет новых обращений',
         'reply_to_application': '💬 Напишите ответ:',
         'response_sent': '✅ Ответ отправлен',
 
@@ -366,6 +367,7 @@ TRANSLATIONS = {
         'answered_applications': '✅ Answered',
         'statistics': '📊 Statistics',
         'broadcast': '📢 Broadcast',
+        'no_new_applications': '📭 No new applications',
         'reply_to_application': '💬 Write reply:',
         'response_sent': '✅ Response sent',
 
