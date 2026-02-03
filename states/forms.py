@@ -51,12 +51,6 @@ class BroadcastState(StatesGroup):
 class OnboardingState(StatesGroup):
     waiting_for_language = State()
 
-# Library navigation states
-class LibraryStates(StatesGroup):
-    choosing_category = State()  # Kategoriya tanlash
-    browsing_books = State()  # Kitoblarni ko'rish
-    searching_books = State()  # Qidirish
-
 # Schedule upload states (admin)
 class ScheduleUploadState(StatesGroup):
     waiting_for_faculty = State()

@@ -159,19 +159,6 @@ def sample_contracts_list():
 
 
 @pytest.fixture
-def sample_library_category():
-    """Sample library category data."""
-    return {
-        'name_uz': 'Test Kategoriya',
-        'name_ru': 'Тестовая категория',
-        'name_en': 'Test Category',
-        'emoji': '📚',
-        'channel_id': '-1001234567890',
-        'channel_username': '@test_channel'
-    }
-
-
-@pytest.fixture
 def populated_db(temp_db, sample_user, sample_user_ru, sample_application, sample_event):
     """Database pre-populated with test data."""
     # Add users

@@ -108,44 +108,6 @@ TRANSLATIONS = {
 📱 Instagram: @tiuofficial
 🎓 Telegram: @tiuofficial''',
 
-        # Library
-        'library': '📚 Kutubxona',
-        'library_title': '📚 KUTUBXONA\n\nKategoriyani tanlang:',
-        'library_category_books': '📚 {category} ({count} kitob)',
-        'library_books_list': '📚 {category} ({total} kitob)\n\nKerakli kitob raqamini yozing:',
-        'library_book_downloading': '📥 Yuklanmoqda...',
-        'library_book_details': '''📘 {title}
-✍️ Muallif: {author}
-📅 Yil: {year}
-📄 Sahifalar: {pages}
-🗂 Kategoriya: {category}
-🌐 Til: {language}
-
-{description}''',
-        'library_book_sent': '✅ Kitob muvaffaqiyatli yuborildi!\n\n💡 Boshqa kitoblar:\n- Keyingi kitob: /{next}\n- Kategoriyaga qaytish: /back',
-        'library_book_not_found': '❌ Kitob topilmadi',
-        'library_search_prompt': '🔍 Qidirish: Kitob yoki muallif nomini yozing',
-        'library_search_results': '🔍 Qidiruv natijalari "{query}":\n\n',
-        'library_no_search_results': '❌ Hech narsa topilmadi. Boshqa so\'z bilan qidiring.',
-        'library_next_page': '📄 Keyingi 15 ta: /next',
-        'library_prev_page': '📄 Oldingi 15 ta: /prev',
-        'library_back': '🔙 Orqaga: /back',
-        'library_favorite_added': '⭐ Sevimlilar ro\'yxatiga qo\'shildi!',
-        'library_favorite_removed': '💔 Sevimlilardan o\'chirildi',
-        'library_favorites': '⭐ Sevimli kitoblar',
-        'library_no_favorites': '📭 Sevimli kitoblar yo\'q',
-        'library_featured': '🌟 Tavsiya etiladigan kitoblar',
-        'library_stats': '''📊 Kutubxona statistikasi:
-
-📚 Jami kitoblar: {total_books}
-📥 Jami yuklab olishlar: {total_downloads}
-👥 Faol foydalanuvchilar: {active_users}
-
-🔝 Top kategoriyalar:
-{top_categories}
-
-📖 Top kitoblar:
-{top_books}''',
     },
 
     'ru': {
@@ -257,44 +219,6 @@ TRANSLATIONS = {
 📱 Instagram: @tiuofficial
 🎓 Telegram: @tiuofficial''',
 
-        # Library
-        'library': '📚 Библиотека',
-        'library_title': '📚 БИБЛИОТЕКА\n\nВыберите категорию:',
-        'library_category_books': '📚 {category} ({count} книг)',
-        'library_books_list': '📚 {category} ({total} книг)\n\nВведите номер нужной книги:',
-        'library_book_downloading': '📥 Загрузка...',
-        'library_book_details': '''📘 {title}
-✍️ Автор: {author}
-📅 Год: {year}
-📄 Страниц: {pages}
-🗂 Категория: {category}
-🌐 Язык: {language}
-
-{description}''',
-        'library_book_sent': '✅ Книга успешно отправлена!\n\n💡 Другие книги:\n- Следующая книга: /{next}\n- Вернуться к категории: /back',
-        'library_book_not_found': '❌ Книга не найдена',
-        'library_search_prompt': '🔍 Поиск: Введите название книги или автора',
-        'library_search_results': '🔍 Результаты поиска "{query}":\n\n',
-        'library_no_search_results': '❌ Ничего не найдено. Попробуйте другой запрос.',
-        'library_next_page': '📄 Следующие 15: /next',
-        'library_prev_page': '📄 Предыдущие 15: /prev',
-        'library_back': '🔙 Назад: /back',
-        'library_favorite_added': '⭐ Добавлено в избранное!',
-        'library_favorite_removed': '💔 Удалено из избранного',
-        'library_favorites': '⭐ Избранные книги',
-        'library_no_favorites': '📭 Нет избранных книг',
-        'library_featured': '🌟 Рекомендуемые книги',
-        'library_stats': '''📊 Статистика библиотеки:
-
-📚 Всего книг: {total_books}
-📥 Всего загрузок: {total_downloads}
-👥 Активных пользователей: {active_users}
-
-🔝 Топ категории:
-{top_categories}
-
-📖 Топ книги:
-{top_books}''',
     },
 
     'en': {
@@ -406,44 +330,6 @@ TRANSLATIONS = {
 📱 Instagram: @tiuofficial
 🎓 Telegram: @tiuofficial''',
 
-        # Library
-        'library': '📚 Library',
-        'library_title': '📚 LIBRARY\n\nSelect a category:',
-        'library_category_books': '📚 {category} ({count} books)',
-        'library_books_list': '📚 {category} ({total} books)\n\nEnter the book number:',
-        'library_book_downloading': '📥 Downloading...',
-        'library_book_details': '''📘 {title}
-✍️ Author: {author}
-📅 Year: {year}
-📄 Pages: {pages}
-🗂 Category: {category}
-🌐 Language: {language}
-
-{description}''',
-        'library_book_sent': '✅ Book sent successfully!\n\n💡 Other books:\n- Next book: /{next}\n- Back to category: /back',
-        'library_book_not_found': '❌ Book not found',
-        'library_search_prompt': '🔍 Search: Enter book title or author name',
-        'library_search_results': '🔍 Search results for "{query}":\n\n',
-        'library_no_search_results': '❌ Nothing found. Try another search term.',
-        'library_next_page': '📄 Next 15: /next',
-        'library_prev_page': '📄 Previous 15: /prev',
-        'library_back': '🔙 Back: /back',
-        'library_favorite_added': '⭐ Added to favorites!',
-        'library_favorite_removed': '💔 Removed from favorites',
-        'library_favorites': '⭐ Favorite Books',
-        'library_no_favorites': '📭 No favorite books',
-        'library_featured': '🌟 Featured Books',
-        'library_stats': '''📊 Library Statistics:
-
-📚 Total books: {total_books}
-📥 Total downloads: {total_downloads}
-👥 Active users: {active_users}
-
-🔝 Top categories:
-{top_categories}
-
-📖 Top books:
-{top_books}''',
     }
 }
 
