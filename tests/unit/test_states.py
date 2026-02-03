@@ -13,7 +13,7 @@ from states.forms import (
     ApplicationForm, ScheduleStates, AdminReplyState,
     EventCreateState, EventDeleteState, EventEditState,
     EventQuickCreateState, BroadcastState, OnboardingState,
-    LibraryStates, ScheduleUploadState, ContractLookupState,
+    ScheduleUploadState, ContractLookupState,
     ContractUploadState
 )
 from aiogram.dispatcher.filters.state import StatesGroup
@@ -134,26 +134,6 @@ class TestBroadcastStates:
                 f"BroadcastState should have '{state_name}' state"
 
 
-class TestLibraryStates:
-    """Test LibraryStates state group."""
-
-    def test_library_is_states_group(self):
-        """Test that LibraryStates inherits from StatesGroup."""
-        assert issubclass(LibraryStates, StatesGroup)
-
-    def test_library_has_required_states(self):
-        """Test that LibraryStates has all required states."""
-        required_states = [
-            'choosing_category',
-            'browsing_books',
-            'searching_books'
-        ]
-
-        for state_name in required_states:
-            assert hasattr(LibraryStates, state_name), \
-                f"LibraryStates should have '{state_name}' state"
-
-
 class TestContractStates:
     """Test contract-related state groups."""
 
@@ -237,7 +217,7 @@ class TestAllStateGroupsExist:
             ApplicationForm, ScheduleStates, AdminReplyState,
             EventCreateState, EventDeleteState, EventEditState,
             EventQuickCreateState, BroadcastState, OnboardingState,
-            LibraryStates, ScheduleUploadState, ContractLookupState,
+            ScheduleUploadState, ContractLookupState,
             ContractUploadState
         ]
 

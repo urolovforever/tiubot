@@ -1,6 +1,6 @@
 """
 Unit tests for database operations.
-Tests cover all CRUD operations for users, applications, events, contracts, and library.
+Tests cover all CRUD operations for users, applications, events, and contracts.
 """
 
 import pytest
@@ -28,9 +28,7 @@ class TestDatabaseInitialization:
 
         expected_tables = {
             'users', 'applications', 'events', 'event_reminders',
-            'schedules', 'channel_posts', 'library_categories',
-            'library_books', 'library_downloads', 'library_favorites',
-            'media_cache', 'student_contracts'
+            'schedules', 'channel_posts', 'media_cache', 'student_contracts'
         }
 
         for table in expected_tables:
